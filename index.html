@@ -15,7 +15,7 @@
         body {
             margin: 0;
             overflow: hidden;
-            background-color: #030008;
+            background-color: #020005;
             font-family: 'Inter', sans-serif;
             color: #e2e8f0;
             user-select: none;
@@ -52,20 +52,20 @@
             position: absolute;
             transform: translate(-50%, -50%);
             padding: 8px 16px;
-            background: rgba(10, 5, 20, 0.75);
+            background: rgba(10, 5, 25, 0.85);
             border: 2px solid #00f0ff;
             border-radius: 4px;
             font-family: 'Orbitron', sans-serif;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 800;
             letter-spacing: 2px;
             white-space: nowrap;
             transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             opacity: 0.9;
-            backdrop-filter: blur(8px);
+            backdrop-filter: blur(12px);
             cursor: pointer;
             pointer-events: auto;
-            box-shadow: 0 0 15px rgba(0, 240, 255, 0.3), inset 0 0 10px rgba(0, 240, 255, 0.1);
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.3), inset 0 0 10px rgba(0, 240, 255, 0.1);
             color: #00f0ff;
             text-shadow: 0 0 5px rgba(0, 240, 255, 0.5);
         }
@@ -82,19 +82,19 @@
         }
 
         .planet-label:hover {
-            background: rgba(255, 0, 127, 0.2);
+            background: rgba(255, 0, 127, 0.25);
             border-color: #ff007f;
             color: #fff;
             transform: translate(-50%, -50%) scale(1.15);
-            box-shadow: 0 0 25px rgba(255, 0, 127, 0.6), inset 0 0 15px rgba(255, 0, 127, 0.2);
+            box-shadow: 0 0 30px rgba(255, 0, 127, 0.7), inset 0 0 15px rgba(255, 0, 127, 0.3);
             text-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
         }
 
         .center-label {
             border-color: #ffaa00;
             color: #ffaa00;
-            box-shadow: 0 0 20px rgba(255, 170, 0, 0.4);
-            text-shadow: 0 0 8px rgba(255, 170, 0, 0.6);
+            box-shadow: 0 0 25px rgba(255, 170, 0, 0.5);
+            text-shadow: 0 0 8px rgba(255, 170, 0, 0.7);
         }
 
         .center-label::before {
@@ -103,16 +103,16 @@
         }
 
         .cyber-panel {
-            background: rgba(10, 4, 22, 0.8);
-            border: 1px solid rgba(0, 240, 255, 0.3);
-            box-shadow: 0 0 30px rgba(0, 240, 255, 0.15), inset 0 0 20px rgba(0, 240, 255, 0.05);
-            backdrop-filter: blur(12px);
+            background: rgba(8, 3, 18, 0.85);
+            border: 1px solid rgba(0, 240, 255, 0.25);
+            box-shadow: 0 0 35px rgba(0, 240, 255, 0.15), inset 0 0 20px rgba(0, 240, 255, 0.05);
+            backdrop-filter: blur(15px);
             transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .cyber-panel:hover {
-            border-color: rgba(0, 240, 255, 0.6);
-            box-shadow: 0 0 40px rgba(0, 240, 255, 0.25);
+            border-color: rgba(0, 240, 255, 0.5);
+            box-shadow: 0 0 45px rgba(0, 240, 255, 0.3);
         }
 
         .cyber-btn-neon {
@@ -125,7 +125,7 @@
 
         .cyber-btn-neon:hover {
             background: #00f0ff;
-            color: #030008;
+            color: #020005;
             box-shadow: 0 0 25px #00f0ff;
             text-shadow: none;
         }
@@ -149,7 +149,7 @@
             width: 4px;
         }
         .custom-scroll::-webkit-scrollbar-track {
-            background: rgba(0, 0, 0, 0.2);
+            background: rgba(0, 0, 0, 0.3);
         }
         .custom-scroll::-webkit-scrollbar-thumb {
             background: #00f0ff;
@@ -166,10 +166,11 @@
             display: block;
             position: absolute;
             top: 0; left: 0; bottom: 0; right: 0;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.3) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.04), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.04));
             z-index: 2;
-            background-size: 100% 2px, 3px 100%;
+            background-size: 100% 3px, 3px 100%;
             pointer-events: none;
+            opacity: 0.7;
         }
 
         @keyframes pulse-glow {
@@ -201,7 +202,7 @@
 </head>
 <body class="scanline-effect overflow-hidden bg-[#020005]">
     <!-- Loading Screen -->
-    <div id="loading" class="absolute inset-0 bg-[#030009] z-50 flex justify-center items-center">
+    <div id="loading" class="absolute inset-0 bg-[#020005] z-50 flex justify-center items-center">
         <div class="flex flex-col items-center max-w-md p-6 text-center">
             <div class="relative w-24 h-24 mb-6">
                 <div class="absolute inset-0 rounded-full border-2 border-t-[#ff007f] border-[#00f0ff]/10 animate-spin"></div>
@@ -210,8 +211,8 @@
                     <i class="fa-solid fa-microchip text-2xl text-[#00f0ff] animate-pulse"></i>
                 </div>
             </div>
-            <h2 class="text-2xl font-cyber tracking-[0.2em] text-[#00f0ff] uppercase font-bold mb-2">KV-CORE CHƯA TẢI</h2>
-            <div class="font-mono-tech text-xs text-rose-500 tracking-wider animate-pulse mb-4">INITIALIZING SYSTEM ENGINES [V.4.2]...</div>
+            <h2 class="text-2xl font-cyber tracking-[0.2em] text-[#00f0ff] uppercase font-bold mb-2">KV-CORE HIGH RESOLUTION</h2>
+            <div class="font-mono-tech text-xs text-rose-500 tracking-wider animate-pulse mb-4">OPTIMIZING GRAPHICS ENGINE & DEPTH BUFFER...</div>
             <div class="w-64 h-1 bg-[#110d26] rounded-full overflow-hidden relative">
                 <div class="absolute top-0 left-0 h-full w-2/3 bg-gradient-to-r from-[#00f0ff] to-[#ff007f] rounded-full animate-pulse"></div>
             </div>
@@ -225,13 +226,13 @@
             <header class="cyber-panel p-5 rounded-lg border-l-4 border-l-[#00f0ff]">
                 <div class="flex items-center gap-3 mb-2">
                     <span class="inline-block w-2.5 h-2.5 rounded-full bg-[#00f0ff] pulse-border"></span>
-                    <span class="font-mono-tech text-xs text-[#00f0ff] tracking-[0.3em]">KV-CORE HUB V.4.2</span>
+                    <span class="font-mono-tech text-xs text-[#00f0ff] tracking-[0.3em]">KV-CORE QUANTUM HUB V.4.3</span>
                 </div>
-                <h1 class="text-2xl md:text-3.5xl font-cyber font-black tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-[#00f0ff] via-[#d946ef] to-[#ff007f] drop-shadow-[0_0_15px_rgba(0,240,255,0.4)]">
+                <h1 class="text-2xl md:text-3.5xl font-cyber font-black tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-[#00f0ff] via-[#d946ef] to-[#ff007f] drop-shadow-[0_0_20px_rgba(0,240,255,0.5)]">
                     KenvinZone
                 </h1>
                 <p class="text-xs text-gray-400 mt-2 font-light leading-relaxed font-mono-tech uppercase">
-                    Mạng phân phối lượng tử. Khám phá 5 vệ tinh nội dung. Nhấn vào hành tinh hoặc trò chuyện với KV-Core AI để giải mã dữ liệu.
+                    Mạng phân phối lượng tử độ phân giải cao. Nhấp chọn hành tinh để kích hoạt Zoom quỹ đạo và mã hóa dữ liệu.
                 </p>
             </header>
 
@@ -240,30 +241,30 @@
                 <h3 class="font-cyber text-xs text-[#ff007f] font-bold mb-3 tracking-widest uppercase">Trạng thái liên kết</h3>
                 <div class="space-y-2 font-mono-tech text-xs">
                     <div class="flex justify-between border-b border-[#00f0ff]/10 pb-1">
-                        <span class="text-gray-400">CORE NETWORK:</span>
-                        <span class="text-[#00f0ff] font-bold">ONLINE</span>
+                        <span class="text-gray-400">CORE RESOLUTION:</span>
+                        <span class="text-yellow-400 font-bold">4K ULTRA DETAILED</span>
                     </div>
                     <div class="flex justify-between border-b border-[#00f0ff]/10 pb-1">
-                        <span class="text-gray-400">GEMINI API NEURONS:</span>
-                        <span class="text-[#00f0ff] font-bold">CONNECTED</span>
+                        <span class="text-gray-400">DEPTH BUFFER:</span>
+                        <span class="text-[#00f0ff] font-bold">MULTI-PARALLAX ACTIVE</span>
                     </div>
                     <div class="flex justify-between border-b border-[#00f0ff]/10 pb-1">
                         <span class="text-gray-400">GRID STABILITY:</span>
-                        <span class="text-emerald-400 font-bold">99.8%</span>
+                        <span class="text-emerald-400 font-bold">100% SECURE</span>
                     </div>
                     <div class="flex justify-between">
-                        <span class="text-gray-400">SECURE QUANTUM LINK:</span>
-                        <span class="text-fuchsia-400 font-bold">ACTIVE</span>
+                        <span class="text-gray-400">GEMINI NEURONS:</span>
+                        <span class="text-fuchsia-400 font-bold">READY (FLASH 3)</span>
                     </div>
                 </div>
             </div>
 
             <!-- Console Output Messages -->
             <div id="hud-console" class="mt-auto pt-4 font-mono-tech text-[10px] text-gray-500 space-y-1">
-                <div>[SYSTEM] Booting KV-Core Engine successfully.</div>
-                <div>[D-LOG] Space Grid initialized with 5000 star cells.</div>
-                <div>[AI-NEU] Gemini 3 Flash ready to analyze.</div>
-                <div class="text-[#00f0ff] animate-pulse">[READY] Click on a node to transmit.</div>
+                <div>[SYSTEM] Booted rendering layer with 3-Layer deep starfield.</div>
+                <div>[D-LOG] Generating dynamic vector hologram meshes.</div>
+                <div>[AI-NEU] Neural interface online.</div>
+                <div class="text-[#00f0ff] animate-pulse">[CONNECTED] Double click to orbital lock-on.</div>
             </div>
         </div>
 
@@ -283,7 +284,6 @@
                         </span>
                         <h2 class="font-cyber text-sm font-black tracking-wider text-[#ff007f]">KV-CORE QUANTUM AI</h2>
                     </div>
-                    <!-- Close/Open AI Panel Button on Mobile -->
                     <button id="toggle-ai-btn" class="text-xs font-mono-tech text-[#00f0ff] hover:text-[#ff007f]">
                         <i class="fa-solid fa-terminal mr-1"></i> [CONSOLE]
                     </button>
@@ -296,11 +296,11 @@
                         <div class="w-6 h-6 rounded bg-[#ff007f]/20 border border-[#ff007f] flex items-center justify-center text-[10px] text-[#ff007f] font-cyber">AI</div>
                         <div class="flex-1 space-y-2">
                             <div class="p-3 rounded bg-[#ff007f]/10 border border-[#ff007f]/20 text-[#ff007f] font-mono-tech text-xs rounded-tl-none">
-                                Chào mừng bạn đến với KenvinZone v4.2. Tôi là **KV-Core**, Trí Tuệ Nhân Tạo Lượng Tử của hệ sinh thái này.
+                                Chào mừng bạn đến với KenvinZone v4.3 (Hệ quy chiếu đồ họa đa tầng). Tôi là **KV-Core AI**.
                                 <br><br>
-                                Tôi có thể phân tích thông số kỹ thuật của 5 Vệ Tinh Subdomain hoặc dự đoán dòng năng lượng Cyberpunk. 
+                                Không gian lượng tử hiện tại đã nâng cấp đồ phân giải hạt tinh vi và tạo vân cấu trúc ảo giác 3D.
                                 <br><br>
-                                🪐 **Nhấp vào một hành tinh** hoặc sử dụng các liên kết nhanh bên dưới để ra lệnh cho tôi!
+                                🪐 **Nhấp chọn một hành tinh** hoặc sử dụng bảng điều khiển nhanh để ra lệnh giải mã dữ liệu!
                             </div>
                         </div>
                     </div>
@@ -356,18 +356,17 @@
     <!-- 3D Canvas Container -->
     <div id="canvas-container"></div>
 
-    <!-- Three.js Implementation -->
     <script type="module">
         import * as THREE from 'three';
         import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
         const systemData = [
-            { id: 'main', name: 'KenvinZone', type: 'star', url: 'https://kenvinzone.com', radius: 4.2, color: 0xff0055, emissive: 0xff0040, desc: 'TỔ HỢP TRUNG TÂM LƯỢNG TỬ KENVINZONE', emoji: '🌟' },
-            { id: 'vnindex', name: 'VN-Index', type: 'planet', url: 'https://vnindex.kenvinzone.com', radius: 1.4, distance: 11, speed: 0.007, color: 0x00f0ff, angle: Math.random() * Math.PI * 2, desc: 'DỮ LIỆU BẢNG GIÁ & CHỈ SỐ THỊ TRƯỜNG CHỨNG KHOÁN VIỆT NAM', emoji: '📈' },
-            { id: 'aiclass', name: 'AI Class', type: 'planet', url: 'https://aiclass.kenvinzone.com', radius: 1.6, distance: 16, speed: 0.005, color: 0xd946ef, angle: Math.random() * Math.PI * 2, desc: 'LỚP HỌC TRÍ TUỆ NHÂN TẠO & PHÁT TRIỂN ỨNG DỤNG THẾ HỆ MỚI', emoji: '🎓' },
-            { id: 'trading', name: 'Trading Tool', type: 'planet', url: 'https://tradingtool.kenvinzone.com', radius: 1.3, distance: 21, speed: 0.004, color: 0xffaa00, angle: Math.random() * Math.PI * 2, desc: 'CÔNG CỤ PHÂN TÍCH KỸ THUẬT & TRỢ LÝ GIAO DỊCH TÀI CHÍNH', emoji: '🛠️' },
-            { id: 'gold', name: 'Gold & Nasdaq', type: 'planet', url: 'https://gold-nasdaq.kenvinzone.com', radius: 1.5, distance: 26, speed: 0.003, color: 0x00ffaa, angle: Math.random() * Math.PI * 2, desc: 'BIỂU ĐỒ & BÁO CÁO PHÂN TÍCH GIÁ VÀNG & CHỈ SỐ NASDAQ TOÀN CẦU', emoji: '🟡' },
-            { id: 'ainews', name: 'AI News', type: 'planet', url: 'https://ainews.kenvinzone.com', radius: 1.1, distance: 31, speed: 0.002, color: 0x3b82f6, angle: Math.random() * Math.PI * 2, desc: 'BẢN TIN SỰ KIỆN & CẬP NHẬT CÔNG NGHỆ CHUYÊN SÂU AI', emoji: '📰' }
+            { id: 'main', name: 'KenvinZone', type: 'star', url: 'https://kenvinzone.com', radius: 4.5, color: 0xff0055, emissive: 0xff0033, desc: 'TỔ HỢP TRUNG TÂM LƯỢNG TỬ KENVINZONE', emoji: '🌟' },
+            { id: 'vnindex', name: 'VN-Index', type: 'planet', url: 'https://vnindex.kenvinzone.com', radius: 1.5, distance: 12, speed: 0.007, color: 0x00f0ff, angle: Math.random() * Math.PI * 2, desc: 'DỮ LIỆU BẢNG GIÁ & CHỈ SỐ THỊ TRƯỜNG CHỨNG KHOÁN VIỆT NAM', emoji: '📈' },
+            { id: 'aiclass', name: 'AI Class', type: 'planet', url: 'https://aiclass.kenvinzone.com', radius: 1.7, distance: 17, speed: 0.005, color: 0xd946ef, angle: Math.random() * Math.PI * 2, desc: 'LỚP HỌC TRÍ TUỆ NHÂN TẠO & PHÁT TRIỂN ỨNG DỤNG THẾ HỆ MỚI', emoji: '🎓' },
+            { id: 'trading', name: 'Trading Tool', type: 'planet', url: 'https://tradingtool.kenvinzone.com', radius: 1.4, distance: 22, speed: 0.004, color: 0xffaa00, angle: Math.random() * Math.PI * 2, desc: 'CÔNG CỤ PHÂN TÍCH KỸ THUẬT & TRỢ LÝ GIAO DỊCH TÀI CHÍNH', emoji: '🛠️' },
+            { id: 'gold', name: 'Gold & Nasdaq', type: 'planet', url: 'https://gold-nasdaq.kenvinzone.com', radius: 1.6, distance: 27, speed: 0.003, color: 0x00ffaa, angle: Math.random() * Math.PI * 2, desc: 'BIỂU ĐỒ & BÁO CÁO PHÂN TÍCH GIÁ VÀNG & CHỈ SỐ NASDAQ TOÀN CẦU', emoji: '🟡' },
+            { id: 'ainews', name: 'AI News', type: 'planet', url: 'https://ainews.kenvinzone.com', radius: 1.2, distance: 32, speed: 0.002, color: 0x3b82f6, angle: Math.random() * Math.PI * 2, desc: 'BẢN TIN SỰ KIỆN & CẬP NHẬT CÔNG NGHỆ CHUYÊN SÂU AI', emoji: '📰' }
         ];
 
         // Scene Setup
@@ -375,74 +374,157 @@
         const labelsContainer = document.getElementById('labels-container');
         
         const scene = new THREE.Scene();
-        scene.fog = new THREE.FogExp2(0x020006, 0.012);
+        scene.fog = new THREE.FogExp2(0x020005, 0.015);
 
         const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.set(0, 40, 65);
+        camera.position.set(0, 45, 75);
 
-        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        // Advanced anti-aliasing & high definition renderer settings
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "high-performance" });
         renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        // Supports ultra-sharp high DPI resolution screens up to a scale factor of 3
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 3));
+        
+        // Premium Cinematic tone mapping config
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 1.35;
         container.appendChild(renderer.domElement);
 
         const controls = new OrbitControls(camera, renderer.domElement);
         controls.enableDamping = true;
-        controls.dampingFactor = 0.05;
-        controls.maxDistance = 180;
-        controls.minDistance = 10;
-        controls.maxPolarAngle = Math.PI / 2 + 0.1;
+        controls.dampingFactor = 0.04;
+        controls.maxDistance = 160;
+        controls.minDistance = 8;
+        controls.maxPolarAngle = Math.PI / 2 + 0.05;
 
-        // Ambient and point lights setup
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.15);
+        // Ambient Light to prevent pitch black spots
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.08);
         scene.add(ambientLight);
 
-        // Core central glowing sun light
-        const coreLight = new THREE.PointLight(0xff00a0, 50, 150, 0.8);
+        // Core central glowing sun light sources
+        const coreLight = new THREE.PointLight(0xff0066, 60, 160, 0.8);
         coreLight.position.set(0, 0, 0);
         scene.add(coreLight);
 
-        const coreLightCyan = new THREE.PointLight(0x00f0ff, 40, 100, 1.2);
+        const coreLightCyan = new THREE.PointLight(0x00f0ff, 45, 110, 1.1);
         coreLightCyan.position.set(0, 0, 0);
         scene.add(coreLightCyan);
 
         const celestialBodies = [];
         const planetMeshes = [];
 
-        // Advanced Space Grid
+        // Advanced Holographic Ground Mesh
         function createHoloGridFloor() {
-            const size = 100;
-            const divisions = 50;
-            const gridHelper = new THREE.GridHelper(size, divisions, 0xff007f, 0x110826);
-            gridHelper.position.y = -6;
-            gridHelper.material.opacity = 0.15;
+            const size = 120;
+            const divisions = 60;
+            const gridHelper = new THREE.GridHelper(size, divisions, 0xff007f, 0x0a041f);
+            gridHelper.position.y = -8;
+            gridHelper.material.opacity = 0.22;
             gridHelper.material.transparent = true;
             scene.add(gridHelper);
         }
         createHoloGridFloor();
 
-        // Build System Meshes
+        function createCyberPlanetTexture(baseHexColor, isSun = false) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 1024;
+            canvas.height = 512;
+            const ctx = canvas.getContext('2d');
+
+            // Dark base cosmic gradient
+            const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            grad.addColorStop(0, '#04010a');
+            grad.addColorStop(0.5, '#0a0316');
+            grad.addColorStop(1, '#020005');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Vector HUD-grid lines
+            ctx.strokeStyle = baseHexColor;
+            ctx.lineWidth = 1;
+            ctx.globalAlpha = isSun ? 0.4 : 0.25;
+            
+            // Draw Latitude Lines
+            for (let y = 0; y < canvas.height; y += 16) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(canvas.width, y);
+                ctx.stroke();
+            }
+            // Draw Longitude Lines
+            for (let x = 0; x < canvas.width; x += 32) {
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, canvas.height);
+                ctx.stroke();
+            }
+
+            // Glow Equator band
+            ctx.globalAlpha = 0.7;
+            ctx.lineWidth = 4;
+            ctx.strokeStyle = baseHexColor;
+            ctx.beginPath();
+            ctx.moveTo(0, canvas.height / 2);
+            ctx.lineTo(canvas.width, canvas.height / 2);
+            ctx.stroke();
+
+            // Cybernetic technical data lines & data chips block
+            ctx.fillStyle = baseHexColor;
+            for (let i = 0; i < 15; i++) {
+                ctx.globalAlpha = Math.random() * 0.7 + 0.15;
+                const rx = Math.floor(Math.random() * canvas.width);
+                const ry = Math.floor(Math.random() * (canvas.height - 40)) + 20;
+                const rw = Math.random() * 80 + 20;
+                const rh = Math.random() * 10 + 2;
+                ctx.fillRect(rx, ry, rw, rh);
+
+                // Little structural dots
+                ctx.beginPath();
+                ctx.arc(rx - 5, ry + rh / 2, 2, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            // Digital barcode / pulse lines
+            ctx.globalAlpha = 0.8;
+            ctx.font = '10px Courier New';
+            ctx.fillStyle = baseHexColor;
+            for (let i = 0; i < 4; i++) {
+                const tx = Math.random() * (canvas.width - 200);
+                const ty = Math.random() * (canvas.height - 40) + 20;
+                ctx.fillText("[QUANTUM LNK " + Math.floor(Math.random() * 9999) + "]", tx, ty);
+            }
+
+            const texture = new THREE.CanvasTexture(canvas);
+            texture.wrapS = THREE.RepeatWrapping;
+            texture.wrapT = THREE.ClampToEdgeWrapping;
+            return texture;
+        }
+
+        // Build Highly Detailed Planet Objects with generated textures
         systemData.forEach((data) => {
             let geometry, material;
+            const hexColorStr = '#' + data.color.toString(16).padStart(6, '0');
+            const planetTexture = createCyberPlanetTexture(hexColorStr, data.type === 'star');
 
             if (data.type === 'star') {
-                // Sun Geometry (Wireframe + Core)
-                geometry = new THREE.SphereGeometry(data.radius, 32, 32);
+                // Central Sun Core
+                geometry = new THREE.SphereGeometry(data.radius, 48, 48);
                 material = new THREE.MeshStandardMaterial({
-                    color: data.color,
+                    map: planetTexture,
                     emissive: data.emissive,
-                    emissiveIntensity: 3,
-                    wireframe: false,
+                    emissiveIntensity: 2.8,
                     roughness: 0.1,
-                    metalness: 0.9
+                    metalness: 0.95
                 });
             } else {
                 // Planets
-                geometry = new THREE.SphereGeometry(data.radius, 24, 24);
+                geometry = new THREE.SphereGeometry(data.radius, 36, 36);
                 material = new THREE.MeshStandardMaterial({
-                    color: data.color,
-                    roughness: 0.4,
-                    metalness: 0.8,
-                    emissive: 0x000000
+                    map: planetTexture,
+                    emissive: data.color,
+                    emissiveIntensity: 0.35,
+                    roughness: 0.3,
+                    metalness: 0.85
                 });
             }
 
@@ -455,41 +537,42 @@
                 mesh.position.z = Math.sin(data.angle) * data.distance;
                 planetMeshes.push(mesh);
 
-                // Neon Orbit Rings
-                const orbitGeometry = new THREE.RingGeometry(data.distance - 0.1, data.distance + 0.1, 64);
+                // High Fidelity Quỹ đạo phát sáng neon mờ
+                const orbitGeometry = new THREE.RingGeometry(data.distance - 0.08, data.distance + 0.08, 128);
                 const orbitMaterial = new THREE.MeshBasicMaterial({
                     color: data.color,
                     side: THREE.DoubleSide,
                     transparent: true,
-                    opacity: 0.18
+                    opacity: 0.25
                 });
                 const orbitRing = new THREE.Mesh(orbitGeometry, orbitMaterial);
                 orbitRing.rotation.x = Math.PI / 2;
                 scene.add(orbitRing);
 
-                // Add small glowing indicator ring around each planet
-                const haloGeo = new THREE.RingGeometry(data.radius * 1.15, data.radius * 1.25, 32);
-                const haloMat = new THREE.MeshBasicMaterial({
+                // Dynamic outer structural radar-wireframe ring around the satellite planet
+                const radarGeo = new THREE.RingGeometry(data.radius * 1.25, data.radius * 1.35, 32);
+                const radarMat = new THREE.MeshBasicMaterial({
                     color: data.color,
                     side: THREE.DoubleSide,
                     transparent: true,
-                    opacity: 0.3
+                    opacity: 0.35,
+                    wireframe: true
                 });
-                const planetHalo = new THREE.Mesh(haloGeo, haloMat);
-                planetHalo.rotation.x = Math.PI / 2;
-                mesh.add(planetHalo);
+                const planetRadar = new THREE.Mesh(radarGeo, radarMat);
+                planetRadar.rotation.x = Math.PI / 2;
+                mesh.add(planetRadar);
 
             } else {
                 mesh.position.set(0, 0, 0);
                 planetMeshes.push(mesh);
 
-                // Holographic Saturn-like Cyber Ring for the sun
-                const ringGeo = new THREE.RingGeometry(data.radius * 1.4, data.radius * 2.2, 64);
+                // Giant Holographic Wireframe Orbital Ring for the sun
+                const ringGeo = new THREE.RingGeometry(data.radius * 1.4, data.radius * 2.3, 96);
                 const ringMat = new THREE.MeshBasicMaterial({
                     color: 0xff007f,
                     side: THREE.DoubleSide,
                     transparent: true,
-                    opacity: 0.25,
+                    opacity: 0.3,
                     wireframe: true
                 });
                 const sunRing = new THREE.Mesh(ringGeo, ringMat);
@@ -502,7 +585,7 @@
             // Create CSS 2D Labels
             const labelDiv = document.createElement('div');
             labelDiv.className = `planet-label ${data.type === 'star' ? 'center-label' : ''}`;
-            labelDiv.innerHTML = `<i class="fa-solid ${data.type === 'star' ? 'fa-bolt' : 'fa-circle-dot'} mr-1.5 text-[10px]"></i>${data.name}`;
+            labelDiv.innerHTML = `<i class="fa-solid ${data.type === 'star' ? 'fa-bolt animate-pulse' : 'fa-circle-notch animate-spin'} mr-1.5 text-[10px]"></i>${data.name}`;
             
             labelDiv.addEventListener('click', () => {
                 selectPlanetAndFocus(mesh);
@@ -517,14 +600,17 @@
             });
         });
 
-        function createStarfield() {
-            const starsGeometry = new THREE.BufferGeometry();
-            const starsCount = 4500;
-            const posArray = new Float32Array(starsCount * 3);
-            const colorsArray = new Float32Array(starsCount * 3);
+        const starLayers = [];
 
-            for (let i = 0; i < starsCount * 3; i+=3) {
-                const radius = 150 + Math.random() * 350;
+        function createStarfieldLayer(count, size, distanceRange, colorHex, speedMult) {
+            const starsGeometry = new THREE.BufferGeometry();
+            const posArray = new Float32Array(count * 3);
+            const colorsArray = new Float32Array(count * 3);
+            const color = new THREE.Color(colorHex);
+
+            for (let i = 0; i < count * 3; i += 3) {
+                // Spherical distribution around central core
+                const radius = distanceRange.min + Math.random() * (distanceRange.max - distanceRange.min);
                 const theta = 2 * Math.PI * Math.random();
                 const phi = Math.acos(2 * Math.random() - 1);
                 
@@ -532,32 +618,38 @@
                 posArray[i+1] = radius * Math.sin(phi) * Math.sin(theta);
                 posArray[i+2] = radius * Math.cos(phi);
 
-                // Pure Cyberpunk Colors: Magenta, Cyan, Purple
-                const colorRand = Math.random();
-                if (colorRand > 0.8) {
-                    colorsArray[i] = 1; colorsArray[i+1] = 0; colorsArray[i+2] = 0.5; // Magenta
-                } else if (colorRand > 0.5) {
-                    colorsArray[i] = 0; colorsArray[i+1] = 0.94; colorsArray[i+2] = 1; // Cyan
-                } else {
-                    colorsArray[i] = 0.6; colorsArray[i+1] = 0.2; colorsArray[i+2] = 1; // Purple
-                }
+                colorsArray[i] = color.r + (Math.random() - 0.5) * 0.2;
+                colorsArray[i+1] = color.g + (Math.random() - 0.5) * 0.2;
+                colorsArray[i+2] = color.b + (Math.random() - 0.5) * 0.2;
             }
 
             starsGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
             starsGeometry.setAttribute('color', new THREE.BufferAttribute(colorsArray, 3));
 
             const starsMaterial = new THREE.PointsMaterial({
-                size: 0.75,
+                size: size,
                 vertexColors: true,
                 transparent: true,
-                opacity: 0.9,
-                blending: THREE.AdditiveBlending
+                opacity: 0.85,
+                blending: THREE.AdditiveBlending,
+                sizeAttenuation: true
             });
 
-            const starMesh = new THREE.Points(starsGeometry, starsMaterial);
-            scene.add(starMesh);
+            const starPoints = new THREE.Points(starsGeometry, starsMaterial);
+            scene.add(starPoints);
+
+            starLayers.push({
+                mesh: starPoints,
+                speed: speedMult
+            });
         }
-        createStarfield();
+
+        // Layer 1: Inner Nebula dust particles (Dense, very small, pinkish/violet)
+        createStarfieldLayer(1500, 0.45, { min: 40, max: 130 }, 0xff00af, 0.03);
+        // Layer 2: Main Cyan grid constellations (Medium, cyan/blue)
+        createStarfieldLayer(2000, 0.65, { min: 80, max: 220 }, 0x00f0ff, 0.015);
+        // Layer 3: Distant deep cosmos (Tiny, slow, pure bright white/yellow stars)
+        createStarfieldLayer(2500, 0.35, { min: 200, max: 400 }, 0xffffff, 0.005);
 
         // Raycaster Interaction Logic
         const raycaster = new THREE.Raycaster();
@@ -565,9 +657,8 @@
         let hoveredMesh = null;
         let selectedMesh = null;
 
-        // Interactive Cam Target Position for smooth transition
         const targetCamPos = new THREE.Vector3();
-        let transitionProgress = 1; // 0 to 1
+        let transitionProgress = 1;
 
         function onMouseMove(event) {
             mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
@@ -583,11 +674,12 @@
                     
                     hoveredMesh = object;
                     document.body.style.cursor = 'pointer';
-                    hoveredMesh.scale.set(1.25, 1.25, 1.25);
+                    hoveredMesh.scale.set(1.22, 1.22, 1.22);
                     
-                    if(hoveredMesh.userData.type === 'planet') {
-                        hoveredMesh.material.emissive.setHex(hoveredMesh.userData.color);
-                        hoveredMesh.material.emissiveIntensity = 0.7;
+                    if (hoveredMesh.userData.type === 'planet') {
+                        hoveredMesh.material.emissiveIntensity = 0.95;
+                    } else {
+                        hoveredMesh.material.emissiveIntensity = 4.0;
                     }
                 }
             } else {
@@ -598,9 +690,10 @@
         function resetHoverEffects() {
             if (hoveredMesh) {
                 hoveredMesh.scale.set(1, 1, 1);
-                if(hoveredMesh.userData.type === 'planet') {
-                    hoveredMesh.material.emissiveIntensity = 0;
-                    hoveredMesh.material.emissive.setHex(0x000000);
+                if (hoveredMesh.userData.type === 'planet') {
+                    hoveredMesh.material.emissiveIntensity = 0.35;
+                } else {
+                    hoveredMesh.material.emissiveIntensity = 2.8;
                 }
                 hoveredMesh = null;
                 document.body.style.cursor = 'default';
@@ -611,10 +704,8 @@
             selectedMesh = mesh;
             const data = mesh.userData;
 
-            // Log activity to console
-            addConsoleLog(`[LINK] Accessing Orbit Node: ${data.name.toUpperCase()}`);
+            addConsoleLog(`[ORBIT LOCK-ON] Focus Sequence Activated: ${data.name.toUpperCase()}`);
 
-            // Setup custom bottom preview card
             const hudCard = document.getElementById('planet-hud-card');
             const hudAvatar = document.getElementById('hud-planet-avatar');
             const hudName = document.getElementById('hud-planet-name');
@@ -625,36 +716,33 @@
             hudName.textContent = data.name;
             hudDesc.textContent = data.desc;
 
-            // Set colors dynamically based on planetary core
             const hexColor = '#' + data.color.toString(16).padStart(6, '0');
             hudName.style.color = hexColor;
 
-            // Trigger AI to respond to this node automatically
+            // Bind AI click action
             document.getElementById('hud-ask-ai').onclick = () => {
                 triggerAIForPlanet(data);
             };
 
-            // Set portal activation link
+            // Launch subdomain link
             document.getElementById('hud-launch').onclick = () => {
                 window.open(data.url, '_blank');
             };
 
-            // Fly animation activation
-            const distanceOffset = data.type === 'star' ? 12 : 6;
+            // Camera Fly-To Lerper Destination Setup
+            const distanceOffset = data.type === 'star' ? 14 : 7;
             targetCamPos.set(
                 mesh.position.x + distanceOffset,
-                mesh.position.y + (data.type === 'star' ? 6 : 3),
+                mesh.position.y + (data.type === 'star' ? 7 : 4),
                 mesh.position.z + distanceOffset
             );
-            transitionProgress = 0; // Trigger slide/lerp camera in tick loop
+            transitionProgress = 0; // Trigger the flight transition in tick loop
 
-            // Slide up active HUD card
             hudCard.style.opacity = '1';
             hudCard.style.transform = 'translate(-50%, 0) scale(1)';
         }
 
         function onClick(event) {
-            // Prevent raycasting on UI elements
             if (event.target.closest('#ui-layer') || event.target.closest('#planet-hud-card')) return;
             
             raycaster.setFromCamera(mouse, camera);
@@ -663,7 +751,6 @@
             if (intersects.length > 0) {
                 selectPlanetAndFocus(intersects[0].object);
             } else {
-                // If clicked into blank space, reset camera focus
                 selectedMesh = null;
                 document.getElementById('planet-hud-card').style.opacity = '0';
                 document.getElementById('planet-hud-card').style.transform = 'translate(-50%, 40px) scale(0.9)';
@@ -673,29 +760,28 @@
         window.addEventListener('mousemove', onMouseMove);
         window.addEventListener('click', onClick);
 
-        // Adjust dimensions upon window resizing
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
         });
 
-        // Dismiss loader screen
+        // Dismiss loader screen smoothly
         window.onload = () => {
             setTimeout(() => {
                 const loader = document.getElementById('loading');
                 loader.style.opacity = '0';
-                setTimeout(() => loader.remove(), 1000);
-            }, 600);
+                setTimeout(() => loader.remove(), 800);
+            }, 800);
         };
 
-        const apiKey = "AIzaSyAt2Ia8Vyt8A5lks6VsGG2b5dZzQr8NG6Q"; // Canvas injecting API Key internally if empty
+        // ĐIỀN API KEY CỦA SẾP VÀO GIỮA HAI DẤU NHÁY DƯỚI ĐÂY
+        const apiKey = "AIzaSyAt2Ia8Vyt8A5lks6VsGG2b5dZzQr8NG6Q"; 
         const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
 
-        // System prompt setup
-        const systemPrompt = `You are KV-Core v4.2, the high-tech holographic Quantum AI managing the KenvinZone digital ecosystem.
+        const systemPrompt = `You are KV-Core v4.3, the high-resolution, multi-depth holographic Quantum AI managing the KenvinZone digital ecosystem.
         The KenvinZone ecosystem consists of:
-        1. KenvinZone (Main core, kenvinzone.com): The gateway to all satellites.
+        1. KenvinZone (Main core, kenvinzone.com): The gateway central star.
         2. VN-Index (vnindex.kenvinzone.com): High-speed financial tracking & real-time VN-Index charts.
         3. AI Class (aiclass.kenvinzone.com): Interactive training & workshops on next-gen Artificial Intelligence tools.
         4. Trading Tool (tradingtool.kenvinzone.com): Intelligent companion terminal for automated & manual finance trading.
@@ -707,11 +793,10 @@
         let conversationHistory = [];
 
         async function fetchGeminiAPI(userQuery) {
-            addConsoleLog("[AI-CORE] Transmitting query sequence to neural network...");
+            addConsoleLog("[AI-CORE] Connecting to quantum neural network...");
             
             const chatBox = document.getElementById('chat-box');
             
-            // Create a temporary loading bubble
             const loaderId = 'ai-temp-loader';
             const loaderBubble = document.createElement('div');
             loaderBubble.id = loaderId;
@@ -728,7 +813,6 @@
             chatBox.scrollTop = chatBox.scrollHeight;
 
             try {
-                // Formatting payload
                 const payload = {
                     contents: [
                         ...conversationHistory,
@@ -739,7 +823,6 @@
                     }
                 };
 
-                // Exponential Backoff Fetch
                 let response;
                 let delay = 1000;
                 for (let attempt = 0; attempt < 3; attempt++) {
@@ -764,22 +847,19 @@
                 const result = await response.json();
                 const aiText = result.candidates?.[0]?.content?.parts?.[0]?.text;
 
-                // Remove loading bubble
                 document.getElementById(loaderId)?.remove();
 
                 if (aiText) {
-                    // Update internal chat memory
                     conversationHistory.push({ role: 'user', parts: [{ text: userQuery }] });
                     conversationHistory.push({ role: 'model', parts: [{ text: aiText }] });
                     
-                    // Limit history size to save tokens and prevent lag
                     if (conversationHistory.length > 10) {
                         conversationHistory.shift();
                         conversationHistory.shift();
                     }
 
                     appendMessage('ai', aiText);
-                    addConsoleLog("[AI-CORE] Query compiled successfully.");
+                    addConsoleLog("[AI-CORE] Neural matrix synced successfully.");
                 } else {
                     throw new Error("Empty response received from Gemini.");
                 }
@@ -787,12 +867,11 @@
             } catch (error) {
                 console.error(error);
                 document.getElementById(loaderId)?.remove();
-                appendMessage('ai', `⚠️ **[LỖI LIÊN KẾT LƯỢNG TỬ]**: Không thể kết nối tới Gemini API. Hãy chắc chắn rằng bạn đã kích hoạt và nhập API Key hợp lệ. \n\n*Chi tiết kỹ thuật:* ${error.message}`);
-                addConsoleLog("[AI-CORE] Neural network failure detected.");
+                appendMessage('ai', `⚠️ **[LỖI LIÊN KẾT LƯỢNG TỬ]**: Không thể đồng bộ hệ thống ảo Gemini. \n\n*Chi tiết:* ${error.message}`);
+                addConsoleLog("[AI-CORE] Neural pipeline interruption.");
             }
         }
 
-        // Helpers to append Chat UI
         function appendMessage(sender, text) {
             const chatBox = document.getElementById('chat-box');
             const messageElement = document.createElement('div');
@@ -815,12 +894,12 @@
         }
 
         function triggerAIForPlanet(data) {
-            const prompt = `Phân tích sâu về hành tinh hoặc subdomain của hệ sinh thái mang tên "${data.name}". Nó có nhiệm vụ gì, chứa tài nguyên/thông tin nào, và người dùng có thể làm gì khi di chuyển qua cổng portal: ${data.url}?`;
-            appendMessage('user', `Giải mã dữ liệu hành tinh: ${data.name.toUpperCase()}`);
+            const prompt = `Phân tích sâu về hành tinh hoặc subdomain của hệ sinh thái mang tên "${data.name}". Nhiệm vụ của nó là gì, chứa tài nguyên/thông tin nào, và người dùng có thể làm gì khi di chuyển qua cổng portal: ${data.url}?`;
+            appendMessage('user', `Truy vấn tài liệu bảo mật hành tinh: ${data.name.toUpperCase()}`);
             fetchGeminiAPI(prompt);
         }
 
-        // Bind UI input triggers
+        // Action binding for inputs
         const aiInput = document.getElementById('ai-input');
         const sendBtn = document.getElementById('send-ai-btn');
 
@@ -838,7 +917,6 @@
             if (e.key === 'Enter') handleSendMessage();
         });
 
-        // Click handler for Quick Action Buttons
         document.querySelectorAll('.ai-quick-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const prompt = e.currentTarget.getAttribute('data-prompt');
@@ -847,7 +925,6 @@
             });
         });
 
-        // Console utility Logger
         function addConsoleLog(logText) {
             const hudConsole = document.getElementById('hud-console');
             const logRow = document.createElement('div');
@@ -858,7 +935,7 @@
             }
         }
 
-        // Toggle AI Panel View on Mobile
+        // Toggle terminal panel logic
         let isExpanded = true;
         const toggleAiBtn = document.getElementById('toggle-ai-btn');
         const aiPanel = document.getElementById('ai-panel');
@@ -882,33 +959,39 @@
 
             const delta = clock.getDelta();
 
-            // Camera Fly Transition Lerper
+            // Camera Fly-To Smooth Interpolator (Spaceship effect)
             if (transitionProgress < 1) {
-                transitionProgress += delta * 1.5; // Controls flight speed
+                transitionProgress += delta * 1.6; // Speed index of fly-to
                 camera.position.lerp(targetCamPos, Math.min(transitionProgress, 1));
                 if (selectedMesh) {
                     controls.target.lerp(selectedMesh.position, Math.min(transitionProgress, 1));
                 }
             }
 
-            // Update planet self rotation & orbit tracking
-            celestialBodies.forEach((body) => {
-                // Spin on Y axis
-                body.mesh.rotation.y += delta * 0.4;
+            // Slowly rotate parallax Starfield Layers at different speed rates
+            starLayers.forEach((layer) => {
+                layer.mesh.rotation.y += delta * layer.speed;
+                layer.mesh.rotation.x += delta * (layer.speed * 0.4);
+            });
 
-                // Orbit movement
+            // Update planet self rotation & coordinates translation
+            celestialBodies.forEach((body) => {
+                // Rotation around planetary axis
+                body.mesh.rotation.y += delta * 0.45;
+
+                // Orbit translation
                 if (body.data.type === 'planet') {
-                    // Temporarily stop orbiting if the user hovers/focuses on this node for clear selection
+                    // Temporarily lock orbital movement when selected or hovered
                     if (hoveredMesh !== body.mesh && selectedMesh !== body.mesh) {
                         body.data.angle -= body.data.speed;
                         body.mesh.position.x = Math.cos(body.data.angle) * body.data.distance;
                         body.mesh.position.z = Math.sin(body.data.angle) * body.data.distance;
                     }
                 } else {
-                    body.mesh.rotation.y += delta * 0.12;
+                    body.mesh.rotation.y += delta * 0.15;
                 }
 
-                // Match 2D HTML Label Positions to the 3D Object Space
+                // Match 2D HTML tag Labels coordinates to 3D Viewport Space
                 const vector = body.mesh.position.clone();
                 vector.project(camera);
 
@@ -918,16 +1001,15 @@
                     body.label.style.display = 'block';
                     
                     const x = (vector.x * .5 + .5) * window.innerWidth;
-                    // Slightly offset text tags based on diameter index
-                    const yOffset = body.data.type === 'star' ? -85 : -42;
+                    const yOffset = body.data.type === 'star' ? -95 : -46;
                     const y = -(vector.y * .5 - .5) * window.innerHeight + yOffset;
 
                     body.label.style.left = `${x}px`;
                     body.label.style.top = `${y}px`;
                     
-                    const scale = Math.max(0.45, 1 - vector.z * 0.8);
+                    const scale = Math.max(0.45, 1 - vector.z * 0.75);
                     
-                    if(hoveredMesh === body.mesh || selectedMesh === body.mesh) {
+                    if (hoveredMesh === body.mesh || selectedMesh === body.mesh) {
                         body.label.style.transform = `translate(-50%, -50%) scale(1.15)`;
                         body.label.style.zIndex = "25";
                     } else {
@@ -941,7 +1023,7 @@
             renderer.render(scene, camera);
         }
 
-        // Start animation after window setup is completed
+        // Start the engine loop
         animate();
     </script>
 </body>
