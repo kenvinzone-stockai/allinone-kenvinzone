@@ -651,6 +651,453 @@
         // Layer 3: Distant deep cosmos (Tiny, slow, pure bright white/yellow stars)
         createStarfieldLayer(2500, 0.35, { min: 200, max: 400 }, 0xffffff, 0.005);
 
+        // ============================================================
+        // CYBERPUNK SPACESHIP - Tàu vũ trụ bay từ dưới lên
+        // ============================================================
+        const spaceshipGroup = new THREE.Group();
+
+        // Thân tàu chính (fuselage) - hình nón thuôn dài
+        const hullGeo = new THREE.ConeGeometry(0.55, 2.6, 12);
+        const hullMat = new THREE.MeshStandardMaterial({
+            color: 0x1a1a2e,
+            emissive: 0x00f0ff,
+            emissiveIntensity: 0.15,
+            metalness: 0.95,
+            roughness: 0.25
+        });
+        const hull = new THREE.Mesh(hullGeo, hullMat);
+        hull.rotation.x = Math.PI / 2; // mũi tàu hướng về phía trước (+Z)
+        spaceshipGroup.add(hull);
+
+        // Khoang lái (cockpit) - cầu thủy tinh phát sáng
+        const cockpitGeo = new THREE.SphereGeometry(0.38, 16, 16, 0, Math.PI * 2, 0, Math.PI / 2);
+        const cockpitMat = new THREE.MeshStandardMaterial({
+            color: 0x00f0ff,
+            emissive: 0x00f0ff,
+            emissiveIntensity: 1.2,
+            metalness: 0.6,
+            roughness: 0.1,
+            transparent: true,
+            opacity: 0.85
+        });
+        const cockpit = new THREE.Mesh(cockpitGeo, cockpitMat);
+        cockpit.rotation.x = -Math.PI / 2;
+        cockpit.position.z = 0.4;
+        cockpit.position.y = 0.15;
+        spaceshipGroup.add(cockpit);
+
+        // Cánh tàu - 2 cánh tam giác phẳng 2 bên
+        const wingShape = new THREE.Shape();
+        wingShape.moveTo(0, 0);
+        wingShape.lineTo(1.5, -0.4);
+        wingShape.lineTo(1.5, -0.05);
+        wingShape.lineTo(0.2, 0.3);
+        wingShape.lineTo(0, 0);
+
+        const wingGeo = new THREE.ExtrudeGeometry(wingShape, { depth: 0.08, bevelEnabled: false });
+        const wingMat = new THREE.MeshStandardMaterial({
+            color: 0x2a0a3e,
+            emissive: 0xff007f,
+            emissiveIntensity: 0.45,
+            metalness: 0.9,
+            roughness: 0.3
+        });
+        const wingLeft = new THREE.Mesh(wingGeo, wingMat);
+        wingLeft.position.set(0, 0, -0.3);
+        spaceshipGroup.add(wingLeft);
+
+        const wingRight = new THREE.Mesh(wingGeo, wingMat);
+        wingRight.position.set(0, 0, -0.3);
+        wingRight.scale.x = -1; // mirror
+        spaceshipGroup.add(wingRight);
+
+        // Đèn neon viền cánh - edges sáng
+        const wingEdgeMat = new THREE.LineBasicMaterial({ color: 0xff007f, transparent: true, opacity: 0.9 });
+        const wingEdgeGeo = new THREE.EdgesGeometry(wingGeo);
+        const wingEdgeLeft = new THREE.LineSegments(wingEdgeGeo, wingEdgeMat);
+        wingEdgeLeft.position.copy(wingLeft.position);
+        spaceshipGroup.add(wingEdgeLeft);
+
+        const wingEdgeRight = new THREE.LineSegments(wingEdgeGeo, wingEdgeMat);
+        wingEdgeRight.position.copy(wingRight.position);
+        wingEdgeRight.scale.x = -1;
+        spaceshipGroup.add(wingEdgeRight);
+
+        // Đèn neon dọc thân tàu
+        const stripGeo = new THREE.CylinderGeometry(0.06, 0.06, 1.8, 6);
+        const stripMat = new THREE.MeshBasicMaterial({ color: 0x00f0ff, transparent: true, opacity: 0.9 });
+        const strip1 = new THREE.Mesh(stripGeo, stripMat);
+        strip1.rotation.x = Math.PI / 2;
+        strip1.position.set(0.35, 0, -0.3);
+        spaceshipGroup.add(strip1);
+        const strip2 = new THREE.Mesh(stripGeo, stripMat);
+        strip2.rotation.x = Math.PI / 2;
+        strip2.position.set(-0.35, 0, -0.3);
+        spaceshipGroup.add(strip2);
+
+        // Engine - 2 ống xả phía sau
+        const engineGeo = new THREE.CylinderGeometry(0.18, 0.22, 0.4, 12);
+        const engineMat = new THREE.MeshStandardMaterial({
+            color: 0x0a0a14,
+            metalness: 0.95,
+            roughness: 0.4
+        });
+        const engineLeft = new THREE.Mesh(engineGeo, engineMat);
+        engineLeft.rotation.x = Math.PI / 2;
+        engineLeft.position.set(0.28, 0, -1.4);
+        spaceshipGroup.add(engineLeft);
+
+        const engineRight = new THREE.Mesh(engineGeo, engineMat);
+        engineRight.rotation.x = Math.PI / 2;
+        engineRight.position.set(-0.28, 0, -1.4);
+        spaceshipGroup.add(engineRight);
+
+        // Lửa động cơ - cone sáng phát ra phía sau
+        const flameGeo = new THREE.ConeGeometry(0.18, 1.2, 12);
+        const flameMat = new THREE.MeshBasicMaterial({
+            color: 0xff007f,
+            transparent: true,
+            opacity: 0.85,
+            blending: THREE.AdditiveBlending
+        });
+        const flameLeft = new THREE.Mesh(flameGeo, flameMat);
+        flameLeft.rotation.x = -Math.PI / 2;
+        flameLeft.position.set(0.28, 0, -2.2);
+        spaceshipGroup.add(flameLeft);
+
+        const flameRight = new THREE.Mesh(flameGeo, flameMat);
+        flameRight.rotation.x = -Math.PI / 2;
+        flameRight.position.set(-0.28, 0, -2.2);
+        spaceshipGroup.add(flameRight);
+
+        // Lửa lõi cyan bên trong (additive blend tạo white-hot core)
+        const innerFlameGeo = new THREE.ConeGeometry(0.1, 0.9, 8);
+        const innerFlameMat = new THREE.MeshBasicMaterial({
+            color: 0x00f0ff,
+            transparent: true,
+            opacity: 0.95,
+            blending: THREE.AdditiveBlending
+        });
+        const innerFlameLeft = new THREE.Mesh(innerFlameGeo, innerFlameMat);
+        innerFlameLeft.rotation.x = -Math.PI / 2;
+        innerFlameLeft.position.set(0.28, 0, -2.0);
+        spaceshipGroup.add(innerFlameLeft);
+
+        const innerFlameRight = new THREE.Mesh(innerFlameGeo, innerFlameMat);
+        innerFlameRight.rotation.x = -Math.PI / 2;
+        innerFlameRight.position.set(-0.28, 0, -2.0);
+        spaceshipGroup.add(innerFlameRight);
+
+        // Đèn point light phát ra từ engine để chiếu vào hệ
+        const engineLight = new THREE.PointLight(0xff007f, 3, 18, 1.5);
+        engineLight.position.set(0, 0, -2.0);
+        spaceshipGroup.add(engineLight);
+
+        const cockpitLight = new THREE.PointLight(0x00f0ff, 1.2, 8, 1.5);
+        cockpitLight.position.set(0, 0.2, 0.5);
+        spaceshipGroup.add(cockpitLight);
+
+        // Vệt khói/particle trail phía sau
+        const TRAIL_COUNT = 80;
+        const trailGeo = new THREE.BufferGeometry();
+        const trailPositions = new Float32Array(TRAIL_COUNT * 3);
+        const trailColors = new Float32Array(TRAIL_COUNT * 3);
+        const trailAlphas = new Float32Array(TRAIL_COUNT);
+        for (let i = 0; i < TRAIL_COUNT; i++) {
+            trailPositions[i * 3] = 0;
+            trailPositions[i * 3 + 1] = 0;
+            trailPositions[i * 3 + 2] = 0;
+            trailColors[i * 3] = 1;
+            trailColors[i * 3 + 1] = 0;
+            trailColors[i * 3 + 2] = 0.5;
+            trailAlphas[i] = 0;
+        }
+        trailGeo.setAttribute('position', new THREE.BufferAttribute(trailPositions, 3));
+        trailGeo.setAttribute('color', new THREE.BufferAttribute(trailColors, 3));
+        const trailMat = new THREE.PointsMaterial({
+            size: 0.45,
+            vertexColors: true,
+            transparent: true,
+            opacity: 0.8,
+            blending: THREE.AdditiveBlending,
+            sizeAttenuation: true,
+            depthWrite: false
+        });
+        const trailPoints = new THREE.Points(trailGeo, trailMat);
+        scene.add(trailPoints);
+
+        // Trail history: lưu lại vị trí trước đó của tàu
+        const trailHistory = [];
+        for (let i = 0; i < TRAIL_COUNT; i++) {
+            trailHistory.push(new THREE.Vector3(0, -100, 0));
+        }
+
+        // Thêm tàu vào scene
+        scene.add(spaceshipGroup);
+
+        // ============================================================
+        // QUỸ ĐẠO TÀU - bay lên từ dưới, lượn quanh hệ, rồi lặp lại
+        // ============================================================
+        // Tổng thời gian 1 chu kỳ (giây)
+        const SHIP_CYCLE_DURATION = 28;
+        let shipTime = 0;
+
+        function getShipPosition(t) {
+            // t: 0 -> 1 (chuẩn hóa trong 1 chu kỳ)
+            // Quỹ đạo: bắt đầu từ dưới sâu (y rất âm), bay lên,
+            // lượn cong quanh hệ mặt trời, rồi quay xuống dưới reset.
+            // Dùng tham số hóa cong (curve parametric).
+            const angle = t * Math.PI * 2; // 1 vòng quanh trục
+            const radius = 38 + Math.sin(t * Math.PI) * 8; // bán kính co giãn nhẹ
+            // Độ cao: hình sin để đi lên đỉnh giữa chu kỳ rồi đi xuống
+            // Bắt đầu từ y = -55 (sâu dưới), đỉnh y = 22, kết thúc y = -55
+            const verticalCurve = Math.sin(t * Math.PI); // 0 -> 1 -> 0
+            const y = -55 + verticalCurve * 80; // -55 -> 25 -> -55
+
+            const x = Math.cos(angle + Math.PI / 2) * radius;
+            const z = Math.sin(angle + Math.PI / 2) * radius;
+
+            return new THREE.Vector3(x, y, z);
+        }
+        // ============================================================
+        // END SPACESHIP SETUP
+        // ============================================================
+
+        // ============================================================
+        // GIANT METEOR - Thiên thạch khổng lồ bay qua, huyền bí
+        // ============================================================
+        const meteorGroup = new THREE.Group();
+
+        // 1. Tạo texture cho meteor: đá xù xì + vết nứt phát sáng (lava cracks)
+        function createMeteorTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 1024;
+            canvas.height = 512;
+            const ctx = canvas.getContext('2d');
+
+            // Nền đá tối với gradient noise
+            const grad = ctx.createRadialGradient(512, 256, 50, 512, 256, 500);
+            grad.addColorStop(0, '#3a2418');
+            grad.addColorStop(0.5, '#1f1410');
+            grad.addColorStop(1, '#0a0606');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Noise đá - chấm sần ngẫu nhiên
+            for (let i = 0; i < 5000; i++) {
+                const x = Math.random() * canvas.width;
+                const y = Math.random() * canvas.height;
+                const size = Math.random() * 3;
+                const shade = Math.floor(Math.random() * 60 + 20);
+                ctx.fillStyle = `rgb(${shade}, ${Math.floor(shade*0.7)}, ${Math.floor(shade*0.5)})`;
+                ctx.fillRect(x, y, size, size);
+            }
+
+            // Hố thiên thạch (craters) - dạng vòng tròn tối
+            for (let i = 0; i < 25; i++) {
+                const cx = Math.random() * canvas.width;
+                const cy = Math.random() * canvas.height;
+                const r = Math.random() * 60 + 20;
+                const craterGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
+                craterGrad.addColorStop(0, 'rgba(0, 0, 0, 0.7)');
+                craterGrad.addColorStop(0.7, 'rgba(40, 25, 15, 0.4)');
+                craterGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+                ctx.fillStyle = craterGrad;
+                ctx.beginPath();
+                ctx.arc(cx, cy, r, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            // Vết nứt phát sáng (glowing cracks) - nét cam/đỏ rực
+            ctx.lineCap = 'round';
+            for (let i = 0; i < 18; i++) {
+                const startX = Math.random() * canvas.width;
+                const startY = Math.random() * canvas.height;
+                
+                // Glow halo của vết nứt
+                ctx.strokeStyle = 'rgba(255, 80, 20, 0.4)';
+                ctx.lineWidth = 8;
+                ctx.beginPath();
+                ctx.moveTo(startX, startY);
+                let x = startX, y = startY;
+                const segments = Math.floor(Math.random() * 6) + 3;
+                for (let s = 0; s < segments; s++) {
+                    x += (Math.random() - 0.5) * 80;
+                    y += (Math.random() - 0.5) * 60;
+                    ctx.lineTo(x, y);
+                }
+                ctx.stroke();
+
+                // Lõi vết nứt - cam vàng cháy
+                ctx.strokeStyle = 'rgba(255, 200, 60, 0.95)';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(startX, startY);
+                x = startX; y = startY;
+                for (let s = 0; s < segments; s++) {
+                    x += (Math.random() - 0.5) * 80;
+                    y += (Math.random() - 0.5) * 60;
+                    ctx.lineTo(x, y);
+                }
+                ctx.stroke();
+            }
+
+            const texture = new THREE.CanvasTexture(canvas);
+            texture.wrapS = THREE.RepeatWrapping;
+            texture.wrapT = THREE.ClampToEdgeWrapping;
+            return texture;
+        }
+
+        // 2. Geometry: dùng IcosahedronGeometry rồi biến dạng vertices cho xù xì
+        const meteorRadius = 5.5;
+        const meteorGeo = new THREE.IcosahedronGeometry(meteorRadius, 3);
+        const meteorPos = meteorGeo.attributes.position;
+        const v = new THREE.Vector3();
+        for (let i = 0; i < meteorPos.count; i++) {
+            v.fromBufferAttribute(meteorPos, i);
+            // Biến dạng ngẫu nhiên - làm bề mặt gồ ghề
+            const noise = (Math.random() - 0.5) * 0.9;
+            // Thêm bump dạng sin để có khối lồi lõm rõ
+            const bump = Math.sin(v.x * 0.5) * Math.cos(v.y * 0.5) * Math.sin(v.z * 0.5) * 0.7;
+            const len = v.length();
+            const newLen = len + noise + bump;
+            v.normalize().multiplyScalar(newLen);
+            meteorPos.setXYZ(i, v.x, v.y, v.z);
+        }
+        meteorGeo.computeVertexNormals();
+
+        const meteorTexture = createMeteorTexture();
+        const meteorMat = new THREE.MeshStandardMaterial({
+            map: meteorTexture,
+            emissive: 0xff4400,
+            emissiveIntensity: 0.35,
+            roughness: 0.95,
+            metalness: 0.15,
+            flatShading: false
+        });
+        const meteorMesh = new THREE.Mesh(meteorGeo, meteorMat);
+        meteorGroup.add(meteorMesh);
+
+        // 3. Hào quang phía sau - sphere lớn mờ phát sáng (atmosphere/aura)
+        const auraGeo = new THREE.SphereGeometry(meteorRadius * 1.5, 32, 32);
+        const auraMat = new THREE.MeshBasicMaterial({
+            color: 0xff6622,
+            transparent: true,
+            opacity: 0.15,
+            blending: THREE.AdditiveBlending,
+            side: THREE.BackSide,
+            depthWrite: false
+        });
+        const aura = new THREE.Mesh(auraGeo, auraMat);
+        meteorGroup.add(aura);
+
+        // Lớp aura thứ 2 - đỏ thẫm rộng hơn (heat shockwave)
+        const aura2Geo = new THREE.SphereGeometry(meteorRadius * 2.2, 24, 24);
+        const aura2Mat = new THREE.MeshBasicMaterial({
+            color: 0xff2200,
+            transparent: true,
+            opacity: 0.07,
+            blending: THREE.AdditiveBlending,
+            side: THREE.BackSide,
+            depthWrite: false
+        });
+        const aura2 = new THREE.Mesh(aura2Geo, aura2Mat);
+        meteorGroup.add(aura2);
+
+        // 4. Hào quang sprite phía sau - tạo cảm giác mặt trời nhỏ phía sau meteor
+        const haloCanvas = document.createElement('canvas');
+        haloCanvas.width = 512;
+        haloCanvas.height = 512;
+        const hctx = haloCanvas.getContext('2d');
+        const haloGrad = hctx.createRadialGradient(256, 256, 0, 256, 256, 256);
+        haloGrad.addColorStop(0, 'rgba(255, 220, 150, 1)');
+        haloGrad.addColorStop(0.15, 'rgba(255, 150, 50, 0.85)');
+        haloGrad.addColorStop(0.4, 'rgba(255, 60, 20, 0.45)');
+        haloGrad.addColorStop(0.7, 'rgba(180, 30, 10, 0.15)');
+        haloGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        hctx.fillStyle = haloGrad;
+        hctx.fillRect(0, 0, 512, 512);
+
+        const haloTexture = new THREE.CanvasTexture(haloCanvas);
+        const haloMat = new THREE.SpriteMaterial({
+            map: haloTexture,
+            transparent: true,
+            opacity: 0.9,
+            blending: THREE.AdditiveBlending,
+            depthWrite: false
+        });
+        const haloSprite = new THREE.Sprite(haloMat);
+        haloSprite.scale.set(meteorRadius * 5, meteorRadius * 5, 1);
+        meteorGroup.add(haloSprite);
+
+        // 5. Đèn point light từ meteor - chiếu cam/đỏ vào hệ khi đi ngang qua
+        const meteorLight = new THREE.PointLight(0xff5522, 8, 80, 1.3);
+        meteorGroup.add(meteorLight);
+
+        // 6. Vệt đuôi sao chổi - particle trail dài, cam rực
+        const METEOR_TRAIL_COUNT = 150;
+        const mTrailGeo = new THREE.BufferGeometry();
+        const mTrailPos = new Float32Array(METEOR_TRAIL_COUNT * 3);
+        const mTrailCol = new Float32Array(METEOR_TRAIL_COUNT * 3);
+        const mTrailSize = new Float32Array(METEOR_TRAIL_COUNT);
+        for (let i = 0; i < METEOR_TRAIL_COUNT; i++) {
+            mTrailPos[i * 3] = 0;
+            mTrailPos[i * 3 + 1] = -200;
+            mTrailPos[i * 3 + 2] = 0;
+            mTrailCol[i * 3] = 1;
+            mTrailCol[i * 3 + 1] = 0.4;
+            mTrailCol[i * 3 + 2] = 0.1;
+            mTrailSize[i] = 2;
+        }
+        mTrailGeo.setAttribute('position', new THREE.BufferAttribute(mTrailPos, 3));
+        mTrailGeo.setAttribute('color', new THREE.BufferAttribute(mTrailCol, 3));
+        const mTrailMat = new THREE.PointsMaterial({
+            size: 2.2,
+            vertexColors: true,
+            transparent: true,
+            opacity: 0.85,
+            blending: THREE.AdditiveBlending,
+            sizeAttenuation: true,
+            depthWrite: false
+        });
+        const meteorTrailPoints = new THREE.Points(mTrailGeo, mTrailMat);
+        scene.add(meteorTrailPoints);
+
+        const meteorTrailHistory = [];
+        for (let i = 0; i < METEOR_TRAIL_COUNT; i++) {
+            meteorTrailHistory.push(new THREE.Vector3(0, -200, 0));
+        }
+
+        scene.add(meteorGroup);
+
+        // ============================================================
+        // QUỸ ĐẠO METEOR - bay chéo qua scene, chậm rãi và huyền bí
+        // ============================================================
+        const METEOR_CYCLE_DURATION = 55; // chậm hơn tàu nhiều - cảm giác đồ sộ
+        let meteorTime = 8; // offset để meteor xuất hiện sau tàu vài giây
+
+        function getMeteorPosition(t) {
+            // Quỹ đạo chéo: vào từ góc trên-xa, ra ở góc dưới-gần (hoặc ngược lại).
+            // Lệch khỏi mặt phẳng XZ của hành tinh để không che chúng.
+            // Đường thẳng cong nhẹ - như sao chổi đi qua.
+            // t: 0 -> 1
+            // Tham số hóa: điểm bắt đầu xa, đi qua "gần camera" rồi đi xa tiếp
+            const startPos = new THREE.Vector3(-90, 35, -80);
+            const endPos = new THREE.Vector3(85, -25, 70);
+            // Điểm điều khiển ở giữa để uốn cong (quadratic bezier)
+            const ctrl = new THREE.Vector3(0, 45, -10);
+
+            // Quadratic Bezier: B(t) = (1-t)^2 P0 + 2(1-t)t P1 + t^2 P2
+            const oneMinusT = 1 - t;
+            const x = oneMinusT * oneMinusT * startPos.x + 2 * oneMinusT * t * ctrl.x + t * t * endPos.x;
+            const y = oneMinusT * oneMinusT * startPos.y + 2 * oneMinusT * t * ctrl.y + t * t * endPos.y;
+            const z = oneMinusT * oneMinusT * startPos.z + 2 * oneMinusT * t * ctrl.z + t * t * endPos.z;
+            return new THREE.Vector3(x, y, z);
+        }
+        // ============================================================
+        // END METEOR SETUP
+        // ============================================================
+
         // Raycaster Interaction Logic
         const raycaster = new THREE.Raycaster();
         const mouse = new THREE.Vector2();
@@ -973,6 +1420,122 @@
                 layer.mesh.rotation.y += delta * layer.speed;
                 layer.mesh.rotation.x += delta * (layer.speed * 0.4);
             });
+
+            // ===== UPDATE SPACESHIP =====
+            shipTime += delta;
+            const tNorm = (shipTime % SHIP_CYCLE_DURATION) / SHIP_CYCLE_DURATION;
+            const currentPos = getShipPosition(tNorm);
+            // Tính hướng bay (tangent vector) bằng cách lấy điểm phía trước
+            const nextPos = getShipPosition((tNorm + 0.005) % 1);
+
+            spaceshipGroup.position.copy(currentPos);
+            spaceshipGroup.lookAt(nextPos); // mũi tàu hướng theo hướng bay
+
+            // Hiệu ứng lửa động cơ nhấp nháy (flicker)
+            const flicker = 0.75 + Math.random() * 0.5;
+            flameLeft.scale.y = flicker;
+            flameRight.scale.y = flicker;
+            innerFlameLeft.scale.y = 0.8 + Math.random() * 0.6;
+            innerFlameRight.scale.y = 0.8 + Math.random() * 0.6;
+            flameMat.opacity = 0.7 + Math.random() * 0.3;
+            engineLight.intensity = 2.5 + Math.random() * 1.5;
+
+            // Đèn neon thân tàu pulse nhẹ
+            const pulse = 0.7 + Math.sin(shipTime * 4) * 0.3;
+            stripMat.opacity = pulse;
+
+            // Cập nhật trail particle: shift mảng + push vị trí mới
+            trailHistory.unshift(currentPos.clone());
+            if (trailHistory.length > TRAIL_COUNT) trailHistory.pop();
+
+            const posAttr = trailGeo.attributes.position;
+            const colAttr = trailGeo.attributes.color;
+            for (let i = 0; i < TRAIL_COUNT; i++) {
+                const p = trailHistory[i];
+                // Lệch nhẹ ngẫu nhiên để trail tỏa ra như khói
+                const spread = i * 0.015;
+                posAttr.array[i * 3]     = p.x + (Math.random() - 0.5) * spread;
+                posAttr.array[i * 3 + 1] = p.y + (Math.random() - 0.5) * spread;
+                posAttr.array[i * 3 + 2] = p.z + (Math.random() - 0.5) * spread;
+
+                // Gradient màu: từ magenta nóng (gần tàu) -> tím -> cyan mờ -> tắt
+                const ratio = i / TRAIL_COUNT;
+                colAttr.array[i * 3]     = (1 - ratio) * 1.0 + ratio * 0.0;       // R
+                colAttr.array[i * 3 + 1] = (1 - ratio) * 0.0 + ratio * 0.6;       // G
+                colAttr.array[i * 3 + 2] = (1 - ratio) * 0.5 + ratio * 1.0;       // B
+            }
+            posAttr.needsUpdate = true;
+            colAttr.needsUpdate = true;
+            // Trail mờ dần khi tàu ở xa
+            trailMat.opacity = Math.max(0.15, 1 - Math.abs(currentPos.y) / 60);
+            // ===== END SPACESHIP UPDATE =====
+
+            // ===== UPDATE METEOR =====
+            meteorTime += delta;
+            const mT = (meteorTime % METEOR_CYCLE_DURATION) / METEOR_CYCLE_DURATION;
+            const meteorPosV = getMeteorPosition(mT);
+            const meteorNextPos = getMeteorPosition((mT + 0.003) % 1);
+
+            meteorGroup.position.copy(meteorPosV);
+
+            // Meteor xoay chậm quanh trục riêng - cảm giác đồ sộ trôi nổi
+            meteorMesh.rotation.x += delta * 0.08;
+            meteorMesh.rotation.y += delta * 0.12;
+            meteorMesh.rotation.z += delta * 0.05;
+
+            // Aura pulse nhẹ - như nhiệt rung động
+            const meteorPulse = 1 + Math.sin(meteorTime * 1.5) * 0.08;
+            aura.scale.setScalar(meteorPulse);
+            aura2.scale.setScalar(1 + Math.sin(meteorTime * 0.8) * 0.12);
+
+            // Halo sprite luôn quay về camera (sprite tự xử lý), pulse opacity
+            haloMat.opacity = 0.75 + Math.sin(meteorTime * 2) * 0.15;
+
+            // Emissive của meteor body nhấp nháy như vết nứt cháy
+            meteorMat.emissiveIntensity = 0.3 + Math.sin(meteorTime * 3.5) * 0.12;
+
+            // Light intensity giảm khi meteor ở xa camera (dist từ origin)
+            const meteorDist = meteorPosV.length();
+            meteorLight.intensity = Math.max(2, 10 - meteorDist * 0.06);
+
+            // Hướng vệt đuôi: ngược hướng bay (từ meteor trừ điểm tiếp theo)
+            // Update trail history
+            meteorTrailHistory.unshift(meteorPosV.clone());
+            if (meteorTrailHistory.length > METEOR_TRAIL_COUNT) meteorTrailHistory.pop();
+
+            const mPosAttr = mTrailGeo.attributes.position;
+            const mColAttr = mTrailGeo.attributes.color;
+            for (let i = 0; i < METEOR_TRAIL_COUNT; i++) {
+                const p = meteorTrailHistory[i];
+                // Spread tăng dần theo độ xa khỏi meteor - trail tỏa rộng dần
+                const spread = i * 0.08 + 0.2;
+                mPosAttr.array[i * 3]     = p.x + (Math.random() - 0.5) * spread;
+                mPosAttr.array[i * 3 + 1] = p.y + (Math.random() - 0.5) * spread;
+                mPosAttr.array[i * 3 + 2] = p.z + (Math.random() - 0.5) * spread;
+
+                // Gradient: vàng trắng nóng (gần) -> cam -> đỏ thẫm -> tắt
+                const ratio = i / METEOR_TRAIL_COUNT;
+                if (ratio < 0.15) {
+                    // Lõi trắng-vàng nóng
+                    mColAttr.array[i * 3]     = 1.0;
+                    mColAttr.array[i * 3 + 1] = 0.9 - ratio;
+                    mColAttr.array[i * 3 + 2] = 0.5 - ratio * 2;
+                } else if (ratio < 0.5) {
+                    // Cam
+                    mColAttr.array[i * 3]     = 1.0;
+                    mColAttr.array[i * 3 + 1] = 0.5 * (1 - (ratio - 0.15) / 0.35);
+                    mColAttr.array[i * 3 + 2] = 0.05;
+                } else {
+                    // Đỏ thẫm tắt dần
+                    const fade = 1 - (ratio - 0.5) / 0.5;
+                    mColAttr.array[i * 3]     = 0.7 * fade;
+                    mColAttr.array[i * 3 + 1] = 0.1 * fade;
+                    mColAttr.array[i * 3 + 2] = 0.0;
+                }
+            }
+            mPosAttr.needsUpdate = true;
+            mColAttr.needsUpdate = true;
+            // ===== END METEOR UPDATE =====
 
             // Update planet self rotation & coordinates translation
             celestialBodies.forEach((body) => {
