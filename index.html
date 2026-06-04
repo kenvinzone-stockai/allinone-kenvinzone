@@ -1224,7 +1224,7 @@
 
         // ĐIỀN API KEY CỦA SẾP VÀO GIỮA HAI DẤU NHÁY DƯỚI ĐÂY
         const apiKey = "AIzaSyAt2Ia8Vyt8A5lks6VsGG2b5dZzQr8NG6Q"; 
-        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
 
         const systemPrompt = `You are KV-Core v4.3, the high-resolution, multi-depth holographic Quantum AI managing the KenvinZone digital ecosystem.
         The KenvinZone ecosystem consists of:
@@ -1265,9 +1265,9 @@
                         ...conversationHistory,
                         { role: 'user', parts: [{ text: userQuery }] }
                     ],
-                    systemInstruction: {
-                        parts: [{ text: systemPrompt }]
-                    }
+                    system_instruction: {
+    parts: [{ text: systemPrompt }]
+}
                 };
 
                 let response;
