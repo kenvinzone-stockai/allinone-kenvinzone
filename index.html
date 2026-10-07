@@ -1,1593 +1,1506 @@
 <!DOCTYPE html>
+
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KenvinZone Cyberpunk Ecosystem</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Share+Tech+Mono&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Marked.js for rendering beautiful markdown responses from Gemini -->
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-
-    <style>
-        body {
-            margin: 0;
-            overflow: hidden;
-            background-color: #020005;
-            font-family: 'Inter', sans-serif;
-            color: #e2e8f0;
-            user-select: none;
-        }
-
-        .font-cyber {
-            font-family: 'Orbitron', sans-serif;
-        }
-
-        .font-mono-tech {
-            font-family: 'Share Tech Mono', monospace;
-        }
-
-        #canvas-container {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            z-index: 1;
-        }
-
-        #ui-layer {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 10;
-            pointer-events: none;
-        }
-
-        .planet-label {
-            position: absolute;
-            transform: translate(-50%, -50%);
-            padding: 8px 16px;
-            background: rgba(10, 5, 25, 0.85);
-            border: 2px solid #00f0ff;
-            border-radius: 4px;
-            font-family: 'Orbitron', sans-serif;
-            font-size: 11px;
-            font-weight: 800;
-            letter-spacing: 2px;
-            white-space: nowrap;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            opacity: 0.9;
-            backdrop-filter: blur(12px);
-            cursor: pointer;
-            pointer-events: auto;
-            box-shadow: 0 0 20px rgba(0, 240, 255, 0.3), inset 0 0 10px rgba(0, 240, 255, 0.1);
-            color: #00f0ff;
-            text-shadow: 0 0 5px rgba(0, 240, 255, 0.5);
-        }
-
-        .planet-label::before {
-            content: '';
-            position: absolute;
-            top: -2px;
-            left: -2px;
-            width: 10px;
-            height: 10px;
-            border-top: 3px solid #ff007f;
-            border-left: 3px solid #ff007f;
-        }
-
-        .planet-label:hover {
-            background: rgba(255, 0, 127, 0.25);
-            border-color: #ff007f;
-            color: #fff;
-            transform: translate(-50%, -50%) scale(1.15);
-            box-shadow: 0 0 30px rgba(255, 0, 127, 0.7), inset 0 0 15px rgba(255, 0, 127, 0.3);
-            text-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
-        }
-
-        .center-label {
-            border-color: #ffaa00;
-            color: #ffaa00;
-            box-shadow: 0 0 25px rgba(255, 170, 0, 0.5);
-            text-shadow: 0 0 8px rgba(255, 170, 0, 0.7);
-        }
-
-        .center-label::before {
-            border-top-color: #ffaa00;
-            border-left-color: #ffaa00;
-        }
-
-        .cyber-panel {
-            background: rgba(8, 3, 18, 0.85);
-            border: 1px solid rgba(0, 240, 255, 0.25);
-            box-shadow: 0 0 35px rgba(0, 240, 255, 0.15), inset 0 0 20px rgba(0, 240, 255, 0.05);
-            backdrop-filter: blur(15px);
-            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .cyber-panel:hover {
-            border-color: rgba(0, 240, 255, 0.5);
-            box-shadow: 0 0 45px rgba(0, 240, 255, 0.3);
-        }
-
-        .cyber-btn-neon {
-            background: transparent;
-            border: 1px solid #00f0ff;
-            color: #00f0ff;
-            box-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
-            transition: all 0.3s ease;
-        }
-
-        .cyber-btn-neon:hover {
-            background: #00f0ff;
-            color: #020005;
-            box-shadow: 0 0 25px #00f0ff;
-            text-shadow: none;
-        }
-
-        .cyber-btn-magenta {
-            background: transparent;
-            border: 1px solid #ff007f;
-            color: #ff007f;
-            box-shadow: 0 0 10px rgba(255, 0, 127, 0.2);
-            transition: all 0.3s ease;
-        }
-
-        .cyber-btn-magenta:hover {
-            background: #ff007f;
-            color: #ffffff;
-            box-shadow: 0 0 25px #ff007f;
-        }
-
-        /* Custom Scrollbar for Chat */
-        .custom-scroll::-webkit-scrollbar {
-            width: 4px;
-        }
-        .custom-scroll::-webkit-scrollbar-track {
-            background: rgba(0, 0, 0, 0.3);
-        }
-        .custom-scroll::-webkit-scrollbar-thumb {
-            background: #00f0ff;
-            border-radius: 2px;
-        }
-
-        @keyframes scanline {
-            0% { transform: translateY(-100%); }
-            100% { transform: translateY(100%); }
-        }
-
-        .scanline-effect::after {
-            content: " ";
-            display: block;
-            position: absolute;
-            top: 0; left: 0; bottom: 0; right: 0;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.3) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.04), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.04));
-            z-index: 2;
-            background-size: 100% 3px, 3px 100%;
-            pointer-events: none;
-            opacity: 0.7;
-        }
-
-        @keyframes pulse-glow {
-            0%, 100% { opacity: 0.3; }
-            50% { opacity: 0.8; }
-        }
-
-        .pulse-border {
-            animation: pulse-glow 2s infinite ease-in-out;
-        }
-
-        /* Hologram Grid Background Effect */
-        .holo-grid {
-            background-image: linear-gradient(rgba(0, 240, 255, 0.04) 1px, transparent 1px),
-                              linear-gradient(90deg, rgba(0, 240, 255, 0.04) 1px, transparent 1px);
-            background-size: 20px 20px;
-        }
-    </style>
-    
-    <!-- Import Map for Three.js -->
-    <script type="importmap">
-        {
-            "imports": {
-                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
-                "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
-            }
-        }
-    </script>
-</head>
-<body class="scanline-effect overflow-hidden bg-[#020005]">
-    <!-- Loading Screen -->
-    <div id="loading" class="absolute inset-0 bg-[#020005] z-50 flex justify-center items-center">
-        <div class="flex flex-col items-center max-w-md p-6 text-center">
-            <div class="relative w-24 h-24 mb-6">
-                <div class="absolute inset-0 rounded-full border-2 border-t-[#ff007f] border-[#00f0ff]/10 animate-spin"></div>
-                <div class="absolute inset-2 rounded-full border border-b-[#00f0ff] border-t-[#00f0ff]/10 animate-spin" style="animation-direction: reverse;"></div>
-                <div class="absolute inset-4 rounded-full bg-[#00f0ff]/10 flex items-center justify-center">
-                    <i class="fa-solid fa-microchip text-2xl text-[#00f0ff] animate-pulse"></i>
-                </div>
-            </div>
-            <h2 class="text-2xl font-cyber tracking-[0.2em] text-[#00f0ff] uppercase font-bold mb-2">KV-CORE HIGH RESOLUTION</h2>
-            <div class="font-mono-tech text-xs text-rose-500 tracking-wider animate-pulse mb-4">OPTIMIZING GRAPHICS ENGINE & DEPTH BUFFER...</div>
-            <div class="w-64 h-1 bg-[#110d26] rounded-full overflow-hidden relative">
-                <div class="absolute top-0 left-0 h-full w-2/3 bg-gradient-to-r from-[#00f0ff] to-[#ff007f] rounded-full animate-pulse"></div>
-            </div>
-        </div>
-    </div>
-
-    <!-- UI Overlay Layer -->
-    <div id="ui-layer" class="flex flex-col md:flex-row justify-between p-4 md:p-6 select-none h-full w-full">
-        <!-- LEFT SIDE: Title & System Index -->
-        <div class="flex flex-col justify-between w-full md:w-[360px] h-full pointer-events-auto z-10">
-            <header class="cyber-panel p-5 rounded-lg border-l-4 border-l-[#00f0ff]">
-                <div class="flex items-center gap-3 mb-2">
-                    <span class="inline-block w-2.5 h-2.5 rounded-full bg-[#00f0ff] pulse-border"></span>
-                    <span class="font-mono-tech text-xs text-[#00f0ff] tracking-[0.3em]">KV-CORE QUANTUM HUB V.4.3</span>
-                </div>
-                <h1 class="text-2xl md:text-3.5xl font-cyber font-black tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-[#00f0ff] via-[#d946ef] to-[#ff007f] drop-shadow-[0_0_20px_rgba(0,240,255,0.5)]">
-                    KenvinZone
-                </h1>
-                <p class="text-xs text-gray-400 mt-2 font-light leading-relaxed font-mono-tech uppercase">
-                    Mạng phân phối lượng tử độ phân giải cao. Nhấp chọn hành tinh để kích hoạt Zoom quỹ đạo và mã hóa dữ liệu.
-                </p>
-            </header>
-
-            <!-- Hologram System Metrics -->
-            <div class="cyber-panel p-4 rounded-lg mt-4 hidden md:block">
-                <h3 class="font-cyber text-xs text-[#ff007f] font-bold mb-3 tracking-widest uppercase">Trạng thái liên kết</h3>
-                <div class="space-y-2 font-mono-tech text-xs">
-                    <div class="flex justify-between border-b border-[#00f0ff]/10 pb-1">
-                        <span class="text-gray-400">CORE RESOLUTION:</span>
-                        <span class="text-yellow-400 font-bold">4K ULTRA DETAILED</span>
-                    </div>
-                    <div class="flex justify-between border-b border-[#00f0ff]/10 pb-1">
-                        <span class="text-gray-400">DEPTH BUFFER:</span>
-                        <span class="text-[#00f0ff] font-bold">MULTI-PARALLAX ACTIVE</span>
-                    </div>
-                    <div class="flex justify-between border-b border-[#00f0ff]/10 pb-1">
-                        <span class="text-gray-400">GRID STABILITY:</span>
-                        <span class="text-emerald-400 font-bold">100% SECURE</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span class="text-gray-400">GEMINI NEURONS:</span>
-                        <span class="text-fuchsia-400 font-bold">READY (FLASH 3)</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Console Output Messages -->
-            <div id="hud-console" class="mt-auto pt-4 font-mono-tech text-[10px] text-gray-500 space-y-1">
-                <div>[SYSTEM] Booted rendering layer with 3-Layer deep starfield.</div>
-                <div>[D-LOG] Generating dynamic vector hologram meshes.</div>
-                <div>[AI-NEU] Neural interface online.</div>
-                <div class="text-[#00f0ff] animate-pulse">[CONNECTED] Double click to orbital lock-on.</div>
-            </div>
-        </div>
-
-        <!-- RIGHT SIDE: Gemini AI Assistant Panel -->
-        <div class="flex flex-col justify-end w-full md:w-[420px] h-[55%] md:h-full mt-4 md:mt-0 pointer-events-auto z-20 transition-all duration-300">
-            <div id="ai-panel" class="cyber-panel rounded-lg w-full h-full flex flex-col overflow-hidden relative border-t-2 border-[#ff007f]/50">
-                <!-- Holographic decorative lines -->
-                <div class="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-[#ff007f] to-transparent"></div>
-                <div class="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-[#00f0ff]/30 pointer-events-none"></div>
-
-                <!-- AI Terminal Header -->
-                <div class="flex items-center justify-between p-3 border-b border-white/10 bg-black/40">
-                    <div class="flex items-center gap-2">
-                        <span class="relative flex h-2 w-2">
-                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#ff007f] opacity-75"></span>
-                            <span class="relative inline-flex rounded-full h-2 w-2 bg-[#ff007f]"></span>
-                        </span>
-                        <h2 class="font-cyber text-sm font-black tracking-wider text-[#ff007f]">KV-CORE QUANTUM AI</h2>
-                    </div>
-                    <button id="toggle-ai-btn" class="text-xs font-mono-tech text-[#00f0ff] hover:text-[#ff007f]">
-                        <i class="fa-solid fa-terminal mr-1"></i> [CONSOLE]
-                    </button>
-                </div>
-
-                <!-- Chat Display Window -->
-                <div id="chat-box" class="flex-1 p-4 overflow-y-auto space-y-4 custom-scroll text-sm bg-black/20 font-light">
-                    <!-- AI Greeting message -->
-                    <div class="chat-message ai flex gap-3">
-                        <div class="w-6 h-6 rounded bg-[#ff007f]/20 border border-[#ff007f] flex items-center justify-center text-[10px] text-[#ff007f] font-cyber">AI</div>
-                        <div class="flex-1 space-y-2">
-                            <div class="p-3 rounded bg-[#ff007f]/10 border border-[#ff007f]/20 text-[#ff007f] font-mono-tech text-xs rounded-tl-none">
-                                Chào mừng bạn đến với KenvinZone v4.3 (Hệ quy chiếu đồ họa đa tầng). Tôi là **KV-Core AI**.
-                                <br><br>
-                                Không gian lượng tử hiện tại đã nâng cấp đồ phân giải hạt tinh vi và tạo vân cấu trúc ảo giác 3D.
-                                <br><br>
-                                🪐 **Nhấp chọn một hành tinh** hoặc sử dụng bảng điều khiển nhanh để ra lệnh giải mã dữ liệu!
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Quick Action Buttons -->
-                <div class="p-2 border-t border-white/5 bg-black/30 flex flex-wrap gap-1">
-                    <button class="ai-quick-btn text-[10px] font-mono-tech px-2 py-1 rounded bg-[#00f0ff]/10 border border-[#00f0ff]/30 hover:border-[#00f0ff] text-[#00f0ff] transition" data-prompt="Phân tích chi tiết Vệ tinh Tài chính VN-Index và những gì nó mang lại cho nhà đầu tư">
-                        📈 VN-Index
-                    </button>
-                    <button class="ai-quick-btn text-[10px] font-mono-tech px-2 py-1 rounded bg-[#ff007f]/10 border border-[#ff007f]/30 hover:border-[#ff007f] text-[#ff007f] transition" data-prompt="Giới thiệu về AI Class: Bạn giảng dạy kiến thức AI gì ở lớp học này?">
-                        🎓 AI Class
-                    </button>
-                    <button class="ai-quick-btn text-[10px] font-mono-tech px-2 py-1 rounded bg-yellow-500/10 border border-yellow-500/30 hover:border-yellow-500/60 text-yellow-400 transition" data-prompt="Trading Tool của KenvinZone sở hữu những chức năng tối ưu nào cho Trader?">
-                        🛠️ Trading Tool
-                    </button>
-                    <button class="ai-quick-btn text-[10px] font-mono-tech px-2 py-1 rounded bg-teal-500/10 border border-teal-500/30 hover:border-teal-500/60 text-teal-400 transition" data-prompt="AI News cập nhật xu hướng công nghệ như thế nào?">
-                        📰 AI News
-                    </button>
-                </div>
-
-                <!-- Input box -->
-                <div class="p-3 border-t border-white/10 bg-black/50 flex gap-2">
-                    <input type="text" id="ai-input" placeholder="Truy vấn dữ liệu KV-Core..." class="flex-1 bg-black/40 border border-[#00f0ff]/30 rounded px-3 py-2 text-xs font-mono-tech text-white focus:outline-none focus:border-[#00f0ff] placeholder-gray-600">
-                    <button id="send-ai-btn" class="cyber-btn-neon text-xs px-4 py-2 rounded font-cyber uppercase tracking-wider flex items-center gap-1">
-                        <span>Gửi</span><i class="fa-solid fa-paper-plane text-[10px]"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Planet Control HUD card inside 3D Scene -->
-        <div id="labels-container" class="absolute inset-0 pointer-events-none"></div>
-    </div>
-
-    <!-- Active Planet Preview HUD overlay (Bottom Center) -->
-    <div id="planet-hud-card" class="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-30 cyber-panel px-6 py-4 rounded-lg flex flex-col md:flex-row items-center gap-4 border-b-4 border-b-[#ff007f] opacity-0 translate-y-10 transition-all duration-500 max-w-lg w-[90%] md:w-auto pointer-events-auto">
-        <div id="hud-planet-avatar" class="w-12 h-12 rounded-full border-2 border-[#ff007f] flex items-center justify-center font-cyber text-lg shadow-[0_0_15px_rgba(255,0,127,0.4)]"></div>
-        <div class="text-center md:text-left">
-            <h4 id="hud-planet-name" class="font-cyber font-bold text-lg text-white">PLANET</h4>
-            <p id="hud-planet-desc" class="text-xs text-gray-400 font-mono-tech uppercase">DỰ LIỆU LIÊN KẾT: CHƯA KẾT NỐI</p>
-        </div>
-        <div class="flex gap-2 w-full md:w-auto mt-2 md:mt-0">
-            <button id="hud-ask-ai" class="flex-1 md:flex-none cyber-btn-magenta font-mono-tech text-xs px-3 py-1.5 rounded">
-                <i class="fa-solid fa-brain mr-1"></i> BÁO CÁO AI
-            </button>
-            <button id="hud-launch" class="flex-1 md:flex-none cyber-btn-neon font-cyber text-xs px-4 py-1.5 rounded uppercase tracking-wider">
-                PORTAL <i class="fa-solid fa-arrow-up-right-from-square ml-1 text-[10px]"></i>
-            </button>
-        </div>
-    </div>
-
-    <!-- 3D Canvas Container -->
-    <div id="canvas-container"></div>
-
-    <script type="module">
-        import * as THREE from 'three';
-        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-
-        const systemData = [
-            { id: 'main', name: 'KenvinZone', type: 'star', url: 'https://kenvinzone.com', radius: 4.5, color: 0xff0055, emissive: 0xff0033, desc: 'TỔ HỢP TRUNG TÂM LƯỢNG TỬ KENVINZONE', emoji: '🌟' },
-            { id: 'vnindex', name: 'VN-Index', type: 'planet', url: 'https://vnindex.kenvinzone.com', radius: 1.5, distance: 12, speed: 0.007, color: 0x00f0ff, angle: Math.random() * Math.PI * 2, desc: 'DỮ LIỆU BẢNG GIÁ & CHỈ SỐ THỊ TRƯỜNG CHỨNG KHOÁN VIỆT NAM', emoji: '📈' },
-            { id: 'aiclass', name: 'AI Class', type: 'planet', url: 'https://aiclass.kenvinzone.com', radius: 1.7, distance: 17, speed: 0.005, color: 0xd946ef, angle: Math.random() * Math.PI * 2, desc: 'LỚP HỌC TRÍ TUỆ NHÂN TẠO & PHÁT TRIỂN ỨNG DỤNG THẾ HỆ MỚI', emoji: '🎓' },
-            { id: 'trading', name: 'Trading Tool', type: 'planet', url: 'https://tradingtool.kenvinzone.com', radius: 1.4, distance: 22, speed: 0.004, color: 0xffaa00, angle: Math.random() * Math.PI * 2, desc: 'CÔNG CỤ PHÂN TÍCH KỸ THUẬT & TRỢ LÝ GIAO DỊCH TÀI CHÍNH', emoji: '🛠️' },
-            { id: 'gold', name: 'Gold & Nasdaq', type: 'planet', url: 'https://gold-nasdaq.kenvinzone.com', radius: 1.6, distance: 27, speed: 0.003, color: 0x00ffaa, angle: Math.random() * Math.PI * 2, desc: 'BIỂU ĐỒ & BÁO CÁO PHÂN TÍCH GIÁ VÀNG & CHỈ SỐ NASDAQ TOÀN CẦU', emoji: '🟡' },
-            { id: 'ainews', name: 'AI News', type: 'planet', url: 'https://ainews.kenvinzone.com', radius: 1.2, distance: 32, speed: 0.002, color: 0x3b82f6, angle: Math.random() * Math.PI * 2, desc: 'BẢN TIN SỰ KIỆN & CẬP NHẬT CÔNG NGHỆ CHUYÊN SÂU AI', emoji: '📰' }
-        ];
-
-        // Scene Setup
-        const container = document.getElementById('canvas-container');
-        const labelsContainer = document.getElementById('labels-container');
-        
-        const scene = new THREE.Scene();
-        scene.fog = new THREE.FogExp2(0x020005, 0.015);
-
-        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.set(0, 45, 75);
-
-        // Advanced anti-aliasing & high definition renderer settings
-        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "high-performance" });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        // Supports ultra-sharp high DPI resolution screens up to a scale factor of 3
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 3));
-        
-        // Premium Cinematic tone mapping config
-        renderer.toneMapping = THREE.ACESFilmicToneMapping;
-        renderer.toneMappingExposure = 1.35;
-        container.appendChild(renderer.domElement);
-
-        const controls = new OrbitControls(camera, renderer.domElement);
-        controls.enableDamping = true;
-        controls.dampingFactor = 0.04;
-        controls.maxDistance = 160;
-        controls.minDistance = 8;
-        controls.maxPolarAngle = Math.PI / 2 + 0.05;
-
-        // Ambient Light to prevent pitch black spots
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.08);
-        scene.add(ambientLight);
-
-        // Core central glowing sun light sources
-        const coreLight = new THREE.PointLight(0xff0066, 60, 160, 0.8);
-        coreLight.position.set(0, 0, 0);
-        scene.add(coreLight);
-
-        const coreLightCyan = new THREE.PointLight(0x00f0ff, 45, 110, 1.1);
-        coreLightCyan.position.set(0, 0, 0);
-        scene.add(coreLightCyan);
-
-        const celestialBodies = [];
-        const planetMeshes = [];
-
-        // Advanced Holographic Ground Mesh
-        function createHoloGridFloor() {
-            const size = 120;
-            const divisions = 60;
-            const gridHelper = new THREE.GridHelper(size, divisions, 0xff007f, 0x0a041f);
-            gridHelper.position.y = -8;
-            gridHelper.material.opacity = 0.22;
-            gridHelper.material.transparent = true;
-            scene.add(gridHelper);
-        }
-        createHoloGridFloor();
-
-        function createCyberPlanetTexture(baseHexColor, isSun = false) {
-            const canvas = document.createElement('canvas');
-            canvas.width = 1024;
-            canvas.height = 512;
-            const ctx = canvas.getContext('2d');
-
-            // Dark base cosmic gradient
-            const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
-            grad.addColorStop(0, '#04010a');
-            grad.addColorStop(0.5, '#0a0316');
-            grad.addColorStop(1, '#020005');
-            ctx.fillStyle = grad;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            // Vector HUD-grid lines
-            ctx.strokeStyle = baseHexColor;
-            ctx.lineWidth = 1;
-            ctx.globalAlpha = isSun ? 0.4 : 0.25;
-            
-            // Draw Latitude Lines
-            for (let y = 0; y < canvas.height; y += 16) {
-                ctx.beginPath();
-                ctx.moveTo(0, y);
-                ctx.lineTo(canvas.width, y);
-                ctx.stroke();
-            }
-            // Draw Longitude Lines
-            for (let x = 0; x < canvas.width; x += 32) {
-                ctx.beginPath();
-                ctx.moveTo(x, 0);
-                ctx.lineTo(x, canvas.height);
-                ctx.stroke();
-            }
-
-            // Glow Equator band
-            ctx.globalAlpha = 0.7;
-            ctx.lineWidth = 4;
-            ctx.strokeStyle = baseHexColor;
-            ctx.beginPath();
-            ctx.moveTo(0, canvas.height / 2);
-            ctx.lineTo(canvas.width, canvas.height / 2);
-            ctx.stroke();
-
-            // Cybernetic technical data lines & data chips block
-            ctx.fillStyle = baseHexColor;
-            for (let i = 0; i < 15; i++) {
-                ctx.globalAlpha = Math.random() * 0.7 + 0.15;
-                const rx = Math.floor(Math.random() * canvas.width);
-                const ry = Math.floor(Math.random() * (canvas.height - 40)) + 20;
-                const rw = Math.random() * 80 + 20;
-                const rh = Math.random() * 10 + 2;
-                ctx.fillRect(rx, ry, rw, rh);
-
-                // Little structural dots
-                ctx.beginPath();
-                ctx.arc(rx - 5, ry + rh / 2, 2, 0, Math.PI * 2);
-                ctx.fill();
-            }
-
-            // Digital barcode / pulse lines
-            ctx.globalAlpha = 0.8;
-            ctx.font = '10px Courier New';
-            ctx.fillStyle = baseHexColor;
-            for (let i = 0; i < 4; i++) {
-                const tx = Math.random() * (canvas.width - 200);
-                const ty = Math.random() * (canvas.height - 40) + 20;
-                ctx.fillText("[QUANTUM LNK " + Math.floor(Math.random() * 9999) + "]", tx, ty);
-            }
-
-            const texture = new THREE.CanvasTexture(canvas);
-            texture.wrapS = THREE.RepeatWrapping;
-            texture.wrapT = THREE.ClampToEdgeWrapping;
-            return texture;
-        }
-
-        // Build Highly Detailed Planet Objects with generated textures
-        systemData.forEach((data) => {
-            let geometry, material;
-            const hexColorStr = '#' + data.color.toString(16).padStart(6, '0');
-            const planetTexture = createCyberPlanetTexture(hexColorStr, data.type === 'star');
-
-            if (data.type === 'star') {
-                // Central Sun Core
-                geometry = new THREE.SphereGeometry(data.radius, 48, 48);
-                material = new THREE.MeshStandardMaterial({
-                    map: planetTexture,
-                    emissive: data.emissive,
-                    emissiveIntensity: 2.8,
-                    roughness: 0.1,
-                    metalness: 0.95
-                });
-            } else {
-                // Planets
-                geometry = new THREE.SphereGeometry(data.radius, 36, 36);
-                material = new THREE.MeshStandardMaterial({
-                    map: planetTexture,
-                    emissive: data.color,
-                    emissiveIntensity: 0.35,
-                    roughness: 0.3,
-                    metalness: 0.85
-                });
-            }
-
-            const mesh = new THREE.Mesh(geometry, material);
-            mesh.userData = { ...data, baseScale: 1 };
-            
-            if (data.type === 'planet') {
-                // Initial Positioning
-                mesh.position.x = Math.cos(data.angle) * data.distance;
-                mesh.position.z = Math.sin(data.angle) * data.distance;
-                planetMeshes.push(mesh);
-
-                // High Fidelity Quỹ đạo phát sáng neon mờ
-                const orbitGeometry = new THREE.RingGeometry(data.distance - 0.08, data.distance + 0.08, 128);
-                const orbitMaterial = new THREE.MeshBasicMaterial({
-                    color: data.color,
-                    side: THREE.DoubleSide,
-                    transparent: true,
-                    opacity: 0.25
-                });
-                const orbitRing = new THREE.Mesh(orbitGeometry, orbitMaterial);
-                orbitRing.rotation.x = Math.PI / 2;
-                scene.add(orbitRing);
-
-                // Dynamic outer structural radar-wireframe ring around the satellite planet
-                const radarGeo = new THREE.RingGeometry(data.radius * 1.25, data.radius * 1.35, 32);
-                const radarMat = new THREE.MeshBasicMaterial({
-                    color: data.color,
-                    side: THREE.DoubleSide,
-                    transparent: true,
-                    opacity: 0.35,
-                    wireframe: true
-                });
-                const planetRadar = new THREE.Mesh(radarGeo, radarMat);
-                planetRadar.rotation.x = Math.PI / 2;
-                mesh.add(planetRadar);
-
-            } else {
-                mesh.position.set(0, 0, 0);
-                planetMeshes.push(mesh);
-
-                // Giant Holographic Wireframe Orbital Ring for the sun
-                const ringGeo = new THREE.RingGeometry(data.radius * 1.4, data.radius * 2.3, 96);
-                const ringMat = new THREE.MeshBasicMaterial({
-                    color: 0xff007f,
-                    side: THREE.DoubleSide,
-                    transparent: true,
-                    opacity: 0.3,
-                    wireframe: true
-                });
-                const sunRing = new THREE.Mesh(ringGeo, ringMat);
-                sunRing.rotation.x = Math.PI / 2 + 0.2;
-                mesh.add(sunRing);
-            }
-
-            scene.add(mesh);
-
-            // Create CSS 2D Labels
-            const labelDiv = document.createElement('div');
-            labelDiv.className = `planet-label ${data.type === 'star' ? 'center-label' : ''}`;
-            labelDiv.innerHTML = `<i class="fa-solid ${data.type === 'star' ? 'fa-bolt animate-pulse' : 'fa-circle-notch animate-spin'} mr-1.5 text-[10px]"></i>${data.name}`;
-            
-            labelDiv.addEventListener('click', () => {
-                selectPlanetAndFocus(mesh);
-            });
-
-            labelsContainer.appendChild(labelDiv);
-
-            celestialBodies.push({
-                mesh: mesh,
-                data: data,
-                label: labelDiv
-            });
-        });
-
-        const starLayers = [];
-
-        function createStarfieldLayer(count, size, distanceRange, colorHex, speedMult) {
-            const starsGeometry = new THREE.BufferGeometry();
-            const posArray = new Float32Array(count * 3);
-            const colorsArray = new Float32Array(count * 3);
-            const color = new THREE.Color(colorHex);
-
-            for (let i = 0; i < count * 3; i += 3) {
-                // Spherical distribution around central core
-                const radius = distanceRange.min + Math.random() * (distanceRange.max - distanceRange.min);
-                const theta = 2 * Math.PI * Math.random();
-                const phi = Math.acos(2 * Math.random() - 1);
-                
-                posArray[i] = radius * Math.sin(phi) * Math.cos(theta);
-                posArray[i+1] = radius * Math.sin(phi) * Math.sin(theta);
-                posArray[i+2] = radius * Math.cos(phi);
-
-                colorsArray[i] = color.r + (Math.random() - 0.5) * 0.2;
-                colorsArray[i+1] = color.g + (Math.random() - 0.5) * 0.2;
-                colorsArray[i+2] = color.b + (Math.random() - 0.5) * 0.2;
-            }
-
-            starsGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
-            starsGeometry.setAttribute('color', new THREE.BufferAttribute(colorsArray, 3));
-
-            const starsMaterial = new THREE.PointsMaterial({
-                size: size,
-                vertexColors: true,
-                transparent: true,
-                opacity: 0.85,
-                blending: THREE.AdditiveBlending,
-                sizeAttenuation: true
-            });
-
-            const starPoints = new THREE.Points(starsGeometry, starsMaterial);
-            scene.add(starPoints);
-
-            starLayers.push({
-                mesh: starPoints,
-                speed: speedMult
-            });
-        }
-
-        // Layer 1: Inner Nebula dust particles (Dense, very small, pinkish/violet)
-        createStarfieldLayer(1500, 0.45, { min: 40, max: 130 }, 0xff00af, 0.03);
-        // Layer 2: Main Cyan grid constellations (Medium, cyan/blue)
-        createStarfieldLayer(2000, 0.65, { min: 80, max: 220 }, 0x00f0ff, 0.015);
-        // Layer 3: Distant deep cosmos (Tiny, slow, pure bright white/yellow stars)
-        createStarfieldLayer(2500, 0.35, { min: 200, max: 400 }, 0xffffff, 0.005);
-
-        // ============================================================
-        // CYBERPUNK SPACESHIP - Tàu vũ trụ bay từ dưới lên
-        // ============================================================
-        const spaceshipGroup = new THREE.Group();
-
-        // Thân tàu chính (fuselage) - hình nón thuôn dài
-        const hullGeo = new THREE.ConeGeometry(0.55, 2.6, 12);
-        const hullMat = new THREE.MeshStandardMaterial({
-            color: 0x1a1a2e,
-            emissive: 0x00f0ff,
-            emissiveIntensity: 0.15,
-            metalness: 0.95,
-            roughness: 0.25
-        });
-        const hull = new THREE.Mesh(hullGeo, hullMat);
-        hull.rotation.x = Math.PI / 2; // mũi tàu hướng về phía trước (+Z)
-        spaceshipGroup.add(hull);
-
-        // Khoang lái (cockpit) - cầu thủy tinh phát sáng
-        const cockpitGeo = new THREE.SphereGeometry(0.38, 16, 16, 0, Math.PI * 2, 0, Math.PI / 2);
-        const cockpitMat = new THREE.MeshStandardMaterial({
-            color: 0x00f0ff,
-            emissive: 0x00f0ff,
-            emissiveIntensity: 1.2,
-            metalness: 0.6,
-            roughness: 0.1,
-            transparent: true,
-            opacity: 0.85
-        });
-        const cockpit = new THREE.Mesh(cockpitGeo, cockpitMat);
-        cockpit.rotation.x = -Math.PI / 2;
-        cockpit.position.z = 0.4;
-        cockpit.position.y = 0.15;
-        spaceshipGroup.add(cockpit);
-
-        // Cánh tàu - 2 cánh tam giác phẳng 2 bên
-        const wingShape = new THREE.Shape();
-        wingShape.moveTo(0, 0);
-        wingShape.lineTo(1.5, -0.4);
-        wingShape.lineTo(1.5, -0.05);
-        wingShape.lineTo(0.2, 0.3);
-        wingShape.lineTo(0, 0);
-
-        const wingGeo = new THREE.ExtrudeGeometry(wingShape, { depth: 0.08, bevelEnabled: false });
-        const wingMat = new THREE.MeshStandardMaterial({
-            color: 0x2a0a3e,
-            emissive: 0xff007f,
-            emissiveIntensity: 0.45,
-            metalness: 0.9,
-            roughness: 0.3
-        });
-        const wingLeft = new THREE.Mesh(wingGeo, wingMat);
-        wingLeft.position.set(0, 0, -0.3);
-        spaceshipGroup.add(wingLeft);
-
-        const wingRight = new THREE.Mesh(wingGeo, wingMat);
-        wingRight.position.set(0, 0, -0.3);
-        wingRight.scale.x = -1; // mirror
-        spaceshipGroup.add(wingRight);
-
-        // Đèn neon viền cánh - edges sáng
-        const wingEdgeMat = new THREE.LineBasicMaterial({ color: 0xff007f, transparent: true, opacity: 0.9 });
-        const wingEdgeGeo = new THREE.EdgesGeometry(wingGeo);
-        const wingEdgeLeft = new THREE.LineSegments(wingEdgeGeo, wingEdgeMat);
-        wingEdgeLeft.position.copy(wingLeft.position);
-        spaceshipGroup.add(wingEdgeLeft);
-
-        const wingEdgeRight = new THREE.LineSegments(wingEdgeGeo, wingEdgeMat);
-        wingEdgeRight.position.copy(wingRight.position);
-        wingEdgeRight.scale.x = -1;
-        spaceshipGroup.add(wingEdgeRight);
-
-        // Đèn neon dọc thân tàu
-        const stripGeo = new THREE.CylinderGeometry(0.06, 0.06, 1.8, 6);
-        const stripMat = new THREE.MeshBasicMaterial({ color: 0x00f0ff, transparent: true, opacity: 0.9 });
-        const strip1 = new THREE.Mesh(stripGeo, stripMat);
-        strip1.rotation.x = Math.PI / 2;
-        strip1.position.set(0.35, 0, -0.3);
-        spaceshipGroup.add(strip1);
-        const strip2 = new THREE.Mesh(stripGeo, stripMat);
-        strip2.rotation.x = Math.PI / 2;
-        strip2.position.set(-0.35, 0, -0.3);
-        spaceshipGroup.add(strip2);
-
-        // Engine - 2 ống xả phía sau
-        const engineGeo = new THREE.CylinderGeometry(0.18, 0.22, 0.4, 12);
-        const engineMat = new THREE.MeshStandardMaterial({
-            color: 0x0a0a14,
-            metalness: 0.95,
-            roughness: 0.4
-        });
-        const engineLeft = new THREE.Mesh(engineGeo, engineMat);
-        engineLeft.rotation.x = Math.PI / 2;
-        engineLeft.position.set(0.28, 0, -1.4);
-        spaceshipGroup.add(engineLeft);
-
-        const engineRight = new THREE.Mesh(engineGeo, engineMat);
-        engineRight.rotation.x = Math.PI / 2;
-        engineRight.position.set(-0.28, 0, -1.4);
-        spaceshipGroup.add(engineRight);
-
-        // Lửa động cơ - cone sáng phát ra phía sau
-        const flameGeo = new THREE.ConeGeometry(0.18, 1.2, 12);
-        const flameMat = new THREE.MeshBasicMaterial({
-            color: 0xff007f,
-            transparent: true,
-            opacity: 0.85,
-            blending: THREE.AdditiveBlending
-        });
-        const flameLeft = new THREE.Mesh(flameGeo, flameMat);
-        flameLeft.rotation.x = -Math.PI / 2;
-        flameLeft.position.set(0.28, 0, -2.2);
-        spaceshipGroup.add(flameLeft);
-
-        const flameRight = new THREE.Mesh(flameGeo, flameMat);
-        flameRight.rotation.x = -Math.PI / 2;
-        flameRight.position.set(-0.28, 0, -2.2);
-        spaceshipGroup.add(flameRight);
-
-        // Lửa lõi cyan bên trong (additive blend tạo white-hot core)
-        const innerFlameGeo = new THREE.ConeGeometry(0.1, 0.9, 8);
-        const innerFlameMat = new THREE.MeshBasicMaterial({
-            color: 0x00f0ff,
-            transparent: true,
-            opacity: 0.95,
-            blending: THREE.AdditiveBlending
-        });
-        const innerFlameLeft = new THREE.Mesh(innerFlameGeo, innerFlameMat);
-        innerFlameLeft.rotation.x = -Math.PI / 2;
-        innerFlameLeft.position.set(0.28, 0, -2.0);
-        spaceshipGroup.add(innerFlameLeft);
-
-        const innerFlameRight = new THREE.Mesh(innerFlameGeo, innerFlameMat);
-        innerFlameRight.rotation.x = -Math.PI / 2;
-        innerFlameRight.position.set(-0.28, 0, -2.0);
-        spaceshipGroup.add(innerFlameRight);
-
-        // Đèn point light phát ra từ engine để chiếu vào hệ
-        const engineLight = new THREE.PointLight(0xff007f, 3, 18, 1.5);
-        engineLight.position.set(0, 0, -2.0);
-        spaceshipGroup.add(engineLight);
-
-        const cockpitLight = new THREE.PointLight(0x00f0ff, 1.2, 8, 1.5);
-        cockpitLight.position.set(0, 0.2, 0.5);
-        spaceshipGroup.add(cockpitLight);
-
-        // Vệt khói/particle trail phía sau
-        const TRAIL_COUNT = 80;
-        const trailGeo = new THREE.BufferGeometry();
-        const trailPositions = new Float32Array(TRAIL_COUNT * 3);
-        const trailColors = new Float32Array(TRAIL_COUNT * 3);
-        const trailAlphas = new Float32Array(TRAIL_COUNT);
-        for (let i = 0; i < TRAIL_COUNT; i++) {
-            trailPositions[i * 3] = 0;
-            trailPositions[i * 3 + 1] = 0;
-            trailPositions[i * 3 + 2] = 0;
-            trailColors[i * 3] = 1;
-            trailColors[i * 3 + 1] = 0;
-            trailColors[i * 3 + 2] = 0.5;
-            trailAlphas[i] = 0;
-        }
-        trailGeo.setAttribute('position', new THREE.BufferAttribute(trailPositions, 3));
-        trailGeo.setAttribute('color', new THREE.BufferAttribute(trailColors, 3));
-        const trailMat = new THREE.PointsMaterial({
-            size: 0.45,
-            vertexColors: true,
-            transparent: true,
-            opacity: 0.8,
-            blending: THREE.AdditiveBlending,
-            sizeAttenuation: true,
-            depthWrite: false
-        });
-        const trailPoints = new THREE.Points(trailGeo, trailMat);
-        scene.add(trailPoints);
-
-        // Trail history: lưu lại vị trí trước đó của tàu
-        const trailHistory = [];
-        for (let i = 0; i < TRAIL_COUNT; i++) {
-            trailHistory.push(new THREE.Vector3(0, -100, 0));
-        }
-
-        // Thêm tàu vào scene
-        scene.add(spaceshipGroup);
-
-        // ============================================================
-        // QUỸ ĐẠO TÀU - bay lên từ dưới, lượn quanh hệ, rồi lặp lại
-        // ============================================================
-        // Tổng thời gian 1 chu kỳ (giây)
-        const SHIP_CYCLE_DURATION = 28;
-        let shipTime = 0;
-
-        function getShipPosition(t) {
-            // t: 0 -> 1 (chuẩn hóa trong 1 chu kỳ)
-            // Quỹ đạo: bắt đầu từ dưới sâu (y rất âm), bay lên,
-            // lượn cong quanh hệ mặt trời, rồi quay xuống dưới reset.
-            // Dùng tham số hóa cong (curve parametric).
-            const angle = t * Math.PI * 2; // 1 vòng quanh trục
-            const radius = 38 + Math.sin(t * Math.PI) * 8; // bán kính co giãn nhẹ
-            // Độ cao: hình sin để đi lên đỉnh giữa chu kỳ rồi đi xuống
-            // Bắt đầu từ y = -55 (sâu dưới), đỉnh y = 22, kết thúc y = -55
-            const verticalCurve = Math.sin(t * Math.PI); // 0 -> 1 -> 0
-            const y = -55 + verticalCurve * 80; // -55 -> 25 -> -55
-
-            const x = Math.cos(angle + Math.PI / 2) * radius;
-            const z = Math.sin(angle + Math.PI / 2) * radius;
-
-            return new THREE.Vector3(x, y, z);
-        }
-        // ============================================================
-        // END SPACESHIP SETUP
-        // ============================================================
-
-        // ============================================================
-        // GIANT METEOR - Thiên thạch khổng lồ bay qua, huyền bí
-        // ============================================================
-        const meteorGroup = new THREE.Group();
-
-        // 1. Tạo texture cho meteor: đá xù xì + vết nứt phát sáng (lava cracks)
-        function createMeteorTexture() {
-            const canvas = document.createElement('canvas');
-            canvas.width = 1024;
-            canvas.height = 512;
-            const ctx = canvas.getContext('2d');
-
-            // Nền đá tối với gradient noise
-            const grad = ctx.createRadialGradient(512, 256, 50, 512, 256, 500);
-            grad.addColorStop(0, '#3a2418');
-            grad.addColorStop(0.5, '#1f1410');
-            grad.addColorStop(1, '#0a0606');
-            ctx.fillStyle = grad;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            // Noise đá - chấm sần ngẫu nhiên
-            for (let i = 0; i < 5000; i++) {
-                const x = Math.random() * canvas.width;
-                const y = Math.random() * canvas.height;
-                const size = Math.random() * 3;
-                const shade = Math.floor(Math.random() * 60 + 20);
-                ctx.fillStyle = `rgb(${shade}, ${Math.floor(shade*0.7)}, ${Math.floor(shade*0.5)})`;
-                ctx.fillRect(x, y, size, size);
-            }
-
-            // Hố thiên thạch (craters) - dạng vòng tròn tối
-            for (let i = 0; i < 25; i++) {
-                const cx = Math.random() * canvas.width;
-                const cy = Math.random() * canvas.height;
-                const r = Math.random() * 60 + 20;
-                const craterGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
-                craterGrad.addColorStop(0, 'rgba(0, 0, 0, 0.7)');
-                craterGrad.addColorStop(0.7, 'rgba(40, 25, 15, 0.4)');
-                craterGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
-                ctx.fillStyle = craterGrad;
-                ctx.beginPath();
-                ctx.arc(cx, cy, r, 0, Math.PI * 2);
-                ctx.fill();
-            }
-
-            // Vết nứt phát sáng (glowing cracks) - nét cam/đỏ rực
-            ctx.lineCap = 'round';
-            for (let i = 0; i < 18; i++) {
-                const startX = Math.random() * canvas.width;
-                const startY = Math.random() * canvas.height;
-                
-                // Glow halo của vết nứt
-                ctx.strokeStyle = 'rgba(255, 80, 20, 0.4)';
-                ctx.lineWidth = 8;
-                ctx.beginPath();
-                ctx.moveTo(startX, startY);
-                let x = startX, y = startY;
-                const segments = Math.floor(Math.random() * 6) + 3;
-                for (let s = 0; s < segments; s++) {
-                    x += (Math.random() - 0.5) * 80;
-                    y += (Math.random() - 0.5) * 60;
-                    ctx.lineTo(x, y);
-                }
-                ctx.stroke();
-
-                // Lõi vết nứt - cam vàng cháy
-                ctx.strokeStyle = 'rgba(255, 200, 60, 0.95)';
-                ctx.lineWidth = 2;
-                ctx.beginPath();
-                ctx.moveTo(startX, startY);
-                x = startX; y = startY;
-                for (let s = 0; s < segments; s++) {
-                    x += (Math.random() - 0.5) * 80;
-                    y += (Math.random() - 0.5) * 60;
-                    ctx.lineTo(x, y);
-                }
-                ctx.stroke();
-            }
-
-            const texture = new THREE.CanvasTexture(canvas);
-            texture.wrapS = THREE.RepeatWrapping;
-            texture.wrapT = THREE.ClampToEdgeWrapping;
-            return texture;
-        }
-
-        // 2. Geometry: dùng IcosahedronGeometry rồi biến dạng vertices cho xù xì
-        const meteorRadius = 5.5;
-        const meteorGeo = new THREE.IcosahedronGeometry(meteorRadius, 3);
-        const meteorPos = meteorGeo.attributes.position;
-        const v = new THREE.Vector3();
-        for (let i = 0; i < meteorPos.count; i++) {
-            v.fromBufferAttribute(meteorPos, i);
-            // Biến dạng ngẫu nhiên - làm bề mặt gồ ghề
-            const noise = (Math.random() - 0.5) * 0.9;
-            // Thêm bump dạng sin để có khối lồi lõm rõ
-            const bump = Math.sin(v.x * 0.5) * Math.cos(v.y * 0.5) * Math.sin(v.z * 0.5) * 0.7;
-            const len = v.length();
-            const newLen = len + noise + bump;
-            v.normalize().multiplyScalar(newLen);
-            meteorPos.setXYZ(i, v.x, v.y, v.z);
-        }
-        meteorGeo.computeVertexNormals();
-
-        const meteorTexture = createMeteorTexture();
-        const meteorMat = new THREE.MeshStandardMaterial({
-            map: meteorTexture,
-            emissive: 0xff4400,
-            emissiveIntensity: 0.35,
-            roughness: 0.95,
-            metalness: 0.15,
-            flatShading: false
-        });
-        const meteorMesh = new THREE.Mesh(meteorGeo, meteorMat);
-        meteorGroup.add(meteorMesh);
-
-        // 3. Hào quang phía sau - sphere lớn mờ phát sáng (atmosphere/aura)
-        const auraGeo = new THREE.SphereGeometry(meteorRadius * 1.5, 32, 32);
-        const auraMat = new THREE.MeshBasicMaterial({
-            color: 0xff6622,
-            transparent: true,
-            opacity: 0.15,
-            blending: THREE.AdditiveBlending,
-            side: THREE.BackSide,
-            depthWrite: false
-        });
-        const aura = new THREE.Mesh(auraGeo, auraMat);
-        meteorGroup.add(aura);
-
-        // Lớp aura thứ 2 - đỏ thẫm rộng hơn (heat shockwave)
-        const aura2Geo = new THREE.SphereGeometry(meteorRadius * 2.2, 24, 24);
-        const aura2Mat = new THREE.MeshBasicMaterial({
-            color: 0xff2200,
-            transparent: true,
-            opacity: 0.07,
-            blending: THREE.AdditiveBlending,
-            side: THREE.BackSide,
-            depthWrite: false
-        });
-        const aura2 = new THREE.Mesh(aura2Geo, aura2Mat);
-        meteorGroup.add(aura2);
-
-        // 4. Hào quang sprite phía sau - tạo cảm giác mặt trời nhỏ phía sau meteor
-        const haloCanvas = document.createElement('canvas');
-        haloCanvas.width = 512;
-        haloCanvas.height = 512;
-        const hctx = haloCanvas.getContext('2d');
-        const haloGrad = hctx.createRadialGradient(256, 256, 0, 256, 256, 256);
-        haloGrad.addColorStop(0, 'rgba(255, 220, 150, 1)');
-        haloGrad.addColorStop(0.15, 'rgba(255, 150, 50, 0.85)');
-        haloGrad.addColorStop(0.4, 'rgba(255, 60, 20, 0.45)');
-        haloGrad.addColorStop(0.7, 'rgba(180, 30, 10, 0.15)');
-        haloGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
-        hctx.fillStyle = haloGrad;
-        hctx.fillRect(0, 0, 512, 512);
-
-        const haloTexture = new THREE.CanvasTexture(haloCanvas);
-        const haloMat = new THREE.SpriteMaterial({
-            map: haloTexture,
-            transparent: true,
-            opacity: 0.9,
-            blending: THREE.AdditiveBlending,
-            depthWrite: false
-        });
-        const haloSprite = new THREE.Sprite(haloMat);
-        haloSprite.scale.set(meteorRadius * 5, meteorRadius * 5, 1);
-        meteorGroup.add(haloSprite);
-
-        // 5. Đèn point light từ meteor - chiếu cam/đỏ vào hệ khi đi ngang qua
-        const meteorLight = new THREE.PointLight(0xff5522, 8, 80, 1.3);
-        meteorGroup.add(meteorLight);
-
-        // 6. Vệt đuôi sao chổi - particle trail dài, cam rực
-        const METEOR_TRAIL_COUNT = 150;
-        const mTrailGeo = new THREE.BufferGeometry();
-        const mTrailPos = new Float32Array(METEOR_TRAIL_COUNT * 3);
-        const mTrailCol = new Float32Array(METEOR_TRAIL_COUNT * 3);
-        const mTrailSize = new Float32Array(METEOR_TRAIL_COUNT);
-        for (let i = 0; i < METEOR_TRAIL_COUNT; i++) {
-            mTrailPos[i * 3] = 0;
-            mTrailPos[i * 3 + 1] = -200;
-            mTrailPos[i * 3 + 2] = 0;
-            mTrailCol[i * 3] = 1;
-            mTrailCol[i * 3 + 1] = 0.4;
-            mTrailCol[i * 3 + 2] = 0.1;
-            mTrailSize[i] = 2;
-        }
-        mTrailGeo.setAttribute('position', new THREE.BufferAttribute(mTrailPos, 3));
-        mTrailGeo.setAttribute('color', new THREE.BufferAttribute(mTrailCol, 3));
-        const mTrailMat = new THREE.PointsMaterial({
-            size: 2.2,
-            vertexColors: true,
-            transparent: true,
-            opacity: 0.85,
-            blending: THREE.AdditiveBlending,
-            sizeAttenuation: true,
-            depthWrite: false
-        });
-        const meteorTrailPoints = new THREE.Points(mTrailGeo, mTrailMat);
-        scene.add(meteorTrailPoints);
-
-        const meteorTrailHistory = [];
-        for (let i = 0; i < METEOR_TRAIL_COUNT; i++) {
-            meteorTrailHistory.push(new THREE.Vector3(0, -200, 0));
-        }
-
-        scene.add(meteorGroup);
-
-        // ============================================================
-        // QUỸ ĐẠO METEOR - bay chéo qua scene, chậm rãi và huyền bí
-        // ============================================================
-        const METEOR_CYCLE_DURATION = 55; // chậm hơn tàu nhiều - cảm giác đồ sộ
-        let meteorTime = 8; // offset để meteor xuất hiện sau tàu vài giây
-
-        function getMeteorPosition(t) {
-            // Quỹ đạo chéo: vào từ góc trên-xa, ra ở góc dưới-gần (hoặc ngược lại).
-            // Lệch khỏi mặt phẳng XZ của hành tinh để không che chúng.
-            // Đường thẳng cong nhẹ - như sao chổi đi qua.
-            // t: 0 -> 1
-            // Tham số hóa: điểm bắt đầu xa, đi qua "gần camera" rồi đi xa tiếp
-            const startPos = new THREE.Vector3(-90, 35, -80);
-            const endPos = new THREE.Vector3(85, -25, 70);
-            // Điểm điều khiển ở giữa để uốn cong (quadratic bezier)
-            const ctrl = new THREE.Vector3(0, 45, -10);
-
-            // Quadratic Bezier: B(t) = (1-t)^2 P0 + 2(1-t)t P1 + t^2 P2
-            const oneMinusT = 1 - t;
-            const x = oneMinusT * oneMinusT * startPos.x + 2 * oneMinusT * t * ctrl.x + t * t * endPos.x;
-            const y = oneMinusT * oneMinusT * startPos.y + 2 * oneMinusT * t * ctrl.y + t * t * endPos.y;
-            const z = oneMinusT * oneMinusT * startPos.z + 2 * oneMinusT * t * ctrl.z + t * t * endPos.z;
-            return new THREE.Vector3(x, y, z);
-        }
-        // ============================================================
-        // END METEOR SETUP
-        // ============================================================
-
-        // Raycaster Interaction Logic
-        const raycaster = new THREE.Raycaster();
-        const mouse = new THREE.Vector2();
-        let hoveredMesh = null;
-        let selectedMesh = null;
-
-        const targetCamPos = new THREE.Vector3();
-        let transitionProgress = 1;
-
-        function onMouseMove(event) {
-            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-
-            raycaster.setFromCamera(mouse, camera);
-            const intersects = raycaster.intersectObjects(planetMeshes);
-
-            if (intersects.length > 0) {
-                const object = intersects[0].object;
-                if (hoveredMesh !== object) {
-                    resetHoverEffects();
-                    
-                    hoveredMesh = object;
-                    document.body.style.cursor = 'pointer';
-                    hoveredMesh.scale.set(1.22, 1.22, 1.22);
-                    
-                    if (hoveredMesh.userData.type === 'planet') {
-                        hoveredMesh.material.emissiveIntensity = 0.95;
-                    } else {
-                        hoveredMesh.material.emissiveIntensity = 4.0;
-                    }
-                }
-            } else {
-                resetHoverEffects();
-            }
-        }
-
-        function resetHoverEffects() {
-            if (hoveredMesh) {
-                hoveredMesh.scale.set(1, 1, 1);
-                if (hoveredMesh.userData.type === 'planet') {
-                    hoveredMesh.material.emissiveIntensity = 0.35;
-                } else {
-                    hoveredMesh.material.emissiveIntensity = 2.8;
-                }
-                hoveredMesh = null;
-                document.body.style.cursor = 'default';
-            }
-        }
-
-        function selectPlanetAndFocus(mesh) {
-            selectedMesh = mesh;
-            const data = mesh.userData;
-
-            addConsoleLog(`[ORBIT LOCK-ON] Focus Sequence Activated: ${data.name.toUpperCase()}`);
-
-            const hudCard = document.getElementById('planet-hud-card');
-            const hudAvatar = document.getElementById('hud-planet-avatar');
-            const hudName = document.getElementById('hud-planet-name');
-            const hudDesc = document.getElementById('hud-planet-desc');
-
-            hudAvatar.textContent = data.emoji;
-            hudAvatar.style.borderColor = '#' + data.color.toString(16).padStart(6, '0');
-            hudName.textContent = data.name;
-            hudDesc.textContent = data.desc;
-
-            const hexColor = '#' + data.color.toString(16).padStart(6, '0');
-            hudName.style.color = hexColor;
-
-            // Bind AI click action
-            document.getElementById('hud-ask-ai').onclick = () => {
-                triggerAIForPlanet(data);
-            };
-
-            // Launch subdomain link
-            document.getElementById('hud-launch').onclick = () => {
-                window.open(data.url, '_blank');
-            };
-
-            // Camera Fly-To Lerper Destination Setup
-            const distanceOffset = data.type === 'star' ? 14 : 7;
-            targetCamPos.set(
-                mesh.position.x + distanceOffset,
-                mesh.position.y + (data.type === 'star' ? 7 : 4),
-                mesh.position.z + distanceOffset
-            );
-            transitionProgress = 0; // Trigger the flight transition in tick loop
-
-            hudCard.style.opacity = '1';
-            hudCard.style.transform = 'translate(-50%, 0) scale(1)';
-        }
-
-        function onClick(event) {
-            if (event.target.closest('#ui-layer') || event.target.closest('#planet-hud-card')) return;
-            
-            raycaster.setFromCamera(mouse, camera);
-            const intersects = raycaster.intersectObjects(planetMeshes);
-
-            if (intersects.length > 0) {
-                selectPlanetAndFocus(intersects[0].object);
-            } else {
-                selectedMesh = null;
-                document.getElementById('planet-hud-card').style.opacity = '0';
-                document.getElementById('planet-hud-card').style.transform = 'translate(-50%, 40px) scale(0.9)';
-            }
-        }
-
-        window.addEventListener('mousemove', onMouseMove);
-        window.addEventListener('click', onClick);
-
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        });
-
-        // Dismiss loader screen smoothly
-        window.onload = () => {
-            setTimeout(() => {
-                const loader = document.getElementById('loading');
-                loader.style.opacity = '0';
-                setTimeout(() => loader.remove(), 800);
-            }, 800);
-        };
-
-        // ĐIỀN API KEY CỦA SẾP VÀO GIỮA HAI DẤU NHÁY DƯỚI ĐÂY
-        const apiKey = "AIzaSyAt2Ia8Vyt8A5lks6VsGG2b5dZzQr8NG6Q"; 
-        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
-
-        const systemPrompt = `You are KV-Core v4.3, the high-resolution, multi-depth holographic Quantum AI managing the KenvinZone digital ecosystem.
-        The KenvinZone ecosystem consists of:
-        1. KenvinZone (Main core, kenvinzone.com): The gateway central star.
-        2. VN-Index (vnindex.kenvinzone.com): High-speed financial tracking & real-time VN-Index charts.
-        3. AI Class (aiclass.kenvinzone.com): Interactive training & workshops on next-gen Artificial Intelligence tools.
-        4. Trading Tool (tradingtool.kenvinzone.com): Intelligent companion terminal for automated & manual finance trading.
-        5. Gold & Nasdaq (gold-nasdaq.kenvinzone.com): Worldwide gold and NASDAQ market signals.
-        6. AI News (ainews.kenvinzone.com): Curated cyberpunk news stream tracking AI, neural networks and LLMs.
-
-        Always reply in Vietnamese. Use a super cool, polished Cyberpunk, high-tech computer terminal tone. Decorate your messages with emojis and cyberpunk symbols like 🪐, ⚡, 🧬, 🚀, [SYSTEM], [QUANTUM-LINK], etc. Keep responses punchy, beautifully structured with bullet points. Avoid long boring paragraphs. If asked about a specific planet, pitch its high technology and redirect them to access it.`;
-
-        let conversationHistory = [];
-
-        async function fetchGeminiAPI(userQuery) {
-            addConsoleLog("[AI-CORE] Connecting to quantum neural network...");
-            
-            const chatBox = document.getElementById('chat-box');
-            
-            const loaderId = 'ai-temp-loader';
-            const loaderBubble = document.createElement('div');
-            loaderBubble.id = loaderId;
-            loaderBubble.className = 'chat-message ai flex gap-3 animate-pulse';
-            loaderBubble.innerHTML = `
-                <div class="w-6 h-6 rounded bg-[#ff007f]/20 border border-[#ff007f] flex items-center justify-center text-[10px] text-[#ff007f] font-cyber">AI</div>
-                <div class="flex-1">
-                    <div class="p-3 rounded bg-[#ff007f]/5 border border-[#ff007f]/10 text-xs font-mono-tech text-gray-500">
-                        <i class="fa-solid fa-microchip animate-spin mr-1"></i> [PROCESSING RESPONSE SEQUENCE IN NEURAL BUFFER]...
-                    </div>
-                </div>
-            `;
-            chatBox.appendChild(loaderBubble);
-            chatBox.scrollTop = chatBox.scrollHeight;
-
-            try {
-                const payload = {
-                    contents: [
-                        ...conversationHistory,
-                        { role: 'user', parts: [{ text: userQuery }] }
-                    ],
-                    system_instruction: {
-    parts: [{ text: systemPrompt }]
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1, viewport-fit=cover" name="viewport"/>
+<title>KenvinZone | Trading Intelligence Ecosystem</title>
+<meta content="KenvinZone phát triển AURORA, hệ thống phân tích định lượng và market intelligence tự động cho Chứng khoán, CFD, Futures, Forex và Crypto." name="description"/>
+<meta content="index,follow" name="robots"/>
+<link href="https://kenvinzone.com/" rel="canonical"/>
+<link href="https://kenvinzone.com/" hreflang="vi" rel="alternate"/>
+<link href="https://kenvinzone.com/?lang=en" hreflang="en" rel="alternate"/>
+<link href="https://kenvinzone.com/" hreflang="x-default" rel="alternate"/>
+<meta content="#0A1426" name="theme-color"/>
+<script>/* KZ theme: dùng chung cho kenvinzone.com và aurora.kenvinzone.com */(function(){try{var m=document.cookie.match(/(?:^|; )kz-theme=(light|dark)/),t=m?m[1]:localStorage.getItem("kz-theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}})();</script>
+<meta content="website" property="og:type"/>
+<meta content="KenvinZone" property="og:site_name"/>
+<meta content="vi_VN" property="og:locale"/>
+<meta content="https://kenvinzone.com/" property="og:url"/>
+<meta content="KenvinZone · Từ dữ liệu thị trường đến quyết định giao dịch có hệ thống" property="og:title"/>
+<meta content="Hệ sinh thái Trading Intelligence: AURORA trên TradingView, phân tích định lượng và báo cáo thị trường cho 5 thị trường." property="og:description"/>
+<meta content="https://kenvinzone.com/og-image.png" property="og:image"/>
+<meta content="1200" property="og:image:width"/>
+<meta content="630" property="og:image:height"/>
+<meta content="KenvinZone Trading Intelligence Ecosystem" property="og:image:alt"/>
+<meta content="summary_large_image" name="twitter:card"/>
+<meta content="KenvinZone · Trading Intelligence Ecosystem" name="twitter:title"/>
+<meta content="AURORA trên TradingView, phân tích định lượng và báo cáo thị trường cho Chứng khoán, CFD, Futures, Forex, Crypto." name="twitter:description"/>
+<meta content="https://kenvinzone.com/og-image.png" name="twitter:image"/>
+<link href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28'%3E%3Crect width='28' height='28' rx='7' fill='%230A1426'/%3E%3Cpath d='M4 21L10 15L15 19L24 7' stroke='%2338D5E7' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" rel="icon"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://kenvinzone.com/#org",
+      "name": "KenvinZone",
+      "url": "https://kenvinzone.com/",
+      "description": "Hệ sinh thái Trading Intelligence: khung giao dịch, phân tích định lượng và báo cáo thị trường tự động.",
+      "sameAs": ["https://t.me/kenvinhoang"]
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://kenvinzone.com/#website",
+      "url": "https://kenvinzone.com/",
+      "name": "KenvinZone",
+      "inLanguage": "vi-VN",
+      "publisher": {"@id": "https://kenvinzone.com/#org"}
+    },
+    {
+      "@type": "SoftwareApplication",
+      "@id": "https://aurora.kenvinzone.com/#app",
+      "name": "KenvinZone AURORA",
+      "url": "https://aurora.kenvinzone.com/",
+      "applicationCategory": "FinanceApplication",
+      "operatingSystem": "TradingView (web, desktop, mobile)",
+      "description": "Khung giao dịch theo xu hướng nhiều lớp trên TradingView, gồm các gói Standard, Pro và Elite.",
+      "publisher": {"@id": "https://kenvinzone.com/#org"}
+    }
+  ]
 }
-                };
+</script>
+<style>
+:root{
+  --ink:#0A1426;      /* nền chính */
+  --deep:#070F1D;     /* nền phụ */
+  --surface:#101D35;  /* bề mặt nổi */
+  --line:#1E2E4D;     /* đường kẻ */
+  --text:#E6EEF8;
+  --muted:#8FA3BF;
+  --cyan:#38D5E7;     /* kỹ thuật, hành động phụ */
+  --gold:#F3BE62;     /* AURORA Pro, chuyển đổi chính */
+  --green:#34D399;    /* đang vận hành, xác nhận */
+  --violet:#B9A8F5;   /* Elite, nghiên cứu */
+  --r:14px;
+  --text2:#C9D5E4; --surface2:#0C182D; --header-bg:rgba(10,20,38,.82); --line2:#2A3D62; --line3:#4A6496;
+  --note-text:#C9E9F0; --ev-bg:rgba(255,255,255,.018); --glow:.55; --gold-btn:#F3BE62; --gold-btn-h:#F7CF86;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;scroll-padding-top:84px}
+body{margin:0;background:var(--ink);color:var(--text);font-family:'Be Vietnam Pro',system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif;font-size:16px;line-height:1.6;font-feature-settings:"tnum" 1}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--cyan);outline-offset:3px;border-radius:6px}
+.wrap{max-width:1180px;margin:0 auto;padding:0 22px}
+h1,h2,h3,h4{margin:0;line-height:1.15;letter-spacing:-.02em}
+p{margin:0}
+ul{margin:0}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 
-                let response;
-                let delay = 1000;
-                for (let attempt = 0; attempt < 3; attempt++) {
-                    try {
-                        response = await fetch(apiUrl, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify(payload)
-                        });
-                        if (response.ok) break;
-                    } catch (err) {
-                        if (attempt === 2) throw err;
-                        await new Promise(r => setTimeout(r, delay));
-                        delay *= 2;
-                    }
-                }
+/* ---------- buttons, status ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:13px 21px;border-radius:12px;font-weight:700;font-size:15px;text-decoration:none;border:1px solid transparent;transition:background .15s,border-color .15s;white-space:nowrap;cursor:pointer}
+.btn.gold{background:var(--gold-btn);color:#2A1B00}
+.btn.gold:hover{background:var(--gold-btn-h)}
+.btn.cyan{background:var(--cyan);color:#062030}
+.btn.cyan:hover{background:#6BE3F0}
+.btn.ghost{border-color:var(--line2);color:var(--text);background:transparent}
+.btn.ghost:hover{border-color:var(--line3)}
+.btn.sm{padding:9px 15px;font-size:14px;border-radius:10px}
+.st{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;white-space:nowrap;color:var(--muted)}
+.st::before{content:"";width:7px;height:7px;border-radius:50%;background:#5B6F8F}
+.st.on{color:var(--green)}.st.on::before{background:var(--green)}
+.st.beta{color:var(--cyan)}.st.beta::before{background:var(--cyan)}
+.st.dev{color:var(--gold)}.st.dev::before{background:var(--gold)}
+.st.lab{color:var(--violet)}.st.lab::before{background:var(--violet)}
 
-                if (!response || !response.ok) {
-                    throw new Error(`API Connection Failed with code: ${response?.status}`);
-                }
+/* ---------- header ---------- */
+header{position:sticky;top:0;z-index:30;background:var(--header-bg);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--line);padding-top:env(safe-area-inset-top,0)}
+.hd{display:flex;align-items:center;justify-content:space-between;height:68px;gap:18px}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none;font-weight:800;font-size:19px;letter-spacing:-.01em}
+.logo svg{width:32px;height:32px;flex:0 0 auto}
+nav.main{display:flex;gap:24px;font-size:14.5px;color:var(--muted)}
+nav.main a{text-decoration:none;white-space:nowrap}
+nav.main a:hover{color:var(--text)}
+.hd-r{display:flex;align-items:center;gap:10px}
+.menu-btn{display:none;width:42px;height:42px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--text);font-size:20px;line-height:1;cursor:pointer}
+@media (max-width:1020px){
+  nav.main{display:none;position:absolute;left:0;right:0;top:100%;flex-direction:column;gap:0;background:var(--deep);border-bottom:1px solid var(--line);padding:6px 22px 14px}
+  nav.main.open{display:flex}
+  nav.main a{padding:12px 0;border-bottom:1px solid var(--line);font-size:16px;color:var(--text)}
+  nav.main a:last-child{border-bottom:0}
+  .menu-btn{display:inline-grid;place-items:center}
+}
+@media (max-width:340px){.logo span{display:none}}
 
-                const result = await response.json();
-                const aiText = result.candidates?.[0]?.content?.parts?.[0]?.text;
+/* ---------- hero ---------- */
+.hero{position:relative;padding:76px 0 34px;overflow:hidden}
+.hero::before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(56,213,231,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(56,213,231,.05) 1px,transparent 1px);background-size:44px 44px;mask-image:radial-gradient(ellipse 80% 70% at 70% 30%,#000 20%,transparent 75%);-webkit-mask-image:radial-gradient(ellipse 80% 70% at 70% 30%,#000 20%,transparent 75%);pointer-events:none}
+.hero .wrap{position:relative;display:grid;grid-template-columns:1.12fr .88fr;gap:52px;align-items:center}
+.pill{display:inline-flex;align-items:center;gap:8px;padding:6px 13px;border-radius:999px;border:1px solid var(--line);background:var(--surface);font-size:13.5px;font-weight:600;color:var(--muted)}
+.pill b{color:var(--text);font-weight:700}
+.hero h1{margin-top:18px;font-size:clamp(34px,4.9vw,58px);font-weight:800;max-width:17ch}
+.hero .lead{margin-top:18px;max-width:58ch;color:var(--muted);font-size:clamp(16px,1.45vw,18px)}
+.hero .acts{margin-top:28px;display:flex;flex-wrap:wrap;gap:12px}
+.trust{margin-top:22px;font-size:14px;color:var(--muted);max-width:56ch}
 
-                document.getElementById(loaderId)?.remove();
+/* bảng bối cảnh: các lớp phân tích tách riêng */
+.ctx{border:1px solid var(--line);border-radius:20px;background:linear-gradient(180deg,var(--surface),var(--surface2));overflow:hidden}
+.ctx-h{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:16px 20px;border-bottom:1px solid var(--line)}
+.ctx-h strong{font-size:15px}
+.ctx-h span{font-size:12.5px;color:var(--muted)}
+.ctx ul{list-style:none;padding:6px 20px}
+.ctx li{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
+.ctx li:last-child{border-bottom:0}
+.ctx .k{font-size:14.5px}
+.ctx .k small{display:block;color:var(--muted);font-size:12.5px;margin-top:1px}
+.ctx .v{font-weight:800;font-size:14.5px;padding:4px 10px;border-radius:8px;white-space:nowrap}
+.v.ok{color:var(--green);background:rgba(52,211,153,.1)}
+.v.mid{color:var(--gold);background:rgba(243,190,98,.1)}
+.ctx-f{padding:16px 20px;border-top:1px solid var(--line);background:var(--deep);display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.ctx-f .sum{font-weight:800}
+.ctx-f .sum em{font-style:normal;color:var(--green)}
+.ctx-f p{font-size:12.5px;color:var(--muted);max-width:34ch}
+@media (max-width:960px){.hero .wrap{grid-template-columns:1fr;gap:40px}.hero{padding-top:56px}}
 
-                if (aiText) {
-                    conversationHistory.push({ role: 'user', parts: [{ text: userQuery }] });
-                    conversationHistory.push({ role: 'model', parts: [{ text: aiText }] });
-                    
-                    if (conversationHistory.length > 10) {
-                        conversationHistory.shift();
-                        conversationHistory.shift();
-                    }
+/* ---------- market selector ---------- */
+.mk-sec{padding:34px 0 88px}
+.mk{border:1px solid var(--line);border-radius:20px;background:linear-gradient(180deg,var(--surface),var(--surface2));overflow:hidden}
+.mk-head{padding:24px 26px 0;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:flex-end}
+.mk-head h2{font-size:clamp(22px,2.4vw,28px);font-weight:800}
+.mk-head p{color:var(--muted);font-size:14.5px;max-width:52ch}
+.tabs{display:flex;gap:8px;padding:18px 22px 0;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:0 0 auto;display:flex;align-items:center;gap:9px;padding:12px 18px;border-radius:12px 12px 0 0;border:1px solid transparent;border-bottom:0;background:none;color:var(--muted);font:600 15.5px/1 'Be Vietnam Pro',system-ui,sans-serif;cursor:pointer}
+.tab .ico{font-size:18px;line-height:1}
+.tab:hover{color:var(--text)}
+.tab[aria-selected="true"]{background:var(--ink);border-color:var(--line);color:var(--text)}
+.tab[aria-selected="true"] .nm{color:var(--cyan)}
+.panes{background:var(--ink);border-top:1px solid var(--line);margin-top:-1px}
+.pane{display:grid;grid-template-columns:1.2fr 1fr}
+.pane[hidden]{display:none}
+.pane .a,.pane .b{padding:30px 30px 32px}
+.pane .b{border-left:1px solid var(--line);background:var(--deep)}
+.pane h3{font-size:clamp(21px,2.3vw,27px);font-weight:800}
+.pane .who{margin-top:8px;color:var(--muted);max-width:54ch}
+.au{margin-top:22px;padding:18px 20px;border-radius:var(--r);border:1px solid rgba(243,190,98,.35);background:linear-gradient(180deg,rgba(243,190,98,.08),rgba(243,190,98,.02))}
+.au .t{font-weight:800;color:var(--gold);font-size:15.5px}
+.au ul{margin-top:10px;padding-left:18px;color:var(--text2)}
+.au li{margin:4px 0}
+.au .row{margin-top:16px;display:flex;gap:10px;flex-wrap:wrap}
+.b h4{margin-bottom:12px;font-size:15px;color:var(--muted);font-weight:600}
+.res{list-style:none;padding:0}
+.res li{padding:14px 0;border-top:1px solid var(--line)}
+.res li:first-child{border-top:0;padding-top:0}
+.res .top{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px}
+.res a{text-decoration:none;font-weight:700}
+.res a:hover{color:var(--cyan)}
+.res p{color:var(--muted);font-size:14.5px;margin-top:3px}
+@media (max-width:820px){
+  .pane{grid-template-columns:1fr}.pane .b{border-left:0;border-top:1px solid var(--line)}
+  .pane .a,.pane .b{padding:24px 20px}.mk-head{padding:20px 20px 0}
+}
+@media (max-width:640px){
+  .tabs{flex-wrap:wrap;padding:14px 16px 16px;gap:8px}
+  .tab{border:1px solid var(--line);border-radius:999px;padding:10px 14px;font-size:14.5px}
+  .tab[aria-selected="true"]{border-color:var(--cyan);background:rgba(56,213,231,.1)}
+  .panes{margin-top:0}
+}
 
-                    appendMessage('ai', aiText);
-                    addConsoleLog("[AI-CORE] Neural matrix synced successfully.");
-                } else {
-                    throw new Error("Empty response received from Gemini.");
-                }
+/* ---------- sections ---------- */
+section.s{padding:92px 0;border-top:1px solid var(--line)}
+section.s.alt{background:var(--deep)}
+.s h2{font-size:clamp(28px,3.5vw,42px);font-weight:800;max-width:24ch}
+.s .intro{margin-top:14px;color:var(--muted);max-width:64ch;font-size:17px}
 
-            } catch (error) {
-                console.error(error);
-                document.getElementById(loaderId)?.remove();
-                appendMessage('ai', `⚠️ **[LỖI LIÊN KẾT LƯỢNG TỬ]**: Không thể đồng bộ hệ thống ảo Gemini. \n\n*Chi tiết:* ${error.message}`);
-                addConsoleLog("[AI-CORE] Neural pipeline interruption.");
-            }
-        }
+/* AURORA tiers */
+.tiers{margin-top:44px;display:grid;grid-template-columns:1fr 1.12fr 1fr;gap:18px;align-items:stretch}
+.tier{display:flex;flex-direction:column;padding:28px 24px;border-radius:18px;border:1px solid var(--line);background:var(--surface)}
+.tier .n{font-weight:800;font-size:22px;letter-spacing:.01em}
+.tier .aud{margin-top:4px;color:var(--muted);font-size:14.5px}
+.tier ul{margin:18px 0 22px;padding-left:18px;color:var(--text2);font-size:15px;flex:1}
+.tier li{margin:6px 0}
+.tier.std .n{color:var(--cyan)}
+.tier.eli .n{color:var(--violet)}
+.tier.pro{border-color:rgba(243,190,98,.55);background:linear-gradient(180deg,rgba(243,190,98,.10),var(--surface) 55%);position:relative}
+.tier.pro .n{color:var(--gold)}
+.tier.pro .rec{position:absolute;top:-12px;left:24px;padding:4px 11px;border-radius:999px;background:var(--gold);color:#2A1B00;font-size:12.5px;font-weight:800}
+.tier .ft{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+@media (max-width:960px){.tiers{grid-template-columns:1fr}.tier.pro{order:-1}}
 
-        function appendMessage(sender, text) {
-            const chatBox = document.getElementById('chat-box');
-            const messageElement = document.createElement('div');
-            messageElement.className = `chat-message ${sender} flex gap-3`;
-            
-            const isAI = sender === 'ai';
-            const avatarColor = isAI ? 'bg-[#ff007f]/20 border-[#ff007f] text-[#ff007f]' : 'bg-[#00f0ff]/20 border-[#00f0ff] text-[#00f0ff]';
-            const bubbleStyle = isAI ? 'bg-[#ff007f]/5 border-[#ff007f]/20 text-gray-300' : 'bg-[#00f0ff]/5 border-[#00f0ff]/20 text-gray-300 font-mono-tech text-xs';
-            
-            messageElement.innerHTML = `
-                <div class="w-6 h-6 rounded ${avatarColor} border flex items-center justify-center text-[10px] font-cyber">${sender.toUpperCase()}</div>
-                <div class="flex-1">
-                    <div class="p-3 rounded border ${bubbleStyle} leading-relaxed">
-                        ${isAI ? marked.parse(text) : text}
-                    </div>
-                </div>
-            `;
-            chatBox.appendChild(messageElement);
-            chatBox.scrollTop = chatBox.scrollHeight;
-        }
+/* How it works */
+.flow{margin:44px 0 0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(6,1fr);gap:0;border:1px solid var(--line);border-radius:18px;overflow:hidden;counter-reset:f}
+.flow li{position:relative;padding:22px 18px 24px;border-left:1px solid var(--line);background:var(--surface)}
+.flow li:first-child{border-left:0}
+.flow li::before{counter-increment:f;content:counter(f);display:block;font-size:13px;font-weight:800;color:var(--muted);margin-bottom:10px}
+.flow li:last-child{background:linear-gradient(180deg,rgba(52,211,153,.12),var(--surface))}
+.flow li:last-child::before{color:var(--green)}
+.flow h3{font-size:16.5px;font-weight:800}
+.flow p{margin-top:6px;color:var(--muted);font-size:14px;line-height:1.55}
+@media (max-width:1020px){.flow{grid-template-columns:repeat(3,1fr)}.flow li:nth-child(4){border-left:0}.flow li:nth-child(n+4){border-top:1px solid var(--line)}}
+@media (max-width:560px){.flow{grid-template-columns:1fr}.flow li{border-left:0;border-top:1px solid var(--line)}.flow li:first-child{border-top:0}}
+.principle{margin-top:26px;display:flex;gap:14px;align-items:flex-start;max-width:820px;padding:18px 20px;border-radius:var(--r);border:1px dashed var(--line2);color:var(--text2);font-size:15.5px}
+.principle strong{color:var(--text)}
 
-        function triggerAIForPlanet(data) {
-            const prompt = `Phân tích sâu về hành tinh hoặc subdomain của hệ sinh thái mang tên "${data.name}". Nhiệm vụ của nó là gì, chứa tài nguyên/thông tin nào, và người dùng có thể làm gì khi di chuyển qua cổng portal: ${data.url}?`;
-            appendMessage('user', `Truy vấn tài liệu bảo mật hành tinh: ${data.name.toUpperCase()}`);
-            fetchGeminiAPI(prompt);
-        }
+/* Intelligence modules */
+.mods{margin-top:44px;border-top:1px solid var(--line)}
+.mod{display:grid;grid-template-columns:200px 1fr 180px auto;gap:24px;align-items:center;padding:22px 0;border-bottom:1px solid var(--line)}
+.mod .mk-tag{font-size:13.5px;font-weight:700;color:var(--muted)}
+.mod h3{font-size:18.5px;font-weight:800}
+.mod h3 a{text-decoration:none}
+.mod h3 a:hover{color:var(--cyan)}
+.mod p{margin-top:4px;color:var(--muted);font-size:15px}
+.mod .sup{font-size:13.5px;color:var(--muted)}
+.mod .sup b{display:block;color:var(--gold);font-weight:700}
+@media (max-width:960px){.mod{grid-template-columns:1fr;gap:8px}.mod .btn{justify-self:start;margin-top:6px}}
 
-        // Action binding for inputs
-        const aiInput = document.getElementById('ai-input');
-        const sendBtn = document.getElementById('send-ai-btn');
+/* Quant */
+.qgrid{margin-top:44px;display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--line);border-left:1px solid var(--line)}
+.q{padding:24px 24px 26px;border-right:1px solid var(--line);border-bottom:1px solid var(--line)}
+.q h3{font-size:17.5px;font-weight:800}
+.q p{margin-top:6px;color:var(--muted);font-size:15px}
+@media (max-width:860px){.qgrid{grid-template-columns:1fr 1fr}}
+@media (max-width:560px){.qgrid{grid-template-columns:1fr}}
 
-        function handleSendMessage() {
-            const text = aiInput.value.trim();
-            if (text) {
-                appendMessage('user', text);
-                aiInput.value = '';
-                fetchGeminiAPI(text);
-            }
-        }
+/* Build strip */
+.build{display:grid;grid-template-columns:1fr auto;gap:28px;align-items:center;padding:30px 32px;border-radius:18px;border:1px solid var(--line);background:var(--surface)}
+.build h2{font-size:clamp(22px,2.4vw,28px)}
+.build p{margin-top:8px;color:var(--muted);max-width:62ch}
+.build .tags{margin-top:12px;display:flex;flex-wrap:wrap;gap:8px}
+.build .tags span{padding:5px 11px;border-radius:999px;border:1px solid var(--line);font-size:13px;color:var(--text2)}
+@media (max-width:760px){.build{grid-template-columns:1fr;padding:24px 22px}}
 
-        sendBtn.addEventListener('click', handleSendMessage);
-        aiInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') handleSendMessage();
-        });
+/* Future platform */
+.fut-head{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.fgrid{margin-top:40px;display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.fi{padding:22px;border-radius:var(--r);border:1px solid var(--line);background:linear-gradient(180deg,rgba(185,168,245,.06),transparent)}
+.fi h3{font-size:17px;font-weight:800}
+.fi p{margin-top:6px;color:var(--muted);font-size:14.5px}
+@media (max-width:860px){.fgrid{grid-template-columns:1fr 1fr}}
+@media (max-width:560px){.fgrid{grid-template-columns:1fr}}
 
-        document.querySelectorAll('.ai-quick-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const prompt = e.currentTarget.getAttribute('data-prompt');
-                appendMessage('user', e.currentTarget.textContent.trim());
-                fetchGeminiAPI(prompt);
-            });
-        });
+/* About */
+.ab{display:grid;grid-template-columns:auto 1fr;gap:34px;align-items:start;max-width:900px}
+.av{width:88px;height:88px;border-radius:24px;display:grid;place-items:center;font-weight:800;font-size:34px;color:#062030;background:linear-gradient(135deg,var(--cyan),#8BEFD7)}
+.ab h2{max-width:none}
+.ab p{margin-top:14px;color:var(--text2);font-size:17px;max-width:64ch}
+.ab .muted{color:var(--muted);font-size:15px}
+.ab .row{margin-top:22px;display:flex;gap:10px;flex-wrap:wrap}
+@media (max-width:640px){.ab{grid-template-columns:1fr;gap:20px}}
 
-        function addConsoleLog(logText) {
-            const hudConsole = document.getElementById('hud-console');
-            const logRow = document.createElement('div');
-            logRow.textContent = logText;
-            hudConsole.appendChild(logRow);
-            if (hudConsole.children.length > 5) {
-                hudConsole.removeChild(hudConsole.children[0]);
-            }
-        }
+/* Labs */
+.labs{display:grid;grid-template-columns:1.4fr 1fr;gap:18px}
+.obs{position:relative;overflow:hidden;border-radius:20px;border:1px solid var(--line);padding:40px 36px;background:#04070F;min-height:260px}
+.obs canvas{position:absolute;inset:0;width:100%;height:100%;opacity:.85}
+.obs .in{position:relative;max-width:470px}
+.obs h3{font-size:clamp(22px,2.4vw,28px);font-weight:800}
+.obs p{margin-top:10px;color:var(--muted)}
+.obs .btn{margin-top:20px}
+.other{border-radius:20px;border:1px solid var(--line);padding:28px 26px;background:var(--surface)}
+.other h3{font-size:17px;font-weight:800}
+.other .res{margin-top:14px}
+@media (max-width:860px){.labs{grid-template-columns:1fr}.obs{padding:32px 24px}}
 
-        // Toggle terminal panel logic
-        let isExpanded = true;
-        const toggleAiBtn = document.getElementById('toggle-ai-btn');
-        const aiPanel = document.getElementById('ai-panel');
-        const chatBox = document.getElementById('chat-box');
+/* Final CTA */
+.final{text-align:left;display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center}
+.final h2{font-size:clamp(30px,3.8vw,46px)}
+.final .intro{margin-top:14px}
+.final .acts{margin-top:26px;display:flex;flex-wrap:wrap;gap:12px}
+.steps{list-style:none;margin:0;padding:0;counter-reset:s}
+.steps li{display:grid;grid-template-columns:40px 1fr;gap:14px;align-items:start;padding:16px 0;border-bottom:1px solid var(--line)}
+.steps li:first-child{border-top:1px solid var(--line)}
+.steps li::before{counter-increment:s;content:counter(s);display:grid;place-items:center;width:34px;height:34px;border-radius:50%;border:1px solid rgba(243,190,98,.5);color:var(--gold);font-weight:800;font-size:14px}
+.steps strong{display:block;font-size:16px}
+.steps span{color:var(--muted);font-size:14.5px}
+@media (max-width:860px){.final{grid-template-columns:1fr;gap:34px}}
 
-        toggleAiBtn.addEventListener('click', () => {
-            isExpanded = !isExpanded;
-            if (isExpanded) {
-                chatBox.style.display = 'block';
-                aiPanel.style.height = '100%';
-            } else {
-                chatBox.style.display = 'none';
-                aiPanel.style.height = '42px';
-            }
-        });
+/* footer */
+footer{border-top:1px solid var(--line);padding:52px 0 calc(40px + env(safe-area-inset-bottom,0));background:var(--deep);color:var(--muted);font-size:14px}
+.fcols{display:grid;grid-template-columns:1.3fr repeat(3,1fr);gap:28px}
+.fcols h4{color:var(--text);font-size:14.5px;margin-bottom:12px}
+.fcols ul{list-style:none;padding:0}
+.fcols li{margin:7px 0}
+.fcols a{text-decoration:none}
+.fcols a:hover{color:var(--text)}
+.fcols .brand p{margin-top:12px;max-width:34ch}
+.risk{margin-top:36px;padding-top:22px;border-top:1px solid var(--line);font-size:13px;line-height:1.65}
+@media (max-width:860px){.fcols{grid-template-columns:1fr 1fr}.fcols .brand{grid-column:1/-1}}
 
-        const clock = new THREE.Clock();
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
 
-        function animate() {
-            requestAnimationFrame(animate);
+/* HYBRID REV3 additions */
+.ctx-preview{display:inline-flex;align-items:center;gap:7px;margin:12px 14px 0;padding:6px 10px;border:1px solid rgba(243,190,98,.28);border-radius:999px;color:var(--gold);font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.ctx-preview::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--gold);box-shadow:0 0 8px rgba(243,190,98,.45)}
+.evidence{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:22px}
+.ev{padding:14px 15px;border:1px solid var(--line);border-radius:12px;background:var(--ev-bg)}
+.ev b{display:block;font-size:13px;color:var(--text);margin-bottom:5px}
+.ev span{display:block;font-size:12px;line-height:1.45;color:var(--muted)}
+.rec.live{display:inline-flex;align-items:center;gap:7px}
+.rec.live::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 8px rgba(52,211,153,.35)}
+.note-inline{display:block;margin-top:8px;color:var(--muted);font-size:12px;line-height:1.45}
+@media(max-width:900px){.evidence{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:560px){.evidence{grid-template-columns:1fr}.ctx-preview{margin-left:12px;margin-right:12px}}
 
-            const delta = clock.getDelta();
 
-            // Camera Fly-To Smooth Interpolator (Spaceship effect)
-            if (transitionProgress < 1) {
-                transitionProgress += delta * 1.6; // Speed index of fly-to
-                camera.position.lerp(targetCamPos, Math.min(transitionProgress, 1));
-                if (selectedMesh) {
-                    controls.target.lerp(selectedMesh.position, Math.min(transitionProgress, 1));
-                }
-            }
+/* ===== Language switch ===== */
+.lang{display:inline-flex;padding:3px;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+.lang button{border:0;background:none;color:var(--muted);font:700 13px/1 'Be Vietnam Pro',system-ui,sans-serif;padding:8px 10px;border-radius:7px;cursor:pointer;letter-spacing:.02em}
+.lang button:hover{color:var(--text)}
+.lang button[aria-pressed="true"]{background:var(--ink);color:var(--cyan);box-shadow:inset 0 0 0 1px var(--line)}
+[data-only="en"]{display:none}
+html[lang="en"] [data-only="en"]{display:block}
+.en-note{margin-top:14px;padding:12px 14px;border-radius:12px;border:1px solid rgba(56,213,231,.3);background:rgba(56,213,231,.06);color:var(--note-text);font-size:14.5px;max-width:62ch}
+.en-note a{color:var(--cyan)}
+@media (max-width:520px){.hd-r>.btn{display:none}}
 
-            // Slowly rotate parallax Starfield Layers at different speed rates
-            starLayers.forEach((layer) => {
-                layer.mesh.rotation.y += delta * layer.speed;
-                layer.mesh.rotation.x += delta * (layer.speed * 0.4);
-            });
+/* ===================== THEME SÁNG ===================== */
+html[data-theme="light"]{
+  --ink:#F5F8FC; --deep:#EBF0F7; --surface:#FFFFFF; --surface2:#F3F6FB; --line:#D8E1EE; --line2:#C3CFE0; --line3:#94A7C4;
+  --text:#0E1B30; --text2:#334760; --muted:#5A6C86; --cyan:#0E8FA8; --gold:#A86A06; --green:#05875F; --violet:#6D4FD0;
+  --header-bg:rgba(245,248,252,.82); --note-text:#0C4A57; --ev-bg:#FFFFFF; --glow:.28; --gold-btn:#F2B544; --gold-btn-h:#F5C468;
+  color-scheme:light;
+}
+html[data-theme="light"] body{background:var(--ink)}
+html[data-theme="light"] .btn.cyan{background:#22C3DB;color:#03212B}
+html[data-theme="light"] .tier.pro .rec{background:var(--gold-btn)}
+html[data-theme="light"] .tier,html[data-theme="light"] .mk,html[data-theme="light"] .ctx,html[data-theme="light"] .build,html[data-theme="light"] .other{box-shadow:0 1px 2px rgba(14,27,48,.05),0 8px 28px -12px rgba(14,27,48,.14)}
+html[data-theme="light"] .v.ok{background:rgba(5,135,95,.10)}
+html[data-theme="light"] .v.mid{background:rgba(168,106,6,.10)}
+html[data-theme="light"] .au{background:linear-gradient(180deg,rgba(242,181,68,.16),rgba(242,181,68,.04));border-color:rgba(168,106,6,.35)}
+html[data-theme="light"] .obs h3{color:#E6EEF8}
+html[data-theme="light"] .obs p{color:#9FB2CC}
+html[data-theme="light"] .obs .btn.ghost{color:#E6EEF8;border-color:#3A5078}
+html[data-theme="light"] .hero::before{background-image:linear-gradient(rgba(14,143,168,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(14,143,168,.07) 1px,transparent 1px)}
+:root{color-scheme:dark}
 
-            // ===== UPDATE SPACESHIP =====
-            shipTime += delta;
-            const tNorm = (shipTime % SHIP_CYCLE_DURATION) / SHIP_CYCLE_DURATION;
-            const currentPos = getShipPosition(tNorm);
-            // Tính hướng bay (tangent vector) bằng cách lấy điểm phía trước
-            const nextPos = getShipPosition((tNorm + 0.005) % 1);
+/* ===================== NÚT HEADER: THEME ===================== */
+.theme-btn{width:40px;height:40px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--text);cursor:pointer;display:inline-grid;place-items:center;transition:border-color .2s,transform .2s}
+.theme-btn:hover{border-color:var(--line3)}
+.theme-btn svg{width:18px;height:18px}
+.theme-btn .sun{display:none}
+html[data-theme="light"] .theme-btn .sun{display:block}
+html[data-theme="light"] .theme-btn .moon{display:none}
+header::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:1px;background:linear-gradient(90deg,transparent,rgba(56,213,231,calc(var(--glow)*.9)) 30%,rgba(243,190,98,calc(var(--glow)*.8)) 70%,transparent);pointer-events:none}
+@media (max-width:400px){.lang button{padding:8px 8px}.theme-btn{width:38px;height:38px}}
 
-            spaceshipGroup.position.copy(currentPos);
-            spaceshipGroup.lookAt(nextPos); // mũi tàu hướng theo hướng bay
+/* ===================== NỀN & ÁNH SÁNG ===================== */
+.aurora-bg{position:absolute;inset:-10% -5% auto -5%;height:780px;pointer-events:none;filter:blur(70px);opacity:var(--glow);z-index:0}
+.aurora-bg i{position:absolute;border-radius:50%;mix-blend-mode:screen}
+html[data-theme="light"] .aurora-bg i{mix-blend-mode:multiply}
+.aurora-bg i:nth-child(1){width:520px;height:420px;left:52%;top:-60px;background:radial-gradient(circle,#38D5E7,transparent 65%);animation:drift1 22s ease-in-out infinite alternate}
+.aurora-bg i:nth-child(2){width:460px;height:380px;left:72%;top:120px;background:radial-gradient(circle,#8B7CF6,transparent 65%);animation:drift2 26s ease-in-out infinite alternate}
+.aurora-bg i:nth-child(3){width:420px;height:340px;left:8%;top:40px;background:radial-gradient(circle,#F3BE62,transparent 68%);opacity:.6;animation:drift3 30s ease-in-out infinite alternate}
+@keyframes drift1{to{transform:translate(-90px,70px) scale(1.12)}}
+@keyframes drift2{to{transform:translate(-140px,-40px) scale(.9)}}
+@keyframes drift3{to{transform:translate(120px,60px) scale(1.15)}}
+.hero .wrap{z-index:1}
+.hero h1{background:linear-gradient(180deg,var(--text) 55%,color-mix(in srgb,var(--text) 72%,var(--cyan)));-webkit-background-clip:text;background-clip:text;color:transparent}
+section.s{position:relative;border-top-color:transparent}
+section.s::before{content:"";position:absolute;top:0;left:50%;transform:translateX(-50%);width:min(1180px,92%);height:1px;background:linear-gradient(90deg,transparent,var(--line3),transparent);opacity:.7}
 
-            // Hiệu ứng lửa động cơ nhấp nháy (flicker)
-            const flicker = 0.75 + Math.random() * 0.5;
-            flameLeft.scale.y = flicker;
-            flameRight.scale.y = flicker;
-            innerFlameLeft.scale.y = 0.8 + Math.random() * 0.6;
-            innerFlameRight.scale.y = 0.8 + Math.random() * 0.6;
-            flameMat.opacity = 0.7 + Math.random() * 0.3;
-            engineLight.intensity = 2.5 + Math.random() * 1.5;
+/* ===================== TƯƠNG TÁC: spotlight theo con trỏ ===================== */
+.spot{position:relative;isolation:isolate}
+.spot::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;opacity:0;transition:opacity .3s;z-index:-1;background:radial-gradient(420px circle at var(--mx,50%) var(--my,50%),rgba(56,213,231,calc(var(--glow)*.22)),transparent 60%)}
+.spot:hover::after{opacity:1}
+.tier,.fi,.q,.build,.other{transition:transform .25s ease,border-color .25s ease}
+.tier:hover,.fi:hover,.build:hover{transform:translateY(-3px);border-color:var(--line3)}
+.btn.gold{position:relative;overflow:hidden;box-shadow:0 0 0 0 rgba(243,190,98,0);transition:background .15s,box-shadow .3s}
+.btn.gold:hover{box-shadow:0 8px 30px -8px rgba(243,190,98,calc(var(--glow)*1.1))}
+.btn.gold::after{content:"";position:absolute;top:0;bottom:0;left:-60%;width:40%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.55),transparent);transform:skewX(-20deg);transition:left .6s ease}
+.btn.gold:hover::after{left:130%}
 
-            // Đèn neon thân tàu pulse nhẹ
-            const pulse = 0.7 + Math.sin(shipTime * 4) * 0.3;
-            stripMat.opacity = pulse;
+/* Viền ánh sáng xoay cho gói Pro */
+@property --ang{syntax:'<angle>';initial-value:0deg;inherits:false}
+.tier.pro{border-color:transparent;background:linear-gradient(var(--surface),var(--surface)) padding-box,conic-gradient(from var(--ang),rgba(243,190,98,.15),#F3BE62,rgba(56,213,231,.6),rgba(243,190,98,.15) 60%) border-box;border:1.5px solid transparent;animation:spin 7s linear infinite}
+.tier.pro::before{content:"";position:absolute;inset:0;border-radius:inherit;background:linear-gradient(180deg,rgba(243,190,98,.10),transparent 55%);pointer-events:none}
+@keyframes spin{to{--ang:360deg}}
 
-            // Cập nhật trail particle: shift mảng + push vị trí mới
-            trailHistory.unshift(currentPos.clone());
-            if (trailHistory.length > TRAIL_COUNT) trailHistory.pop();
+/* ===================== 6 BƯỚC: thang màu gradient ===================== */
+.flow{position:relative;border:0;gap:12px;overflow:visible;counter-reset:f}
+.flow::before{content:"";position:absolute;left:0;right:0;top:0;height:3px;border-radius:3px;background:linear-gradient(90deg,#38D5E7,#22C3DB 20%,#2DD4BF 40%,#34D399 60%,#F3BE62 82%,#F59E0B)}
+.flow li{--c:#38D5E7;--t:.05;border:1px solid var(--line);border-radius:14px;margin-top:14px;background:linear-gradient(180deg,color-mix(in srgb,var(--c) calc(var(--t)*100%),var(--surface)),var(--surface) 85%)}
+.flow li:nth-child(1){--c:#38D5E7;--t:.06}
+.flow li:nth-child(2){--c:#22C3DB;--t:.08}
+.flow li:nth-child(3){--c:#2DD4BF;--t:.10}
+.flow li:nth-child(4){--c:#34D399;--t:.12}
+.flow li:nth-child(5){--c:#F3BE62;--t:.14}
+.flow li:nth-child(6){--c:#F59E0B;--t:.18;border-color:color-mix(in srgb,#F59E0B 45%,var(--line))}
+.flow li:last-child{background:linear-gradient(180deg,color-mix(in srgb,var(--c) 18%,var(--surface)),var(--surface) 85%)}
+.flow li::before{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;color:#06121F;background:var(--c);box-shadow:0 0 18px -2px color-mix(in srgb,var(--c) 70%,transparent);font-size:13px}
+.flow li:last-child::before{color:#2A1B00}
+.flow h3{color:var(--text)}
+.flow li h3::after{content:"";display:block;width:28px;height:2px;border-radius:2px;margin-top:8px;background:var(--c)}
+@media (max-width:1020px){.flow li:nth-child(4){border-left:1px solid var(--line)}.flow li:nth-child(n+4){border-top:1px solid var(--line)}.flow li:nth-child(6){border-color:color-mix(in srgb,#F59E0B 45%,var(--line))}}
+@media (max-width:560px){.flow li{border-left:1px solid var(--line);border-top:1px solid var(--line)}.flow li:first-child{border-top:1px solid var(--line)}}
 
-            const posAttr = trailGeo.attributes.position;
-            const colAttr = trailGeo.attributes.color;
-            for (let i = 0; i < TRAIL_COUNT; i++) {
-                const p = trailHistory[i];
-                // Lệch nhẹ ngẫu nhiên để trail tỏa ra như khói
-                const spread = i * 0.015;
-                posAttr.array[i * 3]     = p.x + (Math.random() - 0.5) * spread;
-                posAttr.array[i * 3 + 1] = p.y + (Math.random() - 0.5) * spread;
-                posAttr.array[i * 3 + 2] = p.z + (Math.random() - 0.5) * spread;
+/* ===================== CHUYỂN CẢNH: hiện dần khi cuộn ===================== */
+.rv{opacity:0;transform:translateY(18px);transition:opacity .7s ease,transform .7s ease}
+.rv.in{opacity:1;transform:none}
+.flow li.rv{transition-delay:calc(var(--i,0) * 80ms)}
 
-                // Gradient màu: từ magenta nóng (gần tàu) -> tím -> cyan mờ -> tắt
-                const ratio = i / TRAIL_COUNT;
-                colAttr.array[i * 3]     = (1 - ratio) * 1.0 + ratio * 0.0;       // R
-                colAttr.array[i * 3 + 1] = (1 - ratio) * 0.0 + ratio * 0.6;       // G
-                colAttr.array[i * 3 + 2] = (1 - ratio) * 0.5 + ratio * 1.0;       // B
-            }
-            posAttr.needsUpdate = true;
-            colAttr.needsUpdate = true;
-            // Trail mờ dần khi tàu ở xa
-            trailMat.opacity = Math.max(0.15, 1 - Math.abs(currentPos.y) / 60);
-            // ===== END SPACESHIP UPDATE =====
+/* ===================== SLIDE ẢNH GIAO DIỆN THỰC TẾ ===================== */
+.shots{margin-top:22px;padding-top:18px;border-top:1px solid var(--line)}
+.sh-top{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.sh-top h4{margin:0}
+.dev{display:inline-flex;padding:3px;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+.dev button{border:0;background:none;color:var(--muted);font:600 13px/1 'Be Vietnam Pro',system-ui,sans-serif;padding:7px 11px;border-radius:7px;cursor:pointer;display:inline-flex;gap:6px;align-items:center}
+.dev button[aria-pressed="true"]{background:var(--ink);color:var(--cyan);box-shadow:inset 0 0 0 1px var(--line)}
+.sh-view{position:relative;overflow:hidden;border-radius:14px;touch-action:pan-y}
+.sh-track{display:flex;transition:transform .55s cubic-bezier(.22,.8,.2,1)}
+.sh-slide{flex:0 0 100%;margin:0;display:grid;justify-items:center;gap:10px;cursor:zoom-in}
+.sh-slide figcaption{font-size:13.5px;color:var(--muted);text-align:center}
+.frame-pc{width:100%;border-radius:12px;border:1px solid var(--line);background:#0B1528;overflow:hidden;box-shadow:0 18px 40px -20px rgba(0,0,0,.6)}
+.frame-pc .bar{height:22px;display:flex;align-items:center;gap:5px;padding:0 10px;background:#111D33;border-bottom:1px solid #1E2E4D}
+.frame-pc .bar i{width:7px;height:7px;border-radius:50%;background:#3A4C6E}
+.frame-pc img{display:block;width:100%;aspect-ratio:16/10;object-fit:cover;object-position:top}
+.frame-mb{width:min(190px,58%);padding:7px;border-radius:30px;background:#0B1528;border:1px solid #2A3D62;box-shadow:0 18px 40px -18px rgba(0,0,0,.65),inset 0 0 0 1px rgba(255,255,255,.04);position:relative}
+.frame-mb::before{content:"";position:absolute;top:12px;left:50%;transform:translateX(-50%);width:54px;height:14px;border-radius:10px;background:#000;z-index:2}
+.frame-mb img{display:block;width:100%;aspect-ratio:9/19.5;object-fit:cover;object-position:top;border-radius:23px}
+.sh-nav{display:flex;align-items:center;justify-content:space-between;margin-top:12px;gap:10px}
+.sh-dots{display:flex;gap:7px}
+.sh-dots button{width:8px;height:8px;padding:0;border-radius:99px;border:0;background:var(--line3);cursor:pointer;transition:width .3s,background .3s}
+.sh-dots button[aria-current="true"]{width:22px;background:var(--cyan)}
+.sh-arrows{display:flex;gap:6px}
+.sh-arrows button{width:34px;height:34px;border-radius:9px;border:1px solid var(--line);background:var(--surface);color:var(--text);cursor:pointer;font-size:15px}
+.sh-arrows button:hover{border-color:var(--line3)}
+.sh-prog{height:2px;background:var(--line);border-radius:2px;overflow:hidden;margin-top:10px}
+.sh-prog i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--cyan),var(--gold))}
+.sh-prog i.run{animation:prog var(--dur,5s) linear forwards}
+@keyframes prog{to{width:100%}}
+.frame-mb .sh-badge{top:34px;right:14px}
+.sh-badge{position:absolute;top:10px;right:10px;z-index:3;padding:3px 8px;border-radius:999px;background:rgba(7,15,29,.75);color:#9FB2CC;font-size:11.5px;border:1px solid #1E2E4D}
+dialog.lb{max-width:min(1100px,94vw);max-height:92vh;padding:0;border:1px solid var(--line);border-radius:16px;background:var(--deep);color:var(--text)}
+dialog.lb::backdrop{background:rgba(3,7,15,.82);backdrop-filter:blur(4px)}
+dialog.lb img{display:block;max-width:100%;max-height:82vh;margin:0 auto}
+dialog.lb .lb-h{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 14px;border-bottom:1px solid var(--line);font-size:14px;color:var(--muted)}
+dialog.lb button{border:1px solid var(--line);background:var(--surface);color:var(--text);border-radius:8px;padding:6px 10px;cursor:pointer}
 
-            // ===== UPDATE METEOR =====
-            meteorTime += delta;
-            const mT = (meteorTime % METEOR_CYCLE_DURATION) / METEOR_CYCLE_DURATION;
-            const meteorPosV = getMeteorPosition(mT);
-            const meteorNextPos = getMeteorPosition((mT + 0.003) % 1);
+@media (prefers-reduced-motion:reduce){.aurora-bg i,.tier.pro{animation:none}.rv{opacity:1;transform:none;transition:none}.sh-track{transition:none}.sh-prog{display:none}.btn.gold::after{display:none}}
+</style>
+</head>
+<body>
+<header>
+<div class="wrap hd">
+<a aria-label="KenvinZone, về đầu trang" class="logo" data-i18n-aria="KenvinZone, back to top" href="#top">
+<svg aria-hidden="true" viewbox="0 0 28 28"><rect fill="#101D35" height="28" rx="8" width="28"></rect><path d="M4 21L10 15L15 19L24 7" fill="none" stroke="#38D5E7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.6"></path><circle cx="24" cy="7" fill="#F3BE62" r="2.4"></circle></svg>
+<span>KenvinZone</span>
+</a>
+<nav aria-label="Menu chính" class="main" data-i18n-aria="Main menu" id="nav">
+<a data-i18n="k0" href="#cach-hoat-dong">Giải pháp</a>
+<a data-i18n="k1" href="#thi-truong">Thị trường</a>
+<a href="#aurora">AURORA</a>
+<a href="#intelligence">Intelligence</a>
+<a href="#labs">Labs</a>
+<a data-i18n="k2" href="#ve-kenvinzone">Về KenvinZone</a>
+</nav>
+<div class="hd-r">
+<div aria-label="Chọn ngôn ngữ" class="lang" data-i18n-aria="Choose language" role="group"><button aria-pressed="true" data-lang="vi" lang="vi" type="button">VI</button><button aria-pressed="false" data-lang="en" lang="en" type="button">EN</button></div>
+<button aria-label="Đổi giao diện sáng / tối" aria-pressed="false" class="theme-btn" data-i18n-aria="Toggle light / dark theme" id="themeBtn" type="button"><svg aria-hidden="true" class="moon" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path></svg><svg aria-hidden="true" class="sun" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.5"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg></button>
+<a class="btn gold sm" data-i18n="k3" data-link="auroraPro" href="https://aurora.kenvinzone.com/pro/">Khám phá AURORA Pro</a>
+<button aria-controls="nav" aria-expanded="false" aria-label="Mở menu" class="menu-btn" data-i18n-aria="Open menu" id="menuBtn">☰</button>
+</div>
+</div>
+</header>
+<main id="top">
+<!-- 01 HERO -->
+<section aria-labelledby="hero-title" class="hero">
+<div aria-hidden="true" class="aurora-bg"><i></i><i></i><i></i></div>
+<div class="wrap">
+<div>
+<span class="pill" data-i18n="k4"><b>KenvinZone</b> Hệ sinh thái Trading Intelligence</span>
+<h1 data-i18n="k5" id="hero-title">Từ dữ liệu thị trường đến quyết định giao dịch có hệ thống</h1>
+<p class="lead" data-i18n="k6">KenvinZone phát triển khung giao dịch, phân tích định lượng, báo cáo thị trường tự động và công cụ hỗ trợ ra quyết định cho Chứng khoán, CFD, Futures, Forex và Crypto.</p>
+<div class="acts">
+<a class="btn gold" data-i18n="k3" data-link="auroraPro" href="https://aurora.kenvinzone.com/pro/">Khám phá AURORA Pro</a>
+<a class="btn ghost" data-i18n="k7" href="#thi-truong">Chọn thị trường của bạn</a>
+</div>
+<p class="trust" data-i18n="k8">Xây dựng quanh phân tích có cấu trúc, bối cảnh minh bạch và quy trình ra quyết định có kiểm soát rủi ro.</p>
+</div>
+<figure aria-label="Minh họa khái niệm bảng bối cảnh quyết định với các lớp phân tích tách riêng" class="ctx spot" data-i18n-aria="Concept illustration of a decision-context panel with separate analytical layers" style="margin:0">
+<div class="ctx-h"><strong data-i18n="k9">XAUUSD H1, tín hiệu mua</strong><span data-i18n="k10">Minh họa khái niệm</span></div>
+<ul>
+<li><span class="k" data-i18n="k11">Kỹ thuật<small>Điểm AURORA</small></span><span class="v ok">82 · A</span></li>
+<li><span class="k" data-i18n="k12">Chất lượng setup<small>Đánh giá riêng của từng setup</small></span><span class="v ok">A</span></li>
+<li><span class="k" data-i18n="k13">Vĩ mô định lượng<small>KenvinZone Quant</small></span><span class="v ok" data-i18n="k14">Thuận chiều</span></li>
+<li><span class="k" data-i18n="k15">Liên thị trường<small>Tài sản liên quan</small></span><span class="v ok" data-i18n="k16">Hỗ trợ</span></li>
+<li><span class="k" data-i18n="k17">Rủi ro sự kiện<small>Lịch kinh tế</small></span><span class="v mid" data-i18n="k18">Trung bình</span></li>
+</ul>
+<figcaption class="ctx-f">
+<span class="sum" data-i18n="k19">Bối cảnh: <em>4/5 lớp xác nhận</em></span>
+<p data-i18n="k20">Mỗi lớp được đánh giá riêng, không cộng dồn thành một con số.</p>
+</figcaption>
+</figure>
+</div>
+</section>
+<!-- 02 CHOOSE YOUR MARKET -->
+<section aria-labelledby="mk-title" class="mk-sec" id="thi-truong">
+<div class="wrap">
+<div class="mk spot">
+<div class="mk-head">
+<h2 data-i18n="k21" id="mk-title">Bạn giao dịch thị trường nào?</h2>
+<p data-i18n="k22">Mỗi thị trường vận động khác nhau. KenvinZone dùng chung một triết lý nghiên cứu, kết hợp công cụ riêng cho từng thị trường.</p>
+</div>
+<div aria-label="Chọn thị trường" class="tabs" data-i18n-aria="Choose a market" role="tablist">
+<button aria-controls="p-stock" aria-selected="true" class="tab" id="t-stock" role="tab"><span aria-hidden="true" class="ico">📈</span><span class="nm" data-i18n="k23">Chứng khoán</span></button>
+<button aria-controls="p-cfd" aria-selected="false" class="tab" id="t-cfd" role="tab" tabindex="-1"><span aria-hidden="true" class="ico">🟡</span><span class="nm">CFD</span></button>
+<button aria-controls="p-fut" aria-selected="false" class="tab" id="t-fut" role="tab" tabindex="-1"><span aria-hidden="true" class="ico">🏛</span><span class="nm">Futures</span></button>
+<button aria-controls="p-fx" aria-selected="false" class="tab" id="t-fx" role="tab" tabindex="-1"><span aria-hidden="true" class="ico">💱</span><span class="nm">Forex</span></button>
+<button aria-controls="p-crypto" aria-selected="false" class="tab" id="t-crypto" role="tab" tabindex="-1"><span aria-hidden="true" class="ico">🪙</span><span class="nm">Crypto</span></button>
+</div>
+<div class="panes">
+<div aria-labelledby="t-stock" class="pane" id="p-stock" role="tabpanel">
+<div class="a">
+<h3 data-i18n="k24">Cổ phiếu Việt Nam và quốc tế</h3>
+<p class="who" data-i18n="k25">Dành cho nhà đầu tư muốn biết khi nào xu hướng mới bắt đầu, nên vào ở đâu và dừng lỗ ở đâu.</p>
+<div class="au">
+<p class="t" data-i18n="k26">AURORA cho Chứng khoán</p>
+<ul>
+<li data-i18n="k27">Chế độ chỉ mua, phù hợp tài khoản không bán khống.</li>
+<li data-i18n="k28">Chấm điểm bằng khối lượng giao dịch thật của sàn.</li>
+<li data-i18n="k29">Mỗi tín hiệu kèm điểm vào, dừng lỗ và hai mức chốt lời.</li>
+</ul>
+<div class="row"><a class="btn gold sm" data-i18n="k3" data-link="auroraPro" href="https://aurora.kenvinzone.com/pro/">Khám phá AURORA Pro</a><a class="btn ghost sm" data-i18n="k30" data-link="aurora" href="https://aurora.kenvinzone.com/">Xem bản Standard</a></div>
+</div>
+</div>
+<div class="b">
+<h4 data-i18n="k31">Intelligence đi kèm</h4>
+<ul class="res">
+<li><div class="top"><a data-link="vnindex" href="https://vnindex.kenvinzone.com/">VNINDEX Intelligence</a><span class="st on" data-i18n="k32">Đang vận hành</span></div><p data-i18n="k33">Báo cáo chiến lược tự động cho cổ phiếu HoSE, phân loại hành động Mua, Nắm giữ, Giảm tỷ trọng.</p></li>
+</ul>
+<div class="shots" data-market="stock">
+<div class="sh-top"><h4 data-i18n="k184">Giao diện thực tế</h4>
+<div aria-label="Thiết bị" class="dev" data-i18n-aria="Device" role="group"><button aria-pressed="true" data-dev="pc" type="button"><span aria-hidden="true">🖥</span><span data-i18n="k185">Máy tính</span></button><button aria-pressed="false" data-dev="mobile" type="button"><span aria-hidden="true">📱</span><span data-i18n="k186">Điện thoại</span></button></div></div>
+<div aria-roledescription="carousel" class="sh-view"><div class="sh-track"></div></div>
+<div class="sh-prog"><i></i></div>
+<div class="sh-nav"><div class="sh-dots"></div><div class="sh-arrows"><button aria-label="Ảnh trước" data-i18n-aria="Previous image" data-dir="-1" type="button">‹</button><button aria-label="Ảnh sau" data-i18n-aria="Next image" data-dir="1" type="button">›</button></div></div>
+</div>
+</div>
+</div>
+<div aria-labelledby="t-cfd" class="pane" hidden="" id="p-cfd" role="tabpanel">
+<div class="a">
+<h3 data-i18n="k34">Vàng, chỉ số và năng lượng CFD</h3>
+<p class="who" data-i18n="k35">Dành cho trader XAUUSD, NAS100, US30, dầu trên MT5 hoặc TradingView, nơi khối lượng của broker thường không đáng tin.</p>
+<div class="au">
+<p class="t" data-i18n="k182">AURORA cho CFD</p>
+<ul>
+<li data-i18n="k36">Tham chiếu khối lượng từ hợp đồng Futures tương ứng như một lớp bối cảnh bên ngoài, không coi là khối lượng gốc của CFD.</li>
+<li data-i18n="k37">Thống kê kết quả theo phiên Á, Âu, Mỹ.</li>
+<li data-i18n="k38">Dừng lỗ và quản lý lệnh tùy chỉnh được, ưu tiên kiểm soát rủi ro.</li>
+</ul>
+<div class="row"><a class="btn gold sm" data-i18n="k3" data-link="auroraPro" href="https://aurora.kenvinzone.com/pro/">Khám phá AURORA Pro</a></div>
+</div>
+</div>
+<div class="b">
+<h4 data-i18n="k31">Intelligence đi kèm</h4>
+<ul class="res">
+<li><div class="top"><a data-link="xaunas" href="https://xaunas.kenvinzone.com/">Gold &amp; US100 Quant</a><span class="st on" data-i18n="k32">Đang vận hành</span></div><p data-i18n="k39">Chấm điểm định lượng vĩ mô và liên thị trường cho vàng và Nasdaq.</p></li>
+<li><div class="top"><a data-link="goldNasdaq" href="https://gold-nasdaq.kenvinzone.com/">Gold / Nasdaq Strategy Desk</a><span class="st on" data-i18n="k32">Đang vận hành</span></div><p data-i18n="k40">Báo cáo tự động với xu hướng, độ tin cậy, kịch bản và mức vô hiệu hóa.</p></li>
+</ul>
+<div class="shots" data-market="cfd">
+<div class="sh-top"><h4 data-i18n="k184">Giao diện thực tế</h4>
+<div aria-label="Thiết bị" class="dev" data-i18n-aria="Device" role="group"><button aria-pressed="true" data-dev="pc" type="button"><span aria-hidden="true">🖥</span><span data-i18n="k185">Máy tính</span></button><button aria-pressed="false" data-dev="mobile" type="button"><span aria-hidden="true">📱</span><span data-i18n="k186">Điện thoại</span></button></div></div>
+<div aria-roledescription="carousel" class="sh-view"><div class="sh-track"></div></div>
+<div class="sh-prog"><i></i></div>
+<div class="sh-nav"><div class="sh-dots"></div><div class="sh-arrows"><button aria-label="Ảnh trước" data-i18n-aria="Previous image" data-dir="-1" type="button">‹</button><button aria-label="Ảnh sau" data-i18n-aria="Next image" data-dir="1" type="button">›</button></div></div>
+</div>
+</div>
+</div>
+<div aria-labelledby="t-fut" class="pane" hidden="" id="p-fut" role="tabpanel">
+<div class="a">
+<h3>Futures CME, COMEX, NYMEX</h3>
+<p class="who" data-i18n="k41">Dành cho trader hợp đồng NQ, ES, GC, CL và người đang thi tài khoản quỹ Futures.</p>
+<div class="au">
+<p class="t" data-i18n="k42">AURORA Pro và Elite cho Futures</p>
+<ul>
+<li data-i18n="k43">Dùng khối lượng khớp thật của sàn trên chart hợp đồng.</li>
+<li data-i18n="k44">Pro: setup cấu trúc thị trường và cài đặt cho tài khoản quỹ.</li>
+<li data-i18n="k45">Elite: Footprint, Delta, POC và Value Area từ dữ liệu sàn, đang phát triển.</li>
+</ul>
+<div class="row"><a class="btn gold sm" data-i18n="k3" data-link="auroraPro" href="https://aurora.kenvinzone.com/pro/">Khám phá AURORA Pro</a><a class="btn ghost sm" data-i18n="k46" data-link="telegram" href="https://t.me/kenvinhoang" rel="noopener" target="_blank">Đăng ký quan tâm Elite</a></div>
+</div>
+</div>
+<div class="b">
+<h4 data-i18n="k31">Intelligence đi kèm</h4>
+<ul class="res">
+<li><div class="top"><a data-link="xaunas" href="https://xaunas.kenvinzone.com/">Gold &amp; US100 Quant</a><span class="st on" data-i18n="k32">Đang vận hành</span></div><p data-i18n="k47">Bối cảnh vĩ mô cho GC và NQ.</p></li>
+<li><div class="top"><span><b>Order Flow Intelligence</b></span><span class="st dev" data-i18n="k48">Đang phát triển</span></div><p data-i18n="k49">Lớp dòng lệnh dành cho AURORA Elite.</p></li>
+</ul>
+<div class="shots" data-market="fut">
+<div class="sh-top"><h4 data-i18n="k184">Giao diện thực tế</h4>
+<div aria-label="Thiết bị" class="dev" data-i18n-aria="Device" role="group"><button aria-pressed="true" data-dev="pc" type="button"><span aria-hidden="true">🖥</span><span data-i18n="k185">Máy tính</span></button><button aria-pressed="false" data-dev="mobile" type="button"><span aria-hidden="true">📱</span><span data-i18n="k186">Điện thoại</span></button></div></div>
+<div aria-roledescription="carousel" class="sh-view"><div class="sh-track"></div></div>
+<div class="sh-prog"><i></i></div>
+<div class="sh-nav"><div class="sh-dots"></div><div class="sh-arrows"><button aria-label="Ảnh trước" data-i18n-aria="Previous image" data-dir="-1" type="button">‹</button><button aria-label="Ảnh sau" data-i18n-aria="Next image" data-dir="1" type="button">›</button></div></div>
+</div>
+</div>
+</div>
+<div aria-labelledby="t-fx" class="pane" hidden="" id="p-fx" role="tabpanel">
+<div class="a">
+<h3 data-i18n="k50">Các cặp tiền Forex</h3>
+<p class="who" data-i18n="k51">Dành cho trader EURUSD, GBPUSD, USDJPY muốn chọn cặp tiền có xu hướng rõ và đúng phiên.</p>
+<div class="au">
+<p class="t" data-i18n="k181">AURORA cho Forex</p>
+<ul>
+<li data-i18n="k52">Giao dịch hai chiều theo xu hướng chính.</li>
+<li data-i18n="k53">Không coi tick volume của broker là dòng lệnh thật của sàn; yếu tố khối lượng chỉ dùng khi có dữ liệu phù hợp.</li>
+<li data-i18n="k54">Thống kê theo phiên để biết cặp tiền chạy tốt vào giờ nào.</li>
+</ul>
+<div class="row"><a class="btn gold sm" data-i18n="k3" data-link="auroraPro" href="https://aurora.kenvinzone.com/pro/">Khám phá AURORA Pro</a></div>
+</div>
+</div>
+<div class="b">
+<h4 data-i18n="k31">Intelligence đi kèm</h4>
+<ul class="res">
+<li><div class="top"><a data-link="forexIndex" href="https://forex-index.kenvinzone.com/">Forex Intelligence</a><span class="st beta" data-i18n="k55">Bản thử nghiệm</span></div><p data-i18n="k56">Phiên giao dịch toàn cầu, tỷ giá chính và công cụ tính pip.</p></li>
+</ul>
+<div class="shots" data-market="fx">
+<div class="sh-top"><h4 data-i18n="k184">Giao diện thực tế</h4>
+<div aria-label="Thiết bị" class="dev" data-i18n-aria="Device" role="group"><button aria-pressed="true" data-dev="pc" type="button"><span aria-hidden="true">🖥</span><span data-i18n="k185">Máy tính</span></button><button aria-pressed="false" data-dev="mobile" type="button"><span aria-hidden="true">📱</span><span data-i18n="k186">Điện thoại</span></button></div></div>
+<div aria-roledescription="carousel" class="sh-view"><div class="sh-track"></div></div>
+<div class="sh-prog"><i></i></div>
+<div class="sh-nav"><div class="sh-dots"></div><div class="sh-arrows"><button aria-label="Ảnh trước" data-i18n-aria="Previous image" data-dir="-1" type="button">‹</button><button aria-label="Ảnh sau" data-i18n-aria="Next image" data-dir="1" type="button">›</button></div></div>
+</div>
+</div>
+</div>
+<div aria-labelledby="t-crypto" class="pane" hidden="" id="p-crypto" role="tabpanel">
+<div class="a">
+<h3 data-i18n="k57">Crypto Spot và Perpetual</h3>
+<p class="who" data-i18n="k58">Dành cho người mua giữ trên Spot lẫn trader hợp đồng vĩnh cửu có đòn bẩy, thị trường chạy 24/7.</p>
+<div class="au">
+<p class="t" data-i18n="k183">AURORA cho Crypto</p>
+<ul>
+<li data-i18n="k59">Dùng khối lượng của sàn và Open Interest (khi có dữ liệu) để bổ sung bối cảnh phái sinh.</li>
+<li data-i18n="k60">Với Spot, chuyển sang chế độ chỉ mua.</li>
+<li data-i18n="k61">Dừng lỗ cố định giúp tính khối lượng trước khi chọn đòn bẩy.</li>
+</ul>
+<div class="row"><a class="btn gold sm" data-i18n="k3" data-link="auroraPro" href="https://aurora.kenvinzone.com/pro/">Khám phá AURORA Pro</a></div>
+</div>
+</div>
+<div class="b">
+<h4 data-i18n="k31">Intelligence đi kèm</h4>
+<ul class="res">
+<li><div class="top"><a data-link="cryptoIndex" href="https://crypto-index.kenvinzone.com/">Crypto Intelligence</a><span class="st beta" data-i18n="k55">Bản thử nghiệm</span></div><p data-i18n="k62">Vốn hóa, tỷ trọng Bitcoin và tâm lý thị trường.</p></li>
+</ul>
+<div class="shots" data-market="crypto">
+<div class="sh-top"><h4 data-i18n="k184">Giao diện thực tế</h4>
+<div aria-label="Thiết bị" class="dev" data-i18n-aria="Device" role="group"><button aria-pressed="true" data-dev="pc" type="button"><span aria-hidden="true">🖥</span><span data-i18n="k185">Máy tính</span></button><button aria-pressed="false" data-dev="mobile" type="button"><span aria-hidden="true">📱</span><span data-i18n="k186">Điện thoại</span></button></div></div>
+<div aria-roledescription="carousel" class="sh-view"><div class="sh-track"></div></div>
+<div class="sh-prog"><i></i></div>
+<div class="sh-nav"><div class="sh-dots"></div><div class="sh-arrows"><button aria-label="Ảnh trước" data-i18n-aria="Previous image" data-dir="-1" type="button">‹</button><button aria-label="Ảnh sau" data-i18n-aria="Next image" data-dir="1" type="button">›</button></div></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- 03 FLAGSHIP: AURORA -->
+<section aria-labelledby="au-title" class="s" id="aurora">
+<div class="wrap">
+<h2 data-i18n="k63" id="au-title">AURORA, khung giao dịch nhiều lớp trên TradingView</h2>
+<p class="intro" data-i18n="k64">AURORA biến bối cảnh thị trường thành quyết định giao dịch có cấu trúc: xác định xu hướng, nhận diện setup, đánh giá chất lượng và vẽ sẵn kế hoạch lệnh. Thống kê đi kèm giúp bạn tự kiểm chứng trên đúng mã mình giao dịch.</p>
+<p class="en-note" data-only="en" lang="en">Product pages and user guides are currently in Vietnamese. For questions in English, message <a href="https://t.me/kenvinhoang" rel="noopener" target="_blank">@kenvinhoang on Telegram</a>.</p>
+<div class="tiers">
+<article class="tier std spot">
+<h3 class="n">Standard</h3>
+<p class="aud" data-i18n="k65">Cho trader phổ thông</p>
+<ul>
+<li data-i18n="k66">Khung xu hướng lõi</li>
+<li data-i18n="k67">Tín hiệu BREAK và SUNNY</li>
+<li data-i18n="k68">Bối cảnh đa khung thời gian và khối lượng</li>
+<li data-i18n="k69">Kế hoạch lệnh Entry, dừng lỗ, chốt lời</li>
+</ul>
+<div class="ft"><a class="btn ghost sm" data-link="aurora" href="https://aurora.kenvinzone.com/">Xem Standard</a></div>
+</article>
+<article class="tier pro spot">
+<span class="rec live" data-i18n="k70">Sản phẩm chủ lực hiện tại</span>
+<h3 class="n">Pro</h3>
+<p class="aud" data-i18n="k71">Cho trader có kinh nghiệm</p>
+<ul>
+<li data-i18n="k72">Toàn bộ Standard</li>
+<li data-i18n="k73">Điểm chất lượng riêng cho từng setup</li>
+<li data-i18n="k74">Setup cấu trúc thị trường (SMC) theo quy tắc rõ ràng</li>
+<li data-i18n="k75">Bối cảnh thanh khoản và dòng tiền được tách lớp để dễ kiểm chứng</li>
+<li data-i18n="k76">Quản lý lệnh nâng cao và thống kê nghiên cứu</li>
+</ul>
+<div class="ft"><a class="btn gold" data-i18n="k3" data-link="auroraPro" href="https://aurora.kenvinzone.com/pro/">Khám phá AURORA Pro</a></div>
+</article>
+<article class="tier eli spot">
+<h3 class="n">Elite</h3>
+<p class="aud" data-i18n="k77">Cho trader Futures và order flow chuyên nghiệp</p>
+<ul>
+<li data-i18n="k78">Footprint gốc của TradingView khi dữ liệu được hỗ trợ</li>
+<li data-i18n="k79">Khối lượng mua / bán, Delta và Imbalance</li>
+<li data-i18n="k80">POC và Value Area</li>
+<li data-i18n="k81">Xác nhận bằng dòng lệnh cho từng setup</li>
+</ul>
+<div class="ft"><div><span class="st dev" data-i18n="k48">Đang phát triển</span><span class="note-inline" data-i18n="k82">Có thể cần gói TradingView Premium / Ultimate và nguồn dữ liệu Futures được hỗ trợ.</span></div><a class="btn ghost sm" data-i18n="k83" data-link="telegram" href="https://t.me/kenvinhoang" rel="noopener" target="_blank">Đăng ký quan tâm</a></div>
+</article>
+</div>
+</div>
+</section>
+<!-- 04 HOW IT WORKS -->
+<section aria-labelledby="how-title" class="s alt" id="cach-hoat-dong">
+<div class="wrap">
+<h2 data-i18n="k84" id="how-title">Từ dữ liệu đến quyết định</h2>
+<p class="intro" data-i18n="k85">KenvinZone không coi một tín hiệu là một quyết định hoàn chỉnh. Mỗi lớp bổ sung một phần bối cảnh trước khi bạn đặt lệnh.</p>
+<ol class="flow">
+<li><h3 data-i18n="k86">Dữ liệu thị trường</h3><p data-i18n="k87">Giá, khối lượng, dữ liệu sàn và lịch sự kiện.</p></li>
+<li><h3 data-i18n="k88">Bối cảnh</h3><p data-i18n="k89">Xu hướng, trạng thái thị trường, vĩ mô và các yếu tố ủng hộ hoặc mâu thuẫn.</p></li>
+<li><h3>Setup</h3><p data-i18n="k90">Tín hiệu vào lệnh theo quy tắc rõ ràng.</p></li>
+<li><h3 data-i18n="k91">Chất lượng</h3><p data-i18n="k92">Đánh giá riêng độ mạnh của từng setup.</p></li>
+<li><h3 data-i18n="k93">Rủi ro</h3><p data-i18n="k94">Mức vô hiệu hóa, khoảng dừng lỗ, dư địa tới vùng thanh khoản, sự kiện và giới hạn quản lý lệnh.</p></li>
+<li><h3 data-i18n="k95">Quyết định</h3><p data-i18n="k96">Vào, chờ, bỏ qua hoặc quản lý setup theo một kế hoạch có cấu trúc.</p></li>
+</ol>
+<p class="principle"><span aria-hidden="true">◇</span><span data-i18n="k97"><strong>Các lớp phân tích được giữ riêng biệt.</strong> Điểm kỹ thuật, chất lượng setup, vĩ mô và dòng lệnh trả lời những câu hỏi khác nhau, nên không bị gộp thành một con số khó hiểu.</span></p>
+<div aria-label="Nguyên tắc phát triển KenvinZone" class="evidence" data-i18n-aria="KenvinZone development principles">
+<div class="ev"><b data-i18n="k98">Theo quy tắc</b><span data-i18n="k99">Setup được định nghĩa bằng quy tắc có thể lặp lại.</span></div>
+<div class="ev"><b data-i18n="k100">Minh bạch</b><span data-i18n="k101">Các lớp điểm và bối cảnh được giữ riêng để dễ kiểm chứng.</span></div>
+<div class="ev"><b data-i18n="k102">Kiểm soát rủi ro</b><span data-i18n="k103">Điểm vào luôn đi cùng mức vô hiệu hóa và kế hoạch quản lý lệnh.</span></div>
+<div class="ev"><b data-i18n="k104">Dựa trên nghiên cứu</b><span data-i18n="k105">Module mới được đo lường trước khi cân nhắc thành bộ lọc.</span></div>
+<div class="ev"><b data-i18n="k106">Không hứa lợi nhuận</b><span data-i18n="k107">Công cụ hỗ trợ quyết định, không cam kết kết quả tương lai.</span></div>
+</div>
+</div>
+</section>
+<!-- 05 MARKET INTELLIGENCE -->
+<section aria-labelledby="intel-title" class="s" id="intelligence">
+<div class="wrap">
+<h2 data-i18n="k108" id="intel-title">Intelligence ngoài biểu đồ</h2>
+<p class="intro" data-i18n="k109">Các hệ thống phân tích và báo cáo tự động của KenvinZone, mỗi hệ thống phục vụ một thị trường và cung cấp bối cảnh cho AURORA.</p>
+<div class="mods">
+<div class="mod spot">
+<span class="mk-tag" data-i18n="k110">Chứng khoán Việt Nam</span>
+<div><h3><a data-link="vnindex" href="https://vnindex.kenvinzone.com/">VNINDEX Intelligence</a></h3><p data-i18n="k111">Phân tích chiến lược tự động cho cổ phiếu HoSE.</p></div>
+<span class="sup"><span class="st on" data-i18n="k32">Đang vận hành</span><b data-i18n="k112">Hỗ trợ AURORA Stocks</b></span>
+<a class="btn ghost sm" data-i18n="k113" data-link="vnindex" href="https://vnindex.kenvinzone.com/">Mở</a>
+</div>
+<div class="mod spot">
+<span class="mk-tag" data-i18n="k114">Vàng và Nasdaq</span>
+<div><h3><a data-link="xaunas" href="https://xaunas.kenvinzone.com/">Gold &amp; US100 Quant</a></h3><p data-i18n="k115">Chấm điểm vĩ mô và liên thị trường.</p></div>
+<span class="sup"><span class="st on" data-i18n="k32">Đang vận hành</span><b data-i18n="k116">Hỗ trợ AURORA CFD, Futures</b></span>
+<a class="btn ghost sm" data-i18n="k113" data-link="xaunas" href="https://xaunas.kenvinzone.com/">Mở</a>
+</div>
+<div class="mod spot">
+<span class="mk-tag" data-i18n="k114">Vàng và Nasdaq</span>
+<div><h3><a data-link="goldNasdaq" href="https://gold-nasdaq.kenvinzone.com/">Gold / Nasdaq Strategy Desk</a></h3><p data-i18n="k117">Báo cáo tự động: xu hướng, độ tin cậy, kịch bản, mức vô hiệu hóa.</p></div>
+<span class="sup"><span class="st on" data-i18n="k32">Đang vận hành</span><b data-i18n="k118">Hỗ trợ AURORA CFD</b></span>
+<a class="btn ghost sm" data-i18n="k113" data-link="goldNasdaq" href="https://gold-nasdaq.kenvinzone.com/">Mở</a>
+</div>
+<div class="mod spot">
+<span class="mk-tag">Forex</span>
+<div><h3><a data-link="forexIndex" href="https://forex-index.kenvinzone.com/">Forex Intelligence</a></h3><p data-i18n="k119">Bối cảnh tiền tệ và phiên giao dịch.</p></div>
+<span class="sup"><span class="st beta" data-i18n="k55">Bản thử nghiệm</span><b data-i18n="k120">Hỗ trợ AURORA Forex</b></span>
+<a class="btn ghost sm" data-i18n="k113" data-link="forexIndex" href="https://forex-index.kenvinzone.com/">Mở</a>
+</div>
+<div class="mod spot">
+<span class="mk-tag">Crypto</span>
+<div><h3><a data-link="cryptoIndex" href="https://crypto-index.kenvinzone.com/">Crypto Intelligence</a></h3><p data-i18n="k121">Trạng thái thị trường và bối cảnh crypto.</p></div>
+<span class="sup"><span class="st beta" data-i18n="k55">Bản thử nghiệm</span><b data-i18n="k122">Hỗ trợ AURORA Crypto</b></span>
+<a class="btn ghost sm" data-i18n="k113" data-link="cryptoIndex" href="https://crypto-index.kenvinzone.com/">Mở</a>
+</div>
+</div>
+</div>
+</section>
+<!-- 06 QUANT & RESEARCH -->
+<section aria-labelledby="q-title" class="s alt" id="quant">
+<div class="wrap">
+<h2 data-i18n="k123" id="q-title">Bối cảnh định lượng cho quyết định tốt hơn</h2>
+<p class="intro" data-i18n="k124">Các hệ thống nghiên cứu của KenvinZone phân tích điều kiện vĩ mô, quan hệ liên thị trường, cấu trúc kỹ thuật và trạng thái thị trường, tách riêng khỏi điểm giao dịch lõi của AURORA.</p>
+<div class="qgrid">
+<div class="q spot"><h3 data-i18n="k125">Vĩ mô định lượng</h3><p data-i18n="k126">Đo lường điều kiện vĩ mô ảnh hưởng tới từng nhóm tài sản.</p></div>
+<div class="q spot"><h3 data-i18n="k127">Liên thị trường</h3><p data-i18n="k128">Theo dõi tài sản liên quan có đang xác nhận hay mâu thuẫn.</p></div>
+<div class="q spot"><h3 data-i18n="k129">Báo cáo tự động</h3><p data-i18n="k130">Kịch bản, độ tin cậy và mức vô hiệu hóa được cập nhật định kỳ.</p></div>
+<div class="q spot"><h3 data-i18n="k131">Trạng thái rủi ro</h3><p data-i18n="k132">Phân biệt giai đoạn thị trường thuận lợi và bất lợi cho giao dịch xu hướng.</p></div>
+<div class="q spot"><h3 data-i18n="k133">Nhận biết sự kiện</h3><p data-i18n="k134">Cảnh báo các mốc dữ liệu kinh tế có thể làm thị trường biến động mạnh.</p></div>
+<div class="q spot"><h3>Research Lab</h3><p data-i18n="k135">Module mới được đo lường và so sánh, có kiểm tra ngoài mẫu và chi phí giao dịch, trước khi được cân nhắc làm bộ lọc trong sản phẩm.</p></div>
+</div>
+</div>
+</section>
+<!-- 07 BUILD WITH KENVINZONE -->
+<section aria-labelledby="build-title" class="s" id="build">
+<div class="wrap">
+<div class="build spot">
+<div>
+<h2 data-i18n="k136" id="build-title">Có ý tưởng giao dịch cần thành công cụ thật?</h2>
+<p data-i18n="k137">KenvinZone Build nhận phát triển chỉ báo, robot giao dịch, tự động hóa và dashboard theo yêu cầu cho trader và doanh nghiệp.</p>
+<div class="tags"><span>Pine Script</span><span>MQL4 / MQL5</span><span data-i18n="k138">Chỉ báo tùy chỉnh</span><span>Expert Advisor</span><span data-i18n="k139">Webhook và tự động hóa</span><span>Web dashboard</span></div>
+</div>
+<a class="btn ghost" data-i18n="k140" data-link="tradingtool" href="https://tradingtool.kenvinzone.com/">Xem dịch vụ phát triển</a>
+</div>
+</div>
+</section>
+<!-- 08 FUTURE PLATFORM -->
+<section aria-labelledby="fut-title" class="s alt" id="tuong-lai">
+<div class="wrap">
+<div class="fut-head"><h2 data-i18n="k141" id="fut-title">AURORA đang hướng tới đâu</h2><span class="st lab" data-i18n="k142">Nghiên cứu, đang phát triển</span></div>
+<p class="intro" data-i18n="k143">AURORA đang phát triển từ một khung giao dịch trên TradingView thành nền tảng hỗ trợ quyết định rộng hơn, kết nối setup kỹ thuật, bối cảnh định lượng và phần giải thích có hỗ trợ AI.</p>
+<div class="fgrid">
+<div class="fi spot"><h3>Web Companion</h3><p data-i18n="k144">Xem setup và lệnh đang chạy ngoài TradingView.</p></div>
+<div class="fi spot"><h3 data-i18n="k145">Ứng dụng iOS, Android</h3><p data-i18n="k146">Theo dõi thị trường trên điện thoại.</p></div>
+<div class="fi spot"><h3 data-i18n="k147">Luồng setup trực tiếp</h3><p data-i18n="k148">Danh sách setup mới trên nhiều thị trường.</p></div>
+<div class="fi spot"><h3 data-i18n="k149">Thông báo đẩy</h3><p data-i18n="k150">Nhận cảnh báo qua ứng dụng, Telegram, email.</p></div>
+<div class="fi spot"><h3 data-i18n="k151">Hỗ trợ quyết định bằng AI</h3><p data-i18n="k152">Giải thích vì sao setup xuất hiện, bằng chứng nào ủng hộ, yếu tố nào mâu thuẫn và điều kiện nào làm setup mất hiệu lực.</p></div>
+<div class="fi spot"><h3 data-i18n="k153">Intelligence hợp nhất</h3><p data-i18n="k154">Kỹ thuật, vĩ mô và rủi ro sự kiện trên cùng một màn hình.</p></div>
+</div>
+</div>
+</section>
+<!-- 09 ABOUT -->
+<section aria-labelledby="ab-title" class="s" id="ve-kenvinzone">
+<div class="wrap">
+<div class="ab">
+<div aria-hidden="true" class="av">K</div>
+<div>
+<h2 data-i18n="k155" id="ab-title">Xây dựng từ quy trình giao dịch thực tế</h2>
+<p data-i18n="k156">KenvinZone hình thành từ nhiều năm tự nghiên cứu thị trường, phát triển hệ thống giao dịch và phân tích trên nhiều nhóm tài sản. Các công cụ được xây quanh quy trình dùng trong nghiên cứu và giao dịch thật, thay vì những ý tưởng chỉ báo rời rạc.</p>
+<p class="muted" data-i18n="k157">Người sáng lập: Trader KenvinHoang. Trang giới thiệu đầy đủ đang được chuẩn bị.</p>
+<div class="row"><a class="btn ghost sm" data-i18n="k158" data-link="telegram" href="https://t.me/kenvinhoang" rel="noopener" target="_blank">Liên hệ qua Telegram</a></div>
+</div>
+</div>
+</div>
+</section>
+<!-- 10 LABS -->
+<section aria-labelledby="labs-title" class="s alt" id="labs">
+<div class="wrap">
+<h2 id="labs-title">KenvinZone Labs</h2>
+<p class="intro" data-i18n="k159">Không gian cho các hệ thống thử nghiệm, dự án ngoài giao dịch và giáo dục.</p>
+<div class="labs" style="margin-top:36px">
+<div class="obs">
+<canvas aria-hidden="true" id="stars"></canvas>
+<div class="in">
+<h3>Quantum Observatory</h3>
+<p data-i18n="k160">Bản đồ trực quan các hệ thống đang hoạt động, đang thử nghiệm và sắp tới của KenvinZone. Nên mở trên máy tính.</p>
+<a class="btn ghost" data-i18n="k161" data-link="ecosystem" href="https://ecosystem.kenvinzone.com/">Mở Quantum Observatory</a>
+</div>
+</div>
+<div class="other spot">
+<h3 data-i18n="k162">Dự án khác</h3>
+<ul class="res">
+<li><div class="top"><a data-link="aiNews" href="https://ainews.kenvinzone.com/">AI News</a><span class="st lab">Labs</span></div><p data-i18n="k163">Tin thị trường được tóm tắt bằng AI.</p></li>
+<li><div class="top"><a data-link="aiClass" href="https://aiclass.kenvinzone.com/">AI Class</a><span class="st lab" data-i18n="k164">Giáo dục</span></div><p data-i18n="k165">Lớp học AI cho học sinh lớp 5 đến lớp 9.</p></li>
+</ul>
+</div>
+</div>
+</div>
+</section>
+<!-- 11 FINAL CTA -->
+<section aria-labelledby="fin-title" class="s" id="bat-dau">
+<div class="wrap final">
+<div>
+<h2 data-i18n="k166" id="fin-title">Bắt đầu với AURORA Pro</h2>
+<p class="intro" data-i18n="k167">Bắt đầu từ khung giao dịch chủ lực hiện tại của KenvinZone. Tìm hiểu phương pháp, nhận quyền truy cập và kiểm chứng trên chính thị trường bạn giao dịch.</p>
+<p class="en-note" data-only="en" lang="en">Product pages and user guides are currently in Vietnamese. For questions in English, message <a href="https://t.me/kenvinhoang" rel="noopener" target="_blank">@kenvinhoang on Telegram</a>.</p>
+<div class="acts">
+<a class="btn gold" data-i18n="k3" data-link="auroraPro" href="https://aurora.kenvinzone.com/pro/">Khám phá AURORA Pro</a>
+<a class="btn ghost" data-i18n="k168" href="#intelligence">Xem tất cả công cụ</a>
+</div>
+</div>
+<ol class="steps">
+<li><span><strong data-i18n="k169">Tìm hiểu AURORA Pro</strong><span data-i18n="k170">Đọc cách hệ thống hoạt động và hướng dẫn sử dụng.</span></span></li>
+<li><span><strong data-i18n="k171">Gửi tên TradingView</strong><span data-i18n="k172">Nhận quyền truy cập Invite-only qua Telegram.</span></span></li>
+<li><span><strong data-i18n="k173">Dùng cài đặt mặc định</strong><span data-i18n="k174">Chọn Market Preset đúng thị trường, chưa cần tinh chỉnh.</span></span></li>
+<li><span><strong data-i18n="k175">Quan sát và kiểm chứng</strong><span data-i18n="k176">Theo dõi thống kê trên chính mã bạn giao dịch trước khi tăng rủi ro.</span></span></li>
+</ol>
+</div>
+</section>
+</main>
+<footer>
+<div class="wrap">
+<div class="fcols">
+<div class="brand">
+<a class="logo" href="#top"><svg aria-hidden="true" viewbox="0 0 28 28"><rect fill="#101D35" height="28" rx="8" width="28"></rect><path d="M4 21L10 15L15 19L24 7" fill="none" stroke="#38D5E7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.6"></path><circle cx="24" cy="7" fill="#F3BE62" r="2.4"></circle></svg><span>KenvinZone</span></a>
+<p data-i18n="k177">Hệ sinh thái Trading Intelligence cho Chứng khoán, CFD, Futures, Forex và Crypto.</p>
+</div>
+<div>
+<h4>AURORA</h4>
+<ul>
+<li><a data-link="auroraPro" href="https://aurora.kenvinzone.com/pro/">AURORA Pro</a></li>
+<li><a data-link="aurora" href="https://aurora.kenvinzone.com/">AURORA Standard</a></li>
+<li><a data-i18n="k178" href="https://aurora.kenvinzone.com/pro/huong-dan.html">Hướng dẫn Pro</a></li>
+<li><a data-i18n="k179" href="https://aurora.kenvinzone.com/huong-dan.html">Hướng dẫn Standard</a></li>
+</ul>
+</div>
+<div>
+<h4>Intelligence</h4>
+<ul>
+<li><a data-link="vnindex" href="https://vnindex.kenvinzone.com/">VNINDEX Intelligence</a></li>
+<li><a data-link="xaunas" href="https://xaunas.kenvinzone.com/">Gold &amp; US100 Quant</a></li>
+<li><a data-link="goldNasdaq" href="https://gold-nasdaq.kenvinzone.com/">Gold / Nasdaq Strategy Desk</a></li>
+<li><a data-link="forexIndex" href="https://forex-index.kenvinzone.com/">Forex Intelligence</a></li>
+<li><a data-link="cryptoIndex" href="https://crypto-index.kenvinzone.com/">Crypto Intelligence</a></li>
+</ul>
+</div>
+<div>
+<h4>KenvinZone</h4>
+<ul>
+<li><a data-link="tradingtool" href="https://tradingtool.kenvinzone.com/">KenvinZone Build</a></li>
+<li><a data-link="ecosystem" href="https://ecosystem.kenvinzone.com/">Labs, Quantum Observatory</a></li>
+<li><a data-link="telegram" href="https://t.me/kenvinhoang" rel="noopener" target="_blank">Telegram @kenvinhoang</a></li>
+</ul>
+</div>
+</div>
+<p class="risk" data-i18n="k180">KenvinZone cung cấp công cụ phân tích và hỗ trợ ra quyết định. Tùy thị trường, một số module dùng dữ liệu gốc của biểu đồ, dữ liệu Futures tham chiếu, dữ liệu phái sinh hoặc dữ liệu mô hình hóa; các nguồn có bản chất khác nhau không được coi là tương đương. Giao dịch chứng khoán, CFD, Futures, Forex và tiền mã hóa có rủi ro mất vốn; không công cụ nào đảm bảo kết quả trong tương lai. Nội dung trên trang không phải lời khuyên đầu tư. TradingView là thương hiệu của TradingView, Inc. © 2026 KenvinZone.</p>
+</div>
+</footer>
+<dialog aria-label="Ảnh giao diện" class="lb" data-i18n-aria="Interface screenshot" id="lb"><div class="lb-h"><span id="lbCap"></span><button id="lbClose" type="button">✕</button></div><img alt="" id="lbImg"/></dialog>
+<script>
+/* ===================== KENVINZONE HYBRID REV3 ===================== */
 
-            meteorGroup.position.copy(meteorPosV);
+/* Centralized destinations: edit here when a domain or contact changes. */
+const LINKS = {
+  auroraPro: 'https://aurora.kenvinzone.com/pro/',
+  aurora: 'https://aurora.kenvinzone.com/',
+  vnindex: 'https://vnindex.kenvinzone.com/',
+  xaunas: 'https://xaunas.kenvinzone.com/',
+  goldNasdaq: 'https://gold-nasdaq.kenvinzone.com/',
+  forexIndex: 'https://forex-index.kenvinzone.com/',
+  cryptoIndex: 'https://crypto-index.kenvinzone.com/',
+  tradingtool: 'https://tradingtool.kenvinzone.com/',
+  ecosystem: 'https://ecosystem.kenvinzone.com/',
+  telegram: 'https://t.me/kenvinhoang',
+  aiNews: 'https://ainews.kenvinzone.com/',
+  aiClass: 'https://aiclass.kenvinzone.com/'
+};
 
-            // Meteor xoay chậm quanh trục riêng - cảm giác đồ sộ trôi nổi
-            meteorMesh.rotation.x += delta * 0.08;
-            meteorMesh.rotation.y += delta * 0.12;
-            meteorMesh.rotation.z += delta * 0.05;
+document.querySelectorAll('[data-link]').forEach(a => {
+  const url = LINKS[a.dataset.link];
+  if (url) a.href = url;
+});
 
-            // Aura pulse nhẹ - như nhiệt rung động
-            const meteorPulse = 1 + Math.sin(meteorTime * 1.5) * 0.08;
-            aura.scale.setScalar(meteorPulse);
-            aura2.scale.setScalar(1 + Math.sin(meteorTime * 0.8) * 0.12);
+/* Analytics-safe event layer. Works without any analytics provider. */
+function track(eventName, payload = {}) {
+  try {
+    if (typeof window.gtag === 'function') {
+      window.gtag('event', eventName, payload);
+    } else if (window.umami && typeof window.umami.track === 'function') {
+      window.umami.track(eventName, payload);
+    }
+  } catch (_) {}
+}
 
-            // Halo sprite luôn quay về camera (sprite tự xử lý), pulse opacity
-            haloMat.opacity = 0.75 + Math.sin(meteorTime * 2) * 0.15;
+document.addEventListener('click', e => {
+  const a = e.target.closest('a');
+  if (!a) return;
+  if (a.dataset.link) track('link_' + a.dataset.link, { href: a.href });
+});
 
-            // Emissive của meteor body nhấp nháy như vết nứt cháy
-            meteorMat.emissiveIntensity = 0.3 + Math.sin(meteorTime * 3.5) * 0.12;
+/* Mobile menu */
+(() => {
+  const b = document.getElementById('menuBtn');
+  const n = document.getElementById('nav');
+  if (!b || !n) return;
+  b.addEventListener('click', () => {
+    const o = n.classList.toggle('open');
+    b.setAttribute('aria-expanded', String(o));
+    b.textContent = o ? '✕' : '☰';
+  });
+  n.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+    n.classList.remove('open');
+    b.setAttribute('aria-expanded', 'false');
+    b.textContent = '☰';
+  }));
+})();
 
-            // Light intensity giảm khi meteor ở xa camera (dist từ origin)
-            const meteorDist = meteorPosV.length();
-            meteorLight.intensity = Math.max(2, 10 - meteorDist * 0.06);
+/* External subdomains open in a new tab; AURORA stays same-tab to preserve conversion flow. */
+document.querySelectorAll('a[href^="http"]').forEach(a => {
+  if (!a.href.includes('aurora.kenvinzone.com')) {
+    a.target = '_blank';
+    a.rel = 'noopener';
+  }
+});
 
-            // Hướng vệt đuôi: ngược hướng bay (từ meteor trừ điểm tiếp theo)
-            // Update trail history
-            meteorTrailHistory.unshift(meteorPosV.clone());
-            if (meteorTrailHistory.length > METEOR_TRAIL_COUNT) meteorTrailHistory.pop();
+/* Market selector.
+   Canonical hashes: /#stock /#cfd /#futures /#forex /#crypto
+   Legacy aliases still work: /#fut /#fx /#cr
+*/
+(() => {
+  const tabs = [...document.querySelectorAll('[role="tab"]')];
+  if (!tabs.length) return;
 
-            const mPosAttr = mTrailGeo.attributes.position;
-            const mColAttr = mTrailGeo.attributes.color;
-            for (let i = 0; i < METEOR_TRAIL_COUNT; i++) {
-                const p = meteorTrailHistory[i];
-                // Spread tăng dần theo độ xa khỏi meteor - trail tỏa rộng dần
-                const spread = i * 0.08 + 0.2;
-                mPosAttr.array[i * 3]     = p.x + (Math.random() - 0.5) * spread;
-                mPosAttr.array[i * 3 + 1] = p.y + (Math.random() - 0.5) * spread;
-                mPosAttr.array[i * 3 + 2] = p.z + (Math.random() - 0.5) * spread;
+  const idToKey = {
+    't-stock': 'stock',
+    't-cfd': 'cfd',
+    't-fut': 'futures',
+    't-fx': 'forex',
+    't-crypto': 'crypto'
+  };
+  const aliases = { fut: 'futures', fx: 'forex', cr: 'crypto' };
 
-                // Gradient: vàng trắng nóng (gần) -> cam -> đỏ thẫm -> tắt
-                const ratio = i / METEOR_TRAIL_COUNT;
-                if (ratio < 0.15) {
-                    // Lõi trắng-vàng nóng
-                    mColAttr.array[i * 3]     = 1.0;
-                    mColAttr.array[i * 3 + 1] = 0.9 - ratio;
-                    mColAttr.array[i * 3 + 2] = 0.5 - ratio * 2;
-                } else if (ratio < 0.5) {
-                    // Cam
-                    mColAttr.array[i * 3]     = 1.0;
-                    mColAttr.array[i * 3 + 1] = 0.5 * (1 - (ratio - 0.15) / 0.35);
-                    mColAttr.array[i * 3 + 2] = 0.05;
-                } else {
-                    // Đỏ thẫm tắt dần
-                    const fade = 1 - (ratio - 0.5) / 0.5;
-                    mColAttr.array[i * 3]     = 0.7 * fade;
-                    mColAttr.array[i * 3 + 1] = 0.1 * fade;
-                    mColAttr.array[i * 3 + 2] = 0.0;
-                }
-            }
-            mPosAttr.needsUpdate = true;
-            mColAttr.needsUpdate = true;
-            // ===== END METEOR UPDATE =====
+  const keyOf = t => idToKey[t.id] || t.id.replace(/^t-/, '');
 
-            // Update planet self rotation & coordinates translation
-            celestialBodies.forEach((body) => {
-                // Rotation around planetary axis
-                body.mesh.rotation.y += delta * 0.45;
+  const select = (t, focus = false, push = false) => {
+    tabs.forEach(x => {
+      const on = x === t;
+      x.setAttribute('aria-selected', String(on));
+      x.tabIndex = on ? 0 : -1;
+      const panel = document.getElementById(x.getAttribute('aria-controls'));
+      if (panel) panel.hidden = !on;
+    });
+    if (focus) t.focus();
+    if (push) history.replaceState(null, '', '#' + keyOf(t));
+    track('market_tab_' + keyOf(t));
+  };
 
-                // Orbit translation
-                if (body.data.type === 'planet') {
-                    // Temporarily lock orbital movement when selected or hovered
-                    if (hoveredMesh !== body.mesh && selectedMesh !== body.mesh) {
-                        body.data.angle -= body.data.speed;
-                        body.mesh.position.x = Math.cos(body.data.angle) * body.data.distance;
-                        body.mesh.position.z = Math.sin(body.data.angle) * body.data.distance;
-                    }
-                } else {
-                    body.mesh.rotation.y += delta * 0.15;
-                }
+  tabs.forEach((t, i) => {
+    t.addEventListener('click', () => select(t, false, true));
+    t.addEventListener('keydown', e => {
+      let next;
+      if (e.key === 'ArrowRight') next = i + 1;
+      else if (e.key === 'ArrowLeft') next = i - 1;
+      else if (e.key === 'Home') next = 0;
+      else if (e.key === 'End') next = tabs.length - 1;
+      else return;
+      e.preventDefault();
+      select(tabs[(next + tabs.length) % tabs.length], true, true);
+    });
+  });
 
-                // Match 2D HTML tag Labels coordinates to 3D Viewport Space
-                const vector = body.mesh.position.clone();
-                vector.project(camera);
+  const fromHash = () => {
+    let raw = location.hash.replace(/^#/, '');
+    raw = aliases[raw] || raw;
+    const t = tabs.find(x => keyOf(x) === raw);
+    if (!t) return;
+    select(t, false, false);
+    const market = document.getElementById('thi-truong');
+    if (market) market.scrollIntoView({ block: 'start' });
+  };
 
-                if (vector.z > 1) {
-                    body.label.style.display = 'none';
-                } else {
-                    body.label.style.display = 'block';
-                    
-                    const x = (vector.x * .5 + .5) * window.innerWidth;
-                    const yOffset = body.data.type === 'star' ? -95 : -46;
-                    const y = -(vector.y * .5 - .5) * window.innerHeight + yOffset;
+  fromHash();
+  addEventListener('hashchange', fromHash);
+})();
 
-                    body.label.style.left = `${x}px`;
-                    body.label.style.top = `${y}px`;
-                    
-                    const scale = Math.max(0.45, 1 - vector.z * 0.75);
-                    
-                    if (hoveredMesh === body.mesh || selectedMesh === body.mesh) {
-                        body.label.style.transform = `translate(-50%, -50%) scale(1.15)`;
-                        body.label.style.zIndex = "25";
-                    } else {
-                        body.label.style.transform = `translate(-50%, -50%) scale(${scale})`;
-                        body.label.style.zIndex = "10";
-                    }
-                }
-            });
+/* Quantum Observatory canvas — paused when offscreen and respectful of reduced-motion. */
+(() => {
+  const c = document.getElementById('stars');
+  if (!c) return;
+  const x = c.getContext('2d');
+  const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let W, H, S = [], visible = false, raf = 0;
 
-            controls.update();
-            renderer.render(scene, camera);
-        }
+  const size = () => {
+    const r = c.getBoundingClientRect();
+    const d = Math.min(devicePixelRatio || 1, 2);
+    W = c.width = Math.max(1, r.width * d);
+    H = c.height = Math.max(1, r.height * d);
+    S = Array.from({ length: Math.round(r.width * r.height / 1500) }, () => ({
+      x: Math.random() * W,
+      y: Math.random() * H,
+      z: Math.random() * .8 + .2
+    }));
+  };
 
-        // Start the engine loop
-        animate();
-    </script>
+  const draw = t => {
+    x.clearRect(0, 0, W, H);
+    for (const s of S) {
+      const a = still ? s.z : s.z * (.55 + .45 * Math.sin(t / 900 + s.x));
+      x.fillStyle = s.z > .85 ? `rgba(243,190,98,${a})` : `rgba(160,220,240,${a})`;
+      x.fillRect(s.x, s.y, s.z * 2.2, s.z * 2.2);
+    }
+    raf = (!still && visible) ? requestAnimationFrame(draw) : 0;
+  };
+
+  size();
+  addEventListener('resize', () => {
+    size();
+    if (visible && !raf) draw(performance.now());
+  });
+
+  const io = new IntersectionObserver(([entry]) => {
+    visible = entry.isIntersecting;
+    if (visible && !raf) raf = requestAnimationFrame(draw);
+    if (!visible && raf) {
+      cancelAnimationFrame(raf);
+      raf = 0;
+    }
+  });
+  io.observe(c);
+})();
+
+/* ===================== VI / EN LANGUAGE SWITCH =====================
+   Tiếng Việt nằm sẵn trong HTML (mặc định, tốt cho SEO). Bản tiếng Anh nằm trong I18N_EN; sửa câu chữ tại đây.
+   Thứ tự chọn ngôn ngữ: ?lang=en|vi, rồi lựa chọn đã lưu, rồi múi giờ Việt Nam / ngôn ngữ trình duyệt. */
+const I18N_EN = {
+ "k0": "Solutions",
+ "k1": "Markets",
+ "k2": "About",
+ "k3": "Explore AURORA Pro",
+ "k4": "<b>KenvinZone</b> Trading Intelligence Ecosystem",
+ "k5": "From market data to systematic trading decisions",
+ "k6": "KenvinZone builds trading frameworks, quantitative analytics, automated market reports and decision-support tools for Stocks, CFDs, Futures, Forex and Crypto.",
+ "k7": "Choose your market",
+ "k8": "Built around structured analysis, transparent context and risk-aware decision workflows.",
+ "k9": "XAUUSD H1, buy setup",
+ "k10": "Concept illustration",
+ "k11": "Technical<small>AURORA score</small>",
+ "k12": "Setup quality<small>Rated per setup type</small>",
+ "k13": "Macro quant<small>KenvinZone Quant</small>",
+ "k14": "Aligned",
+ "k15": "Cross-market<small>Related assets</small>",
+ "k16": "Supportive",
+ "k17": "Event risk<small>Economic calendar</small>",
+ "k18": "Medium",
+ "k19": "Context: <em>4 of 5 layers confirm</em>",
+ "k20": "Each layer is assessed on its own, never summed into a single number.",
+ "k21": "Which market do you trade?",
+ "k22": "Every market behaves differently. KenvinZone applies one research philosophy with tools built for each market.",
+ "k23": "Stocks",
+ "k24": "Vietnamese and global equities",
+ "k25": "For investors who want to know when a new trend begins, where to enter and where to place the stop.",
+ "k26": "AURORA for Stocks",
+ "k27": "Long-only mode for accounts that cannot short.",
+ "k28": "Scores with the exchange’s real traded volume.",
+ "k29": "Every signal comes with an entry, a stop and two profit targets.",
+ "k30": "See Standard",
+ "k31": "Related intelligence",
+ "k32": "Live",
+ "k33": "Automated strategy reports for HoSE stocks, classified as Buy, Hold or Reduce.",
+ "k34": "Gold, index and energy CFDs",
+ "k35": "For XAUUSD, NAS100, US30 and oil traders on MT5 or TradingView, where broker volume is often unreliable.",
+ "k36": "References volume from the matching futures contract as external context, never treated as the CFD’s native volume.",
+ "k37": "Results broken down by Asian, European and US sessions.",
+ "k38": "Configurable stops and trade management with risk control first.",
+ "k39": "Quantitative macro and cross-market scoring for gold and Nasdaq.",
+ "k40": "Automated reports with bias, confidence, scenarios and invalidation levels.",
+ "k41": "For NQ, ES, GC and CL traders, including futures prop-firm challengers.",
+ "k42": "AURORA Pro and Elite for Futures",
+ "k43": "Uses real exchange volume on the contract chart.",
+ "k44": "Pro: market-structure setups and prop-firm settings.",
+ "k45": "Elite: footprint, delta, POC and value area from exchange data, in development.",
+ "k46": "Join the Elite waitlist",
+ "k47": "Macro context for GC and NQ.",
+ "k48": "In development",
+ "k49": "Order-flow layer for AURORA Elite.",
+ "k50": "Forex currency pairs",
+ "k51": "For EURUSD, GBPUSD and USDJPY traders who want pairs with a clear trend, in the right session.",
+ "k52": "Trades both directions with the main trend.",
+ "k53": "Broker tick volume is never treated as exchange order flow; volume factors apply only when suitable data exists.",
+ "k54": "Session statistics show when each pair performs best.",
+ "k55": "Beta",
+ "k56": "Global sessions, major rates and a pip calculator.",
+ "k57": "Crypto spot and perpetuals",
+ "k58": "For spot holders and leveraged perpetual traders in a 24/7 market.",
+ "k59": "Uses exchange volume and open interest (when available) for derivatives context.",
+ "k60": "Switch to long-only mode for spot.",
+ "k61": "A fixed stop lets you size the position before choosing leverage.",
+ "k62": "Market cap, Bitcoin dominance and sentiment.",
+ "k63": "AURORA, a multi-layer trading framework for TradingView",
+ "k64": "AURORA turns market context into structured trade decisions: it defines the trend, detects setups, rates their quality and draws the trade plan. Built-in statistics let you validate it on the exact symbols you trade.",
+ "k65": "For everyday traders",
+ "k66": "Core trend framework",
+ "k67": "BREAK and SUNNY signals",
+ "k68": "Multi-timeframe and volume context",
+ "k69": "Trade plan with entry, stop and targets",
+ "k70": "Current flagship",
+ "k71": "For experienced traders",
+ "k72": "Everything in Standard",
+ "k73": "Quality score for each setup",
+ "k74": "Rule-based market-structure (SMC) setups",
+ "k75": "Liquidity and flow context kept as separate, verifiable layers",
+ "k76": "Advanced trade management and research statistics",
+ "k77": "For professional futures and order-flow traders",
+ "k78": "Native TradingView footprint where data is supported",
+ "k79": "Buy / sell volume, delta and imbalances",
+ "k80": "POC and value area",
+ "k81": "Order-flow confirmation for each setup",
+ "k82": "May require TradingView Premium / Ultimate and a supported futures data feed.",
+ "k83": "Join the waitlist",
+ "k84": "From data to decision",
+ "k85": "KenvinZone never treats a single signal as a complete decision. Each layer adds context before you place a trade.",
+ "k86": "Market data",
+ "k87": "Price, volume, exchange data and the event calendar.",
+ "k88": "Context",
+ "k89": "Trend, market regime, macro and the factors that support or conflict.",
+ "k90": "Entry signals defined by clear rules.",
+ "k91": "Quality",
+ "k92": "A separate rating of each setup’s strength.",
+ "k93": "Risk",
+ "k94": "Invalidation, stop distance, room to liquidity, events and management limits.",
+ "k95": "Decision",
+ "k96": "Enter, wait, skip or manage the setup with a structured plan.",
+ "k97": "<strong>Analytical layers stay separate.</strong> Technical score, setup quality, macro and order flow answer different questions, so they are never merged into one opaque number.",
+ "k98": "Rule-based",
+ "k99": "Setups are defined by repeatable rules.",
+ "k100": "Transparent",
+ "k101": "Scores and context layers are kept apart so they can be verified.",
+ "k102": "Risk-aware",
+ "k103": "Every entry comes with an invalidation level and a management plan.",
+ "k104": "Research-driven",
+ "k105": "New modules are measured before they are considered as filters.",
+ "k106": "No profit promises",
+ "k107": "Decision-support tools with no guarantee of future results.",
+ "k108": "Intelligence beyond the chart",
+ "k109": "KenvinZone’s automated analysis and reporting systems. Each serves one market and provides context for AURORA.",
+ "k110": "Vietnam equities",
+ "k111": "Automated strategy analysis for HoSE stocks.",
+ "k112": "Supports AURORA Stocks",
+ "k113": "Open",
+ "k114": "Gold and Nasdaq",
+ "k115": "Macro and cross-market scoring.",
+ "k116": "Supports AURORA CFD, Futures",
+ "k117": "Automated reports: bias, confidence, scenarios, invalidation.",
+ "k118": "Supports AURORA CFD",
+ "k119": "Currency and session context.",
+ "k120": "Supports AURORA Forex",
+ "k121": "Crypto market regime and context.",
+ "k122": "Supports AURORA Crypto",
+ "k123": "Quantitative context for better decisions",
+ "k124": "KenvinZone research systems analyse macro conditions, cross-market relationships, technical structure and market regime, separately from AURORA’s core trading score.",
+ "k125": "Macro quant",
+ "k126": "Measures the macro conditions that affect each asset class.",
+ "k127": "Cross-market",
+ "k128": "Tracks whether related assets confirm or contradict.",
+ "k129": "Automated reports",
+ "k130": "Scenarios, confidence and invalidation, updated on a schedule.",
+ "k131": "Risk regime",
+ "k132": "Separates favourable and unfavourable conditions for trend trading.",
+ "k133": "Event awareness",
+ "k134": "Flags economic releases that can move markets sharply.",
+ "k135": "New modules are measured and compared, including out-of-sample and cost testing, before being considered as product filters.",
+ "k136": "Have a trading idea that needs to become a real tool?",
+ "k137": "KenvinZone Build develops custom indicators, expert advisors, automation and dashboards for traders and businesses.",
+ "k138": "Custom indicators",
+ "k139": "Webhooks and automation",
+ "k140": "See development services",
+ "k141": "Where AURORA is heading",
+ "k142": "Research, in development",
+ "k143": "AURORA is growing from a TradingView framework into a broader decision-support platform that connects technical setups, quantitative context and AI-assisted explanation.",
+ "k144": "See setups and open trades outside TradingView.",
+ "k145": "iOS and Android apps",
+ "k146": "Follow the markets on your phone.",
+ "k147": "Live setup feed",
+ "k148": "New setups across many markets.",
+ "k149": "Push notifications",
+ "k150": "Alerts by app, Telegram and email.",
+ "k151": "AI decision support",
+ "k152": "Explains why a setup appeared, what supports it, what conflicts with it and what would invalidate it.",
+ "k153": "Unified intelligence",
+ "k154": "Technical, macro and event risk on one screen.",
+ "k155": "Built from real trading workflows",
+ "k156": "KenvinZone grew out of years of independent market research, trading-system development and multi-asset analysis. The tools are built around workflows used in real research and trading, not isolated indicator ideas.",
+ "k157": "Founder: Trader KenvinHoang. A full about page is coming soon.",
+ "k158": "Contact on Telegram",
+ "k159": "A space for experimental systems, non-trading projects and education.",
+ "k160": "A visual map of KenvinZone’s live, experimental and upcoming systems. Best viewed on desktop.",
+ "k161": "Open Quantum Observatory",
+ "k162": "Other projects",
+ "k163": "Market news summarised by AI.",
+ "k164": "Education",
+ "k165": "AI classes for students in grades 5 to 9 (Vietnamese).",
+ "k166": "Start with AURORA Pro",
+ "k167": "Begin with KenvinZone’s current flagship framework. Learn the method, request access and validate it on the markets you actually trade.",
+ "k168": "View all tools",
+ "k169": "Explore AURORA Pro",
+ "k170": "Read how the system works and the user guide.",
+ "k171": "Send your TradingView username",
+ "k172": "Receive invite-only access via Telegram.",
+ "k173": "Start with default settings",
+ "k174": "Pick the market preset for your market; no tuning needed yet.",
+ "k175": "Observe and validate",
+ "k176": "Review the statistics on your own symbols before increasing risk.",
+ "k177": "A trading intelligence ecosystem for Stocks, CFDs, Futures, Forex and Crypto.",
+ "k178": "Pro guide (Vietnamese)",
+ "k179": "Standard guide (Vietnamese)",
+ "k180": "KenvinZone provides analysis and decision-support tools. Depending on the market, some modules use chart-native data, referenced futures data, derivatives data or modelled data; sources of a different nature are never treated as equivalent. Trading stocks, CFDs, futures, forex and crypto carries a risk of loss; no tool guarantees future results. Nothing on this page is investment advice. TradingView is a trademark of TradingView, Inc. © 2026 KenvinZone.",
+ "k181": "AURORA for Forex",
+ "k182": "AURORA for CFDs",
+ "k183": "AURORA for Crypto",
+ "k184": "Real interface",
+ "k185": "Desktop",
+ "k186": "Mobile"
+};
+const META_EN = {
+  title: 'KenvinZone | Trading Intelligence Ecosystem',
+  desc: 'KenvinZone builds AURORA, quantitative analytics and automated market intelligence for Stocks, CFDs, Futures, Forex and Crypto.'
+};
+(() => {
+  const els = [...document.querySelectorAll('[data-i18n]')];
+  const viHTML = new Map(els.map(e => [e, e.innerHTML]));
+  const ariaEls = [...document.querySelectorAll('[data-i18n-aria]')];
+  const viAria = new Map(ariaEls.map(e => [e, e.getAttribute('aria-label')]));
+  const md = document.querySelector('meta[name="description"]');
+  const viMeta = { title: document.title, desc: md ? md.content : '' };
+  const btns = [...document.querySelectorAll('.lang [data-lang]')];
+
+  const apply = (lang, save) => {
+    const en = lang === 'en';
+    els.forEach(e => { const t = en ? I18N_EN[e.dataset.i18n] : viHTML.get(e); if (t != null) e.innerHTML = t; });
+    ariaEls.forEach(e => e.setAttribute('aria-label', en ? e.dataset.i18nAria : viAria.get(e)));
+    document.documentElement.lang = en ? 'en' : 'vi';
+    document.title = en ? META_EN.title : viMeta.title;
+    if (md) md.content = en ? META_EN.desc : viMeta.desc;
+    btns.forEach(b => b.setAttribute('aria-pressed', String(b.dataset.lang === lang)));
+    document.dispatchEvent(new CustomEvent('kz:lang', { detail: lang }));
+    if (save) {
+      try { localStorage.setItem('kz-lang', lang); } catch (_) {}
+      const u = new URL(location.href);
+      if (en) u.searchParams.set('lang', 'en'); else u.searchParams.delete('lang');
+      history.replaceState(null, '', u.pathname + u.search + u.hash);
+      track('lang_' + lang);
+    }
+  };
+  btns.forEach(b => b.addEventListener('click', () => apply(b.dataset.lang, true)));
+
+  let lang = new URLSearchParams(location.search).get('lang');
+  if (lang !== 'en' && lang !== 'vi') { try { lang = localStorage.getItem('kz-lang'); } catch (_) { lang = null; } }
+  if (lang !== 'en' && lang !== 'vi') {
+    // Nhiều người Việt để trình duyệt tiếng Anh, nên xét múi giờ Việt Nam trước.
+    let tz = '';
+    try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch (_) {}
+    const langs = (navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || 'vi']).map(x => String(x).toLowerCase());
+    lang = (/^Asia\/(Ho_Chi_Minh|Saigon)$/.test(tz) || langs.some(x => x.startsWith('vi'))) ? 'vi' : 'en';
+  }
+  if (lang === 'en') apply('en', false);
+})();
+
+/* ===================== THEME SÁNG / TỐI ===================== */
+(() => {
+  const b = document.getElementById('themeBtn'); if (!b) return;
+  const root = document.documentElement, meta = document.querySelector('meta[name="theme-color"]');
+  const sync = () => { const l = root.getAttribute('data-theme') === 'light'; b.setAttribute('aria-pressed', String(l)); if (meta) meta.content = l ? '#F5F8FC' : '#0A1426'; };
+  b.addEventListener('click', () => {
+    const next = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+    root.setAttribute('data-theme', next);
+    try { localStorage.setItem('kz-theme', next); } catch (_) {}
+    document.cookie = 'kz-theme=' + next + '; path=/; max-age=31536000; SameSite=Lax' + (location.hostname.endsWith('kenvinzone.com') ? '; domain=.kenvinzone.com' : '');
+    sync(); track('theme_' + next);
+  });
+  sync();
+})();
+
+/* ===================== SPOTLIGHT THEO CON TRỎ ===================== */
+document.addEventListener('pointermove', e => {
+  const el = e.target.closest && e.target.closest('.spot'); if (!el) return;
+  const r = el.getBoundingClientRect();
+  el.style.setProperty('--mx', (e.clientX - r.left) + 'px');
+  el.style.setProperty('--my', (e.clientY - r.top) + 'px');
+}, { passive: true });
+
+/* ===================== HIỆN DẦN KHI CUỘN ===================== */
+(() => {
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) return;
+  const targets = [...document.querySelectorAll('section.s .wrap > h2, section.s .wrap > .intro, .tiers, .mods, .qgrid, .fgrid, .build, .labs, .final, .ab, .evidence, .principle')];
+  document.querySelectorAll('.flow li').forEach((li, i) => { li.style.setProperty('--i', i); targets.push(li); });
+  targets.forEach(t => t.classList.add('rv'));
+  const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { rootMargin: '0px 0px -8% 0px' });
+  targets.forEach(t => io.observe(t));
+})();
+
+/* ===================== ẢNH GIAO DIỆN THỰC TẾ =====================
+   Cách thêm ảnh: đặt file vào thư mục  assets/shots/  đúng tên dưới đây
+   (ví dụ assets/shots/cfd-pc-1.webp). Ảnh nào chưa có sẽ tự hiện hình minh họa.
+   PC nên tỉ lệ 16:10 (vd 1600x1000). Điện thoại nên tỉ lệ 9:19.5 (vd 900x1950).
+   Có thể thêm hoặc bớt ảnh trong từng danh sách. */
+const SHOTS = {
+  stock: {
+    pc:     [ { src: 'assets/shots/stock-pc-1.webp',  vi: 'Kế hoạch lệnh và Dashboard trên cổ phiếu', en: 'Trade plan and dashboard on a stock chart', sym: 'FPT · D1' },
+              { src: 'assets/shots/stock-pc-2.webp',  vi: 'Thống kê kết quả theo từng setup',          en: 'Results by setup type',                    sym: 'VNM · H4' } ],
+    mobile: [ { src: 'assets/shots/stock-mb-1.webp',  vi: 'Bảng LIVE trên điện thoại',                 en: 'LIVE panel on mobile',                     sym: 'FPT · D1' },
+              { src: 'assets/shots/stock-mb-2.webp',  vi: 'Cảnh báo tín hiệu qua TradingView',         en: 'Signal alert via TradingView',             sym: 'HPG · D1' } ]
+  },
+  cfd: {
+    pc:     [ { src: 'assets/shots/cfd-pc-1.webp',    vi: 'XAUUSD với khối lượng tham chiếu từ COMEX', en: 'XAUUSD with COMEX reference volume',       sym: 'XAUUSD · M15' },
+              { src: 'assets/shots/cfd-pc-2.webp',    vi: 'NAS100 và thống kê theo phiên',             en: 'NAS100 with session statistics',           sym: 'NAS100 · H1' } ],
+    mobile: [ { src: 'assets/shots/cfd-mb-1.webp',    vi: 'Theo dõi vàng trên điện thoại',              en: 'Tracking gold on mobile',                  sym: 'XAUUSD · M15' },
+              { src: 'assets/shots/cfd-mb-2.webp',    vi: 'Thẻ chi tiết kế hoạch lệnh',                en: 'Trade plan detail card',                   sym: 'US30 · M15' } ]
+  },
+  fut: {
+    pc:     [ { src: 'assets/shots/fut-pc-1.webp',    vi: 'Hợp đồng NQ với setup cấu trúc thị trường', en: 'NQ futures with market-structure setups',  sym: 'NQ1! · M5' },
+              { src: 'assets/shots/fut-pc-2.webp',    vi: 'Cài đặt cho tài khoản quỹ Prop Firm',       en: 'Prop-firm account settings',               sym: 'GC1! · M15' } ],
+    mobile: [ { src: 'assets/shots/fut-mb-1.webp',    vi: 'Lệnh đang chạy trên điện thoại',            en: 'Open trade on mobile',                     sym: 'ES1! · M5' },
+              { src: 'assets/shots/fut-mb-2.webp',    vi: 'Bảng điều kiện vào lệnh',                   en: 'Entry checklist panel',                    sym: 'CL1! · M15' } ]
+  },
+  fx: {
+    pc:     [ { src: 'assets/shots/fx-pc-1.webp',     vi: 'EURUSD với thống kê theo phiên',            en: 'EURUSD with session statistics',           sym: 'EURUSD · M15' },
+              { src: 'assets/shots/fx-pc-2.webp',     vi: 'Đồng thuận đa khung thời gian',             en: 'Multi-timeframe agreement',                sym: 'GBPUSD · H1' } ],
+    mobile: [ { src: 'assets/shots/fx-mb-1.webp',     vi: 'Bảng LIVE cho Forex',                       en: 'LIVE panel for Forex',                     sym: 'USDJPY · M15' },
+              { src: 'assets/shots/fx-mb-2.webp',     vi: 'Khoảng cách tới điểm kích hoạt',            en: 'Distance to trigger',                      sym: 'EURUSD · M15' } ]
+  },
+  crypto: {
+    pc:     [ { src: 'assets/shots/crypto-pc-1.webp', vi: 'BTC Perpetual với Open Interest',           en: 'BTC perpetual with open interest',         sym: 'BTCUSDT.P · H1' },
+              { src: 'assets/shots/crypto-pc-2.webp', vi: 'ETH Spot ở chế độ chỉ mua',                 en: 'ETH spot in long-only mode',               sym: 'ETHUSDT · H4' } ],
+    mobile: [ { src: 'assets/shots/crypto-mb-1.webp', vi: 'Theo dõi crypto 24/7 trên điện thoại',      en: 'Tracking crypto 24/7 on mobile',           sym: 'BTCUSDT.P · H1' },
+              { src: 'assets/shots/crypto-mb-2.webp', vi: 'Thẻ chi tiết kế hoạch lệnh',                en: 'Trade plan detail card',                   sym: 'SOLUSDT.P · M15' } ]
+  }
+};
+const SHOT_INTERVAL = 5000;   // thời gian mỗi ảnh (ms)
+
+/* Hình minh họa tự sinh khi chưa có ảnh thật */
+function mockShot(device, sym, seed) {
+  let r = seed * 9301 + 49297; const rnd = () => (r = (r * 9301 + 49297) % 233280) / 233280;
+  const pc = device === 'pc', W = pc ? 800 : 360, H = pc ? 500 : 780;
+  const top = pc ? 30 : 120, bot = pc ? H - 30 : 470, n = pc ? 46 : 22, cw = (W - 40) / n;
+  let y = (top + bot) / 2 + 60, out = '', trail = [], hi = [], lo = [];
+  for (let i = 0; i < n; i++) {
+    const drift = i < n * .35 ? 3 : -5.5, o = y, c = Math.max(top + 20, Math.min(bot - 20, y + drift + (rnd() - .5) * 26));
+    const h = Math.min(o, c) - rnd() * 14, l = Math.max(o, c) + rnd() * 14, x = 20 + i * cw, up = c < o;
+    out += `<line x1="${x + cw / 2}" y1="${h}" x2="${x + cw / 2}" y2="${l}" stroke="${up ? '#34D399' : '#F87171'}" stroke-width="1.4"/><rect x="${x + cw * .18}" y="${Math.min(o, c)}" width="${cw * .64}" height="${Math.max(2, Math.abs(c - o))}" fill="${up ? '#34D399' : '#F87171'}"/>`;
+    trail.push(l + (i < n * .38 ? -60 : 26)); y = c;
+  }
+  let tp = '', last = trail[0];
+  trail.forEach((t, i) => { const v = i < n * .38 ? Math.min(last, t) : (i === Math.round(n * .38) ? t : Math.min(Math.max(last, t - 40), t)); tp += i ? ` H${20 + i * cw} V${v}` : `M${20} ${v}`; last = v; });
+  const ex = 20 + Math.round(n * .45) * cw;
+  const panel = pc
+    ? `<rect x="${W - 220}" y="38" width="200" height="118" rx="10" fill="#0E1A2F" stroke="#1E2E4D"/><text x="${W - 206}" y="62" fill="#38D5E7" font-size="13" font-weight="700">AURORA</text>` + ['Trend','Score','MTF','Setup'].map((t, i) => `<text x="${W - 206}" y="${86 + i * 20}" fill="#8FA3BF" font-size="11.5">${t}</text><rect x="${W - 110}" y="${77 + i * 20}" width="${56 + rnd() * 30}" height="9" rx="4" fill="${['#34D399','#38D5E7','#F3BE62','#34D399'][i]}" opacity=".8"/>`).join('')
+    : `<rect x="16" y="500" width="${W - 32}" height="250" rx="16" fill="#0E1A2F" stroke="#1E2E4D"/><text x="34" y="532" fill="#38D5E7" font-size="16" font-weight="700">AURORA LIVE</text>` + ['Trend','Trigger','Checks','Stop','Last'].map((t, i) => `<text x="34" y="${566 + i * 36}" fill="#8FA3BF" font-size="13">${t}</text><rect x="130" y="${555 + i * 36}" width="${90 + rnd() * 90}" height="12" rx="6" fill="${['#34D399','#F3BE62','#38D5E7','#F87171','#8B7CF6'][i]}" opacity=".75"/>`).join('');
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" font-family="Be Vietnam Pro,system-ui,sans-serif"><rect width="${W}" height="${H}" fill="#070F1D"/>${[1,2,3,4].map(k => `<line x1="0" x2="${W}" y1="${top + (bot - top) * k / 5}" y2="${top + (bot - top) * k / 5}" stroke="#13213A"/>`).join('')}<text x="20" y="${pc ? 22 : 86}" fill="#E6EEF8" font-size="${pc ? 13 : 16}" font-weight="700">${sym}</text><rect x="${ex}" y="${top + 40}" width="${W - ex - (pc ? 240 : 20)}" height="${(bot - top) * .38}" fill="#34D399" opacity=".08"/><path d="${tp}" fill="none" stroke="#38D5E7" stroke-width="2.4"/>${out}${panel}</svg>`;
+  return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+}
+
+(() => {
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const lb = document.getElementById('lb'), lbImg = document.getElementById('lbImg'), lbCap = document.getElementById('lbCap');
+  document.getElementById('lbClose').addEventListener('click', () => lb.close());
+  lb.addEventListener('click', e => { if (e.target === lb) lb.close(); });
+  const L = () => document.documentElement.lang === 'en' ? 'en' : 'vi';
+
+  document.querySelectorAll('.shots').forEach(box => {
+    const mk = box.dataset.market, data = SHOTS[mk] || {};
+    const trk = box.querySelector('.sh-track'), dots = box.querySelector('.sh-dots'), prog = box.querySelector('.sh-prog i'), view = box.querySelector('.sh-view');
+    const devBtns = [...box.querySelectorAll('.dev button')];
+    let dev = 'pc', idx = 0, timer = 0, paused = false, visible = false;
+
+    const build = () => {
+      const list = data[dev] || [];
+      trk.innerHTML = ''; dots.innerHTML = '';
+      list.forEach((it, i) => {
+        const fig = document.createElement('figure'); fig.className = 'sh-slide';
+        fig.setAttribute('role', 'group'); fig.setAttribute('aria-roledescription', 'slide');
+        const frame = document.createElement('div'); frame.className = dev === 'pc' ? 'frame-pc' : 'frame-mb'; frame.style.position = 'relative';
+        if (dev === 'pc') frame.innerHTML = '<div class="bar"><i></i><i></i><i></i></div>';
+        const img = new Image(); img.loading = 'lazy'; img.decoding = 'async'; img.alt = it[L()] || '';
+        const fallback = () => { img.src = mockShot(dev, it.sym || mk.toUpperCase(), i + mk.length * 7 + (dev === 'pc' ? 0 : 3)); const b = document.createElement('span'); b.className = 'sh-badge'; b.textContent = L() === 'en' ? 'Illustration' : 'Minh họa'; frame.appendChild(b); };
+        img.onerror = () => { img.onerror = null; fallback(); };
+        if (it.src) img.src = it.src; else fallback();
+        frame.appendChild(img);
+        const cap = document.createElement('figcaption'); cap.textContent = it[L()] || '';
+        fig.append(frame, cap);
+        fig.addEventListener('click', () => { lbImg.src = img.src; lbImg.alt = cap.textContent; lbCap.textContent = cap.textContent; if (lb.showModal) lb.showModal(); });
+        trk.appendChild(fig);
+        const d = document.createElement('button'); d.type = 'button'; d.setAttribute('aria-label', (L() === 'en' ? 'Image ' : 'Ảnh ') + (i + 1));
+        d.addEventListener('click', () => go(i, true)); dots.appendChild(d);
+      });
+      go(0);
+    };
+    const go = (i, user) => {
+      const n = trk.children.length; if (!n) return;
+      idx = (i + n) % n;
+      trk.style.transform = `translateX(${-idx * 100}%)`;
+      [...dots.children].forEach((d, k) => d.setAttribute('aria-current', String(k === idx)));
+      [...trk.children].forEach((s, k) => s.setAttribute('aria-hidden', String(k !== idx)));
+      restart(); if (user) trk.dataset.touched = '1';
+    };
+    const restart = () => {
+      clearTimeout(timer); prog.classList.remove('run'); void prog.offsetWidth;
+      const pane = box.closest('[role="tabpanel"]');
+      if (reduce || paused || !visible || (pane && pane.hidden) || trk.children.length < 2) return;
+      prog.style.setProperty('--dur', SHOT_INTERVAL + 'ms'); prog.classList.add('run');
+      timer = setTimeout(() => go(idx + 1), SHOT_INTERVAL);
+    };
+    devBtns.forEach(b => b.addEventListener('click', () => { dev = b.dataset.dev; devBtns.forEach(x => x.setAttribute('aria-pressed', String(x === b))); build(); track('shots_' + mk + '_' + dev); }));
+    box.querySelectorAll('.sh-arrows button').forEach(b => b.addEventListener('click', () => go(idx + Number(b.dataset.dir), true)));
+    ['mouseenter', 'focusin'].forEach(ev => box.addEventListener(ev, () => { paused = true; restart(); }));
+    ['mouseleave', 'focusout'].forEach(ev => box.addEventListener(ev, () => { paused = false; restart(); }));
+    let x0 = null;
+    view.addEventListener('pointerdown', e => { x0 = e.clientX; });
+    view.addEventListener('pointerup', e => { if (x0 === null) return; const dx = e.clientX - x0; x0 = null; if (Math.abs(dx) > 40) go(idx + (dx < 0 ? 1 : -1), true); });
+    new IntersectionObserver(([e]) => { visible = e.isIntersecting; restart(); }).observe(box);
+    document.addEventListener('kz:lang', build);
+    document.querySelectorAll('[role="tab"]').forEach(t => t.addEventListener('click', () => setTimeout(restart, 30)));
+    build();
+  });
+})();
+</script>
 </body>
 </html>
