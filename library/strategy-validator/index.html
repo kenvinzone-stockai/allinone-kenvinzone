@@ -1,0 +1,166 @@
+<!DOCTYPE html><html lang="vi" data-theme="dark"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><script>
+  (function(){try{var m=document.cookie.match(/(?:^|; )kz-theme=(dark|light)/);var v=m?m[1]:localStorage.getItem('kz-theme');if(v==='light'||v==='dark')document.documentElement.setAttribute('data-theme',v);}catch(e){}})();
+</script><title>Strategy Validator: kiểm chứng AURORA có tính phí và khớp lệnh thật | KenvinZone Trading Library</title><meta name="description" content="Strategy Validator là gì, khác Dashboard ở đâu, các giả định khớp lệnh, cách chia giai đoạn In-sample / Out-of-sample, đọc tên lệnh, và quy trình kiểm chứng một cấu hình."><link rel="canonical" href="https://kenvinzone.com/library/strategy-validator/"><link rel="alternate" hreflang="vi" href="https://kenvinzone.com/library/strategy-validator/"><link rel="alternate" hreflang="en" href="https://kenvinzone.com/en/library/strategy-validator/"><link rel="alternate" hreflang="x-default" href="https://kenvinzone.com/library/strategy-validator/"><meta property="og:type" content="article"><meta property="og:site_name" content="KenvinZone"><meta property="og:title" content="Strategy Validator: kiểm chứng AURORA có tính phí và khớp lệnh thật | KenvinZone Trading Library"><meta property="og:description" content="Strategy Validator là gì, khác Dashboard ở đâu, các giả định khớp lệnh, cách chia giai đoạn In-sample / Out-of-sample, đọc tên lệnh, và quy trình kiểm chứng một cấu hình."><meta property="og:url" content="https://kenvinzone.com/library/strategy-validator/"><meta property="og:image" content="https://kenvinzone.com/library/img/strategy-validator.svg"><meta property="og:locale" content="vi_VN"><meta name="twitter:card" content="summary_large_image"><meta name="theme-color" content="#0D1320"><link rel="icon" href="/library/img/favicon.svg" type="image/svg+xml"><link rel="sitemap" href="/library/sitemap.xml"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Literata:opsz,wght@7..72,400;7..72,600&display=swap"><script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"Strategy Validator: kiểm chứng AURORA có tính phí và khớp lệnh thật","description":"Strategy Validator là gì, khác Dashboard ở đâu, các giả định khớp lệnh, cách chia giai đoạn In-sample / Out-of-sample, đọc tên lệnh, và quy trình kiểm chứng một cấu hình.","inLanguage":"vi","mainEntityOfPage":"https://kenvinzone.com/library/strategy-validator/","url":"https://kenvinzone.com/library/strategy-validator/","datePublished":"2026-10-14T00:00:00.000Z","dateModified":"2026-10-14T00:00:00.000Z","author":{"@type":"Person","name":"Hoàng Văn Hiệu (Kenvin Hoang)","url":"https://kenvinzone.com/"},"editor":{"@type":"Organization","name":"KenvinZone Editorial"},"publisher":{"@type":"Organization","name":"KenvinZone","url":"https://kenvinzone.com/"},"about":["Validation","Execution"],"educationalLevel":"Advanced","learningResourceType":"Explainer","image":"https://kenvinzone.com/library/img/strategy-validator.svg"}</script><script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"KenvinZone","item":"https://kenvinzone.com/"},{"@type":"ListItem","position":2,"name":"Thư viện Trading","item":"https://kenvinzone.com/library/"},{"@type":"ListItem","position":3,"name":"Nghiên cứu & kiểm chứng","item":"https://kenvinzone.com/library/topic/research-validation/"},{"@type":"ListItem","position":4,"name":"Strategy Validator: kiểm chứng AURORA có tính phí và khớp lệnh thật","item":"https://kenvinzone.com/library/strategy-validator/"}]}</script><link rel="stylesheet" href="/library/assets/Base.ww2ztrsO.css"></head><body><a class="skip" href="#main">Bỏ qua tới nội dung</a><header class="hd"><div class="wrap hd-in"><a class="brand" href="/" aria-label="KenvinZone"><svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="#131B2A" stroke="#263247"></rect><path d="M7 22l6-7 5 4 7-9" fill="none" stroke="#5EC4D8" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path><circle cx="25" cy="10" r="2.4" fill="#D9B062"></circle></svg><span>KenvinZone</span><small>Trading Library</small></a><nav class="nav" id="kzNav" aria-label="Học"><a href="/library/">Thư viện</a><a href="/library/paths/">Lộ trình học</a><a href="/library/glossary/">Thuật ngữ</a><a href="/library/#aurora">Hướng dẫn AURORA</a><a href="/library/explainers/">Explainer mới</a></nav><div class="hd-r"><a class="icon-btn" href="/library/search/" aria-label="Tìm kiếm" title="Tìm kiếm ( / )"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg></a><div class="lang" role="group" aria-label="Chọn ngôn ngữ"><span aria-current="true">VI</span><a href="/en/library/strategy-validator/" hreflang="en" data-setlang="en">EN</a></div><button class="icon-btn" type="button" id="kzTheme" aria-label="Đổi giao diện sáng / tối"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path></svg></button><button class="icon-btn menu-btn" type="button" id="kzMenu" aria-controls="kzNav" aria-expanded="false" aria-label="Mở menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"></path></svg></button></div></div></header><main id="main"><div class="progress" id="kzProg" aria-hidden="true"></div><div class="wrap" data-pagefind-body><!-- Bộ lọc và meta cho Pagefind (không hiển thị) --><div hidden data-pagefind-ignore><span data-pagefind-meta="one_liner">Strategy Validator là bản strategy của AURORA, chạy cùng tín hiệu trong Strategy Tester của TradingView với khối lượng theo % rủi ro, khớp lệnh ở nến kế tiếp, có phí và trượt giá.</span><span data-pagefind-meta="level">Nâng cao</span><span data-pagefind-meta="category">Nghiên cứu &amp; kiểm chứng</span><span data-pagefind-meta="products">AURORA Standard, AURORA Pro</span><span data-pagefind-meta="video"></span><span data-pagefind-filter="Trình độ">Nâng cao</span><span data-pagefind-filter="Chủ đề">Nghiên cứu &amp; kiểm chứng</span><span data-pagefind-filter="Sản phẩm">Kiến thức chung</span><span data-pagefind-filter="Sản phẩm">AURORA Standard</span><span data-pagefind-filter="Sản phẩm">AURORA Pro</span><span data-pagefind-filter="Thị trường">Mọi thị trường</span><span data-pagefind-filter="Định dạng">Explainer</span></div><nav class="crumbs" aria-label="Breadcrumb" data-pagefind-ignore><ol><li><a href="/">KenvinZone</a></li><li><a href="/library/">Thư viện Trading</a></li><li><a href="/library/topic/research-validation/">Nghiên cứu &amp; kiểm chứng</a></li></ol></nav><header class="art-head"><h1 data-pagefind-meta="title">Strategy Validator: kiểm chứng AURORA có tính phí và khớp lệnh thật</h1><p class="one">Strategy Validator là bản strategy của AURORA, chạy cùng tín hiệu trong Strategy Tester của TradingView với khối lượng theo % rủi ro, khớp lệnh ở nến kế tiếp, có phí và trượt giá.</p><div class="badges"><span class="badge" title="Nâng cao"><span class="meter" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i><i class></i></span>Nâng cao</span><span class="badge b-prod">AURORA Standard</span><span class="badge b-prod">AURORA Pro</span><span class="badge">10 phút đọc</span></div><div class="byline" data-pagefind-ignore><span>Chủ đề: <a href="/library/topic/research-validation/">Nghiên cứu &amp; kiểm chứng</a></span><span>Thị trường: Mọi thị trường</span><span>Tác giả: <b>Hoàng Văn Hiệu (Kenvin Hoang)</b></span><span>Người duyệt: <b>KenvinZone Editorial</b></span><span class="badge rev">✓ Đã kiểm duyệt 14 thg 10, 2026</span></div></header><div class="art"><article><div class="question"><span>Câu hỏi</span><p>Dashboard trên biểu đồ báo lãi, vậy sau phí, trượt giá và khớp lệnh thật thì còn lại bao nhiêu?</p></div><div class="objectives" data-pagefind-ignore><h2>Sau bài này bạn sẽ</h2><ul><li>Hiểu vì sao kết quả trên Dashboard và trong Strategy Tester khác nhau</li><li>Thiết lập phí, trượt giá, khối lượng và đòn bẩy cho đúng tài khoản của bạn</li><li>Dùng In-sample / Out-of-sample để kiểm tra một cấu hình trước khi dùng tiền thật</li></ul></div><div class="prose"><h2 id="strategy-validator-là-gì">Strategy Validator là gì?</h2>
+<p>Dashboard trên biểu đồ ghi kết quả kế hoạch lệnh theo R, giả định vào lệnh đúng giá đóng nến và <strong>chưa tính chi phí</strong>. <strong>Strategy Validator</strong> là bản <em>strategy</em> của AURORA: cùng tín hiệu, nhưng chạy trong <strong>Strategy Tester</strong> của TradingView như một tài khoản mô phỏng.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Dashboard (chỉ báo)</th>
+<th>Strategy Validator</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Giá vào</td>
+<td>Giá đóng nến tín hiệu</td>
+<td>Khớp ở tick / nến <strong>kế tiếp</strong></td>
+</tr>
+<tr>
+<td>Chi phí</td>
+<td>Không tính</td>
+<td>Phí + <a href="/library/glossary/#slippage">trượt giá</a> mỗi lần khớp</td>
+</tr>
+<tr>
+<td>Khối lượng</td>
+<td>Không có (chỉ tính R)</td>
+<td>Theo % rủi ro trên vốn</td>
+</tr>
+<tr>
+<td>Kết quả</td>
+<td>Tổng R, R trung bình</td>
+<td>Lợi nhuận ròng, <a href="/library/glossary/#drawdown">drawdown</a> lớn nhất, <a href="/library/glossary/#profit-factor">Profit Factor</a>, danh sách lệnh</td>
+</tr>
+</tbody>
+</table>
+<h2 id="vì-sao-cần-bước-kiểm-chứng-này">Vì sao cần bước kiểm chứng này?</h2>
+<ul>
+<li><strong>Chi phí ăn vào từng lệnh.</strong> Với Stoploss gần, phí và trượt giá có thể chiếm một phần lớn của 1R.</li>
+<li><strong>Khớp lệnh thật không hoàn hảo.</strong> Gap và trượt giá làm rủi ro thực tế lệch khỏi 1R danh nghĩa.</li>
+<li><strong>Drawdown quyết định bạn có trụ được không.</strong> Một hệ thống lãi nhưng có chuỗi sụt vốn sâu có thể không dùng được với tài khoản quỹ.</li>
+</ul>
+<h2 id="những-hiểu-lầm-thường-gặp">Những hiểu lầm thường gặp</h2>
+<ul>
+<li><strong>Backtest đạt là chắc lãi.</strong> Không. Đây vẫn là kết quả quá khứ, dù đã có chi phí.</li>
+<li><strong>Phí mặc định hợp với mọi người.</strong> Mức mặc định (0.05% mỗi lệnh + 2 tick trượt giá) chỉ là giá trị tạm. Cổ phiếu và crypto thường tính phí theo %, Futures theo hợp đồng, CFD và Forex chủ yếu qua spread.</li>
+<li><strong>Tối ưu trên toàn bộ lịch sử.</strong> Chỉnh tham số tới khi đẹp trên toàn bộ dữ liệu là cách nhanh nhất để có một cấu hình chỉ đẹp trong quá khứ.</li>
+<li><strong>Cài đặt Validator không cần giống chỉ báo.</strong> Khác Market Preset, Trading mode hay Entry Filter Profile thì Validator đang kiểm tra một hệ thống khác.</li>
+</ul>
+<h2 id="ví-dụ-trên-biểu-đồ">Ví dụ trên biểu đồ</h2>
+<p><img src="/library/img/strategy-validator.svg" alt="Minh họa chia giai đoạn In-sample / Out-of-sample và lệnh khớp ở nến kế tiếp">
+<em>Hình minh họa.</em></p>
+<h2 id="dùng-strategy-validator-của-aurora-thế-nào">Dùng Strategy Validator của AURORA thế nào?</h2>
+<p><strong>Thiết lập:</strong></p>
+<ol>
+<li>Thêm <strong>Validator</strong> vào cùng biểu đồ với chỉ báo, đặt cùng Market Preset, Trading mode. Ở AURORA Pro, đặt thêm cùng Trading Style và Entry Filter Profile.</li>
+<li>Mở <strong>Strategy Properties</strong>, thay phí và trượt giá bằng số liệu của broker hoặc sàn bạn dùng.</li>
+<li><strong>Khối lượng:</strong> mặc định rủi ro <strong>1% vốn mỗi lệnh</strong>, tính từ khoảng cách Stoploss. Ô <em>Round qty to lot step</em> làm tròn theo lô: 100 cho cổ phiếu Việt Nam, 0.001 cho crypto…</li>
+<li><strong>Đòn bẩy:</strong> ô <em>Max position notional</em> (mặc định 5 lần vốn) phải khớp với Margin trong Strategy Properties (mặc định 20%). Tài khoản không đòn bẩy: đặt 1 và Margin 100%.</li>
+</ol>
+<p><strong>Giả định khớp lệnh:</strong></p>
+<ul>
+<li><strong>Lệnh market</strong> khớp ở nến kế tiếp. Khối lượng, SL, TP tính từ giá đóng nến tín hiệu, nên 1% là rủi ro <strong>mục tiêu</strong>; rủi ro thực tế có thể lệch khi có gap.</li>
+<li><strong>Chia khối lượng:</strong> 50% TP1 + 50% TP2. Với Runner (Pro): 50% / 25% / 25%. Các lệnh này được đặt ngay khi vào lệnh. Khối lượng quá nhỏ, ví dụ 1 hợp đồng, không chia được.</li>
+<li><strong>Lệnh chờ Pullback</strong> khớp theo ô <em>Verify price for limit orders</em> trong Strategy Properties. Hãy so sánh 0 tick với 1 tick trở lên.</li>
+<li><strong>Validator mặc định không phát alert JSON</strong>, vì JSON mô tả kế hoạch của chỉ báo, không phải lệnh khớp trong Strategy Tester.</li>
+</ul>
+<p><strong>Chia giai đoạn:</strong></p>
+<ul>
+<li>Ô <em>Backtest từ ngày</em> / <em>đến ngày</em> giới hạn khoảng vào lệnh. Lệnh còn mở khi hết khoảng được đóng với nhãn <code>WINDOW</code>.</li>
+<li>Ô <em>Sample tag</em> (IS / OOS) gắn nhãn vào tên lệnh.</li>
+</ul>
+<p><strong>Đọc tên lệnh</strong> trong danh sách lệnh:</p>
+<table>
+<thead>
+<tr>
+<th>Tên</th>
+<th>Nghĩa</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>BREAK-L</code>, <code>BREAK-S</code></td>
+<td>Lệnh BREAK mua / bán (1st và 2nd BREAK gộp chung)</td>
+</tr>
+<tr>
+<td><code>BREAK-L·PB</code></td>
+<td>BREAK vào bằng lệnh chờ Pullback</td>
+</tr>
+<tr>
+<td><code>SUNNY-L</code>, <code>SMART-L</code></td>
+<td>Lệnh SUNNY, lệnh Smart</td>
+</tr>
+<tr>
+<td><code>SMC-SWEEP-L W</code></td>
+<td>(Pro) SMC SWEEP, <code>W</code> khi Stoploss cấu trúc rộng</td>
+</tr>
+<tr>
+<td><code>Q72</code>, <code>T65</code>, <code>RUN</code></td>
+<td>(Pro) điểm Setup Quality, điểm Tier 3, có Runner</td>
+</tr>
+<tr>
+<td><code>OOS</code></td>
+<td>Lệnh thuộc giai đoạn Out-of-sample</td>
+</tr>
+</tbody>
+</table>
+<p>Lệnh đóng ghi <code>TP1</code>, <code>TP2</code>, <code>SL</code>, hoặc <code>EXIT</code> / <code>TIME</code> / <code>REV</code> / <code>NEXT</code> như trên chỉ báo.</p>
+<p><strong>Quy trình kiểm chứng gợi ý:</strong></p>
+<ol>
+<li>Chọn mã, khung thời gian, đặt chi phí đúng.</li>
+<li>Đặt khoảng <a href="/library/glossary/#in-sample">In-sample</a>, ví dụ 2/3 lịch sử đầu, và chỉnh cấu hình ở đây.</li>
+<li>Giữ nguyên cấu hình, chuyển sang khoảng <a href="/library/glossary/#oos">Out-of-sample</a> còn lại, ghi kết quả.</li>
+<li>Mỗi lần chỉ đổi <strong>một</strong> yếu tố; so sánh R trung bình, drawdown lớn nhất, Profit Factor và số lệnh.</li>
+<li>Lặp lại trên vài mã khác cùng loại thị trường trước khi tin vào một cấu hình.</li>
+</ol>
+<h2 id="giới-hạn-của-strategy-validator">Giới hạn của Strategy Validator</h2>
+<ul>
+<li><strong>Độ sâu dữ liệu</strong> phụ thuộc gói TradingView; ít dữ liệu thì ít lệnh, kết luận yếu.</li>
+<li><strong>Mô phỏng không phải thực tế:</strong> spread biến động, phí qua đêm, độ trễ của bot và thanh khoản lúc tin tức không được mô phỏng đầy đủ.</li>
+<li><strong>Out-of-sample chỉ dùng được một lần.</strong> Nếu xem kết quả OOS rồi quay lại chỉnh tiếp, giai đoạn đó đã trở thành in-sample.</li>
+<li><strong>Kết quả quá khứ không đảm bảo tương lai.</strong> Validator là bộ lọc để loại cấu hình yếu, không phải công cụ dự báo lợi nhuận.</li>
+</ul>
+</div><section class="block" id="checklist" aria-labelledby="h-check"><h2 id="h-check">Checklist thực hành</h2><ul class="check"><li>Đặt Validator cùng Market Preset, Trading mode (và ở Pro: Trading Style, Entry Filter Profile) như chỉ báo.</li><li>Thay phí và trượt giá mặc định bằng số liệu của broker hoặc sàn bạn dùng.</li><li>Khớp ô Max position notional với Margin trong Strategy Properties.</li><li>Chọn cấu hình trên giai đoạn In-sample, kiểm tra lại trên giai đoạn Out-of-sample.</li><li>Mỗi lần chỉ đổi một yếu tố, và so sánh bằng R trung bình, drawdown, số lệnh.</li></ul></section><section class="block" id="video" aria-labelledby="h-video" data-pagefind-ignore><h2 id="h-video">Video Explainer</h2><div class="video pending"><p>Video cho bài này đang được sản xuất. Toàn bộ nội dung bài viết đã đầy đủ để bạn học ngay.</p></div><script>
+document.querySelectorAll('.video[data-yt] button').forEach(function(b){b.addEventListener('click',function(){var w=b.parentNode,id=w.getAttribute('data-yt');var f=document.createElement('iframe');f.src='https://www.youtube-nocookie.com/embed/'+id+'?autoplay=1&rel=0';f.title=b.getAttribute('aria-label');f.allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';f.allowFullscreen=true;w.innerHTML='';w.appendChild(f);});});
+</script><h3 style="margin-top:22px;font-size:17px">Các chương trong video</h3><ol class="chapters"><li><time>00:00</time><span>Lãi trên biểu đồ còn bao nhiêu sau phí?</span></li><li><time>01:10</time><span>Validator khác Dashboard ở đâu</span></li><li><time>02:50</time><span>Thiết lập cho đúng tài khoản</span></li><li><time>04:30</time><span>In-sample và Out-of-sample</span></li><li><time>06:10</time><span>Quy trình kiểm chứng</span></li></ol><details class="transcript"><summary>Xem bản ghi lời thoại</summary><div class="tx">Dashboard trên biểu đồ báo lãi. Câu hỏi tiếp theo là: sau phí, trượt giá và khớp lệnh thật thì còn lại bao nhiêu?
+
+Strategy Validator chạy đúng các tín hiệu của AURORA trong Strategy Tester của TradingView. Lệnh khớp ở nến kế tiếp, khối lượng tính theo phần trăm rủi ro trên vốn, mỗi lần khớp đều trừ phí và trượt giá.
+
+Hãy chia lịch sử làm hai giai đoạn: chọn cấu hình trên giai đoạn đầu, rồi kiểm tra lại trên giai đoạn sau mà không chỉnh gì thêm. Nếu kết quả giữ được, cấu hình đó đáng tin hơn.
+
+Và nhớ: đây vẫn là kết quả quá khứ. Một cấu hình đạt trên Validator chỉ là điều kiện cần, không phải lời hứa về tương lai.
+</div></details></section><section class="block" id="related" aria-labelledby="h-rel" data-pagefind-ignore><h2 id="h-rel">Khái niệm liên quan</h2><ul class="links-list"><li><span class="soon"><span>In-sample và Out-of-sample</span><small>Sắp xuất bản</small></span></li><li><span class="soon"><span>Phí và trượt giá</span><small>Sắp xuất bản</small></span></li><li><span class="soon"><span>Cỡ mẫu bao nhiêu là đủ</span><small>Sắp xuất bản</small></span></li><li><span class="soon"><span>Drawdown</span><small>Sắp xuất bản</small></span></li><li><a href="/library/filtered-trades/"><span>Lệnh bị lọc và lệnh ma: đo giá trị thật của một bộ lọc</span><small>Nâng cao</small></a></li></ul><h3 style="margin:26px 0 12px;font-size:17px">Nên đọc trước</h3><ul class="links-list"><li><a href="/library/dashboard-statistics/"><span>Đọc Dashboard thống kê thế nào cho đúng?</span><small>Trung cấp</small></a></li><li><a href="/library/r-multiple/"><span>R-Multiple là gì?</span><small>Cơ bản</small></a></li><li><span class="soon"><span>Tính khối lượng lệnh</span><small>Sắp xuất bản</small></span></li></ul><h3 style="margin:26px 0 10px;font-size:17px">Thuật ngữ trong bài</h3><p class="badges"><a class="chip" href="/library/glossary/#in-sample">In-sample (IS)</a><a class="chip" href="/library/glossary/#oos">OOS</a><a class="chip" href="/library/glossary/#slippage">Slippage</a><a class="chip" href="/library/glossary/#drawdown">Drawdown</a><a class="chip" href="/library/glossary/#profit-factor">Profit Factor</a><a class="chip" href="/library/glossary/#r-multiple">R-Multiple</a></p></section><nav class="pn" aria-label="Trong lộ trình: Làm chủ AURORA Pro" data-pagefind-ignore><a href="/library/alerts-webhook/"><small>Bài trước</small>Alert JSON và webhook: đưa tín hiệu AURORA sang bot</a><span class="nx"><small>Bài tiếp theo · Sắp xuất bản</small>Nguồn gốc dữ liệu</span></nav><section class="block" aria-labelledby="h-docs" data-pagefind-ignore><h2 id="h-docs">Tài liệu sản phẩm</h2><ul class="links-list"><li><a href="https://aurora.kenvinzone.com/huong-dan.html#validator"><span>AURORA Standard: Strategy Validator</span><small>Mở</small></a></li><li><a href="https://aurora.kenvinzone.com/pro/huong-dan.html#validator"><span>AURORA Pro: Strategy Validator</span><small>Mở</small></a></li></ul></section><p class="disclaimer" data-pagefind-ignore>Nội dung mang tính giáo dục và hỗ trợ ra quyết định, không phải lời khuyên đầu tư. Ví dụ trên biểu đồ là minh họa hoặc dữ liệu quá khứ, không đảm bảo kết quả tương lai. Giao dịch tài chính có rủi ro mất vốn.</p></article><aside class="toc" aria-labelledby="toc-t" data-pagefind-ignore><h2 id="toc-t">Trong bài này</h2><ol><li><a href="#strategy-validator-là-gì">Strategy Validator là gì?</a></li><li><a href="#vì-sao-cần-bước-kiểm-chứng-này">Vì sao cần bước kiểm chứng này?</a></li><li><a href="#những-hiểu-lầm-thường-gặp">Những hiểu lầm thường gặp</a></li><li><a href="#ví-dụ-trên-biểu-đồ">Ví dụ trên biểu đồ</a></li><li><a href="#dùng-strategy-validator-của-aurora-thế-nào">Dùng Strategy Validator của AURORA thế nào?</a></li><li><a href="#giới-hạn-của-strategy-validator">Giới hạn của Strategy Validator</a></li><li><a href="#checklist">Checklist thực hành</a></li><li><a href="#video">Video Explainer</a></li><li><a href="#related">Khái niệm liên quan</a></li></ol></aside></div></div></main><footer class="ft"><div class="wrap ft-in"><p>Thư viện kiến thức của KenvinZone. Viết và kiểm duyệt bởi KenvinZone.</p><nav aria-label="Footer"><a href="/">kenvinzone.com</a><a href="https://aurora.kenvinzone.com/">AURORA Standard</a><a href="https://aurora.kenvinzone.com/pro/">AURORA Pro</a><a href="/library/contribute/">Hướng dẫn đóng góp</a><a href="/library/sitemap.xml">Sitemap</a></nav></div></footer><script>
+(function(){
+  var d=document,h=d.documentElement;
+  function setCookie(k,v){var dom=/kenvinzone\.com$/.test(location.hostname)?';domain=.kenvinzone.com':'';d.cookie=k+'='+v+';path=/;max-age=31536000;SameSite=Lax'+dom;}
+  var tb=d.getElementById('kzTheme');
+  if(tb)tb.addEventListener('click',function(){var n=h.getAttribute('data-theme')==='light'?'dark':'light';h.setAttribute('data-theme',n);try{localStorage.setItem('kz-theme',n);}catch(e){}setCookie('kz-theme',n);});
+  var mb=d.getElementById('kzMenu'),nav=d.getElementById('kzNav');
+  if(mb&&nav)mb.addEventListener('click',function(){var o=nav.classList.toggle('open');mb.setAttribute('aria-expanded',o?'true':'false');});
+  d.querySelectorAll('[data-setlang]').forEach(function(a){a.addEventListener('click',function(){setCookie('kz-lang',a.getAttribute('data-setlang'));});});
+  // "/" để tìm kiếm
+  d.addEventListener('keydown',function(e){if(e.key!=='/'||e.metaKey||e.ctrlKey||/INPUT|TEXTAREA|SELECT/.test((d.activeElement||{}).tagName||''))return;var i=d.querySelector('input[type=search]');e.preventDefault();if(i){i.focus();}else{location.href=h.lang==='en'?'/en/library/search/':'/library/search/';}});
+})();
+</script><script>(function(){const glossaryJson = {"first-break":{"term":"1st BREAK","def":"Cú phá vỡ đầu tiên theo hướng của một chu kỳ xu hướng mới được xác nhận. Setup cốt lõi của AURORA.","href":"/library/glossary/#first-break"},"second-break":{"term":"2nd BREAK","def":"Cú phá vỡ thứ hai theo hướng của cùng một chu kỳ xu hướng, sau 1st BREAK. Thường được theo dõi riêng vì cú đầu tiên đôi khi bị quét.","href":"/library/glossary/#second-break"},"absorption":{"term":"Absorption","def":"Volume lớn bất thường nhưng giá đi rất ít hoặc để lại râu dài: lực mua (bán) bị phía đối diện hấp thụ, thường là dấu hiệu cảnh báo.","href":"/library/glossary/#absorption"},"atr":{"term":"ATR","def":"Biên độ dao động trung bình của giá trong N nến gần nhất. Dùng để đo độ biến động và đặt khoảng cách Stoploss phù hợp với thị trường.","href":"/library/glossary/#atr"},"avg-r":{"term":"Avg R","def":"Lợi nhuận trung bình mỗi lệnh tính bằng R. Công bằng hơn tổng R khi so sánh hai nhóm lệnh có số lượng khác nhau.","href":"/library/glossary/#avg-r"},"bar-close":{"term":"Bar-close confirmation","def":"Chỉ xác nhận tín hiệu khi nến đã đóng cửa. Tín hiệu không đổi sau khi nến đóng, nhưng có thể xuất hiện muộn hơn so với lúc giá đang chạy.","href":"/library/glossary/#bar-close"},"bos":{"term":"BOS","def":"Giá đóng cửa vượt đỉnh (hoặc đáy) cấu trúc trước đó theo cùng chiều xu hướng hiện tại, cho thấy xu hướng đang tiếp diễn.","href":"/library/glossary/#bos"},"breakeven":{"term":"Breakeven (BE)","def":"Dời Stoploss về đúng giá vào lệnh, để phần lệnh còn lại không thể lỗ (chưa tính phí và trượt giá).","href":"/library/glossary/#breakeven"},"breakout":{"term":"Breakout","def":"Giá vượt qua một mức hoặc vùng quan trọng. Một breakout chỉ có giá trị khi có quy tắc rõ ràng về điều kiện xác nhận và mức vô hiệu hóa.","href":"/library/glossary/#breakout"},"choch":{"term":"CHoCH","def":"Lần phá cấu trúc đầu tiên ngược với xu hướng trước đó, thường được xem là dấu hiệu sớm của đổi chiều.","href":"/library/glossary/#choch"},"delta":{"term":"Delta","def":"Chênh lệch giữa khối lượng mua chủ động và bán chủ động. Trên TradingView, Delta thường là ước lượng từ nến khung thấp, không phải dữ liệu khớp lệnh bid / ask gốc của sàn.","href":"/library/glossary/#delta"},"drawdown":{"term":"Drawdown","def":"Mức sụt giảm từ đỉnh vốn cao nhất xuống đáy gần nhất. Cho biết bạn phải chịu đựng chuỗi thua sâu đến đâu.","href":"/library/glossary/#drawdown"},"f-sl":{"term":"F-SL","def":"Stoploss cố định của một lệnh, chốt tại thời điểm vào lệnh theo quy tắc của setup. Là cơ sở để tính 1R và khối lượng.","href":"/library/glossary/#f-sl"},"family-score":{"term":"Family Score","def":"Cách chấm điểm 0–100 của AURORA gồm 6 nhóm độc lập (Trend, Momentum, Structure, Volatility, Flow, Execution), cộng theo trọng số.","href":"/library/glossary/#family-score"},"fvg":{"term":"FVG","def":"Khoảng trống giá trong mô hình ba nến, khi râu nến thứ nhất và nến thứ ba không chồng lên nhau. Cho thấy giá di chuyển một chiều rất nhanh.","href":"/library/glossary/#fvg"},"ghost-trade":{"term":"Ghost trade","def":"Setup bị bộ lọc chặn nhưng vẫn được theo dõi ngầm như thể đã vào lệnh, với cùng Stoploss, chốt lời và quy tắc thoát. Dùng để đo giá trị thật của bộ lọc.","href":"/library/glossary/#ghost-trade"},"ifvg":{"term":"IFVG","def":"Một FVG bị giá đóng cửa xuyên qua và đổi vai: vùng kháng cự cũ trở thành hỗ trợ, hoặc ngược lại.","href":"/library/glossary/#ifvg"},"in-sample":{"term":"In-sample (IS)","def":"Giai đoạn dữ liệu dùng để chọn và tinh chỉnh tham số. Kết quả trên giai đoạn này thường đẹp hơn thực tế.","href":"/library/glossary/#in-sample"},"trailing-line":{"term":"Kenvin Super Trailing","def":"Đường stoploss động dạng bậc thang của AURORA, tính từ điểm pivot và ATR. Chỉ dịch theo hướng xu hướng và đổi chiều khi giá đóng cửa xuyên qua.","href":"/library/glossary/#trailing-line"},"limit-order":{"term":"Limit order","def":"Lệnh chỉ khớp ở mức giá bạn đặt hoặc tốt hơn. Đổi lại, lệnh có thể không bao giờ khớp nếu giá không quay về.","href":"/library/glossary/#limit-order"},"liquidity":{"term":"Liquidity","def":"Trên biểu đồ, thường là vùng tập trung lệnh chờ như Stoploss dưới đáy hoặc trên đỉnh rõ ràng. Giá hay quét qua các vùng này trước khi đi tiếp.","href":"/library/glossary/#liquidity"},"mss":{"term":"MSS","def":"Giá đóng cửa vượt qua đỉnh (hoặc đáy) gần nhất của nhịp điều chỉnh, xác nhận lực quay lại theo hướng mong đợi.","href":"/library/glossary/#mss"},"mtf":{"term":"MTF","def":"Xem cùng lúc nhiều khung thời gian. Dữ liệu khung lớn chỉ đáng tin khi lấy từ nến khung lớn đã đóng.","href":"/library/glossary/#mtf"},"oi":{"term":"OI","def":"Tổng số hợp đồng phái sinh đang mở. Giá tăng cùng OI tăng thường cho thấy có tiền mới vào thị trường.","href":"/library/glossary/#oi"},"oos":{"term":"OOS","def":"Giai đoạn dữ liệu không dùng khi chọn tham số. Kết quả OOS cho biết cấu hình có hoạt động ngoài dữ liệu đã tối ưu hay không.","href":"/library/glossary/#oos"},"order-block":{"term":"Order Block","def":"Theo cách định nghĩa phổ biến, là nến ngược chiều cuối cùng trước một cú bung mạnh. Được dùng làm vùng giá có thể quay lại.","href":"/library/glossary/#order-block"},"poc":{"term":"POC","def":"Mức giá có khối lượng giao dịch lớn nhất trong một khoảng thời gian, theo Volume Profile.","href":"/library/glossary/#poc"},"position-sizing":{"term":"Position sizing","def":"Tính khối lượng lệnh từ số tiền bạn chấp nhận mất và khoảng cách tới Stoploss, thay vì đánh một khối lượng cố định.","href":"/library/glossary/#position-sizing"},"profit-factor":{"term":"Profit Factor","def":"Tổng lãi chia tổng lỗ. Trên 1 là có lãi trên dữ liệu đã kiểm tra, nhưng cần đọc cùng cỡ mẫu, drawdown và chi phí.","href":"/library/glossary/#profit-factor"},"r-multiple":{"term":"R-Multiple","def":"Kết quả của một lệnh tính theo bội số của rủi ro ban đầu. Lỗ đúng Stoploss là −1R; lãi gấp đôi rủi ro là +2R.","href":"/library/glossary/#r-multiple"},"rvol":{"term":"RVOL","def":"Volume hiện tại so với mức bình thường. Đo theo cùng giờ trong ngày giúp loại bỏ ảnh hưởng của phiên giao dịch.","href":"/library/glossary/#rvol"},"slippage":{"term":"Slippage","def":"Chênh lệch giữa giá bạn định khớp và giá thực tế khớp, thường bất lợi khi thị trường biến động mạnh hoặc thanh khoản mỏng.","href":"/library/glossary/#slippage"},"stop-loss":{"term":"Stop loss","def":"Mức giá mà tại đó ý tưởng giao dịch được xem là sai và lệnh được đóng để giới hạn thua lỗ.","href":"/library/glossary/#stop-loss"},"sunny":{"term":"SUNNY","def":"Setup tiếp diễn thuận xu hướng của AURORA: vào lệnh khi thị trường quay lại theo hướng chính sau một nhịp điều chỉnh.","href":"/library/glossary/#sunny"},"sweep":{"term":"Sweep","def":"Giá chọc qua một đỉnh hoặc đáy rõ ràng rồi đóng cửa quay lại, thường sau khi kích hoạt các lệnh chờ quanh mức đó.","href":"/library/glossary/#sweep"},"t-sl":{"term":"T-SL","def":"Stoploss động theo đường Trailing hiện tại, thay đổi mỗi nến. Dùng để tham khảo khi quản lý lệnh thủ công.","href":"/library/glossary/#t-sl"},"take-profit":{"term":"Take profit (TP)","def":"Mức giá chốt lời đã định trước. Thường đặt theo bội số của rủi ro, ví dụ TP1 = 1R, TP2 = 2R.","href":"/library/glossary/#take-profit"},"vah-val":{"term":"VAH / VAL","def":"Biên trên và biên dưới của vùng giá chứa phần lớn khối lượng giao dịch (thường 70%) trong Volume Profile.","href":"/library/glossary/#vah-val"},"volume-quality":{"term":"Volume Quality (VQ)","def":"Điểm 0–100 đánh giá volume của một nến có ủng hộ hướng giao dịch hay không: độ lớn RVOL, hướng Delta, nỗ lực so với kết quả, và volume có đang mở rộng.","href":"/library/glossary/#volume-quality"},"webhook":{"term":"Webhook","def":"Cách TradingView gửi nội dung alert tới một địa chỉ URL của máy chủ hoặc dịch vụ khác, để bot tự xử lý.","href":"/library/glossary/#webhook"}};
+
+(function(){
+  // Thanh tiến độ đọc + mục lục đang đọc
+  var p=document.getElementById('kzProg');
+  var links=[].slice.call(document.querySelectorAll('.toc a'));
+  var targets=links.map(function(a){return document.getElementById(decodeURIComponent(a.hash.slice(1)));});
+  function onScroll(){var h=document.documentElement,max=h.scrollHeight-h.clientHeight;if(p)p.style.width=(max>0?h.scrollTop/max*100:0)+'%';
+    var cur=-1;targets.forEach(function(t,i){if(t&&t.getBoundingClientRect().top<120)cur=i;});links.forEach(function(a,i){a.classList.toggle('on',i===cur);});}
+  addEventListener('scroll',onScroll,{passive:true});onScroll();
+  // Popover thuật ngữ cho link tới glossary trong thân bài
+  var pop=null;
+  function hide(){if(pop){pop.remove();pop=null;}}
+  document.querySelectorAll('.prose a[href*="/glossary/#"]').forEach(function(a){
+    var id=a.getAttribute('href').split('#')[1],g=glossaryJson[id];if(!g)return;a.classList.add('gl');
+    function show(){hide();pop=document.createElement('div');pop.className='gl-pop';pop.setAttribute('role','tooltip');
+      var b=document.createElement('b');b.textContent=g.term;var s=document.createElement('span');s.textContent=g.def;pop.appendChild(b);pop.appendChild(s);
+      document.body.appendChild(pop);var r=a.getBoundingClientRect();pop.style.top=(scrollY+r.bottom+8)+'px';pop.style.left=Math.max(12,Math.min(scrollX+r.left,scrollX+innerWidth-pop.offsetWidth-12))+'px';}
+    a.addEventListener('mouseenter',show);a.addEventListener('focus',show);a.addEventListener('mouseleave',hide);a.addEventListener('blur',hide);
+  });
+  addEventListener('keydown',function(e){if(e.key==='Escape')hide();});
+})();
+})();</script></body></html>
