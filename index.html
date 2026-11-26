@@ -557,6 +557,81 @@ html[data-theme="light"] .sec-head-plate {
   padding: clamp(32px, 5vw, 64px) 0 clamp(56px, 7vw, 96px);
   border-bottom: 1px solid var(--hairline);
   overflow: hidden;
+  isolation: isolate;
+  background: var(--ink);
+}
+#kzHeroChartBg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+.hero-monolith::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  background:
+    radial-gradient(ellipse 64% 72% at 34% 46%, rgba(4, 7, 15, 0.78) 0%, rgba(4, 7, 15, 0.42) 60%, rgba(4, 7, 15, 0.06) 100%),
+    linear-gradient(to bottom, rgba(4, 7, 15, 0.16) 0%, rgba(4, 7, 15, 0.1) 46%, var(--ink) 100%);
+}
+html[data-theme="light"] .hero-monolith::before {
+  background:
+    radial-gradient(ellipse 64% 72% at 34% 46%, rgba(243, 246, 251, 0.84) 0%, rgba(243, 246, 251, 0.48) 62%, rgba(243, 246, 251, 0.08) 100%),
+    linear-gradient(to bottom, rgba(243, 246, 251, 0.12) 0%, rgba(243, 246, 251, 0.1) 48%, var(--ink) 100%);
+}
+.hero-monolith > .wrap {
+  position: relative;
+  z-index: 2;
+}
+/* Header Specular Light Sweep */
+header.top-ledger::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 1px;
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent 0%, rgba(56, 213, 231, 0.45) 50%, transparent 100%);
+  transform: translateX(-100%);
+  animation: kzHdSweep 5.5s ease-in-out infinite;
+}
+@keyframes kzHdSweep {
+  0% { transform: translateX(-100%); }
+  65%, 100% { transform: translateX(100%); }
+}
+/* Cursor-Following Ambient Glow Orb (Pipcy Pricing-Section Style) */
+.kz-orb-host {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+.kz-orb-host > *:not(.kz-cursor-orb) {
+  position: relative;
+  z-index: 2;
+}
+.kz-cursor-orb {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 440px;
+  height: 440px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0;
+  filter: blur(68px);
+  background: radial-gradient(circle, rgba(52, 211, 153, 0.26) 0%, rgba(56, 213, 231, 0.10) 52%, transparent 74%);
+  transition: opacity 0.35s ease;
+  will-change: transform, opacity;
+}
+.kz-cursor-orb.is-active { opacity: 1; }
+html[data-theme="light"] .kz-cursor-orb {
+  background: radial-gradient(circle, rgba(8, 126, 150, 0.14) 0%, rgba(5, 150, 105, 0.06) 54%, transparent 74%);
 }
 .hero-watermark {
   position: absolute;
@@ -1759,11 +1834,27 @@ html[lang="en"] [data-only="en"] { display: block; }
 
 /* ---------- FOOTER & COMMAND PALETTE MODAL ---------- */
 footer.colophon {
+  position: relative;
+  overflow: hidden;
   padding: 56px 0 42px;
-  background: var(--deep);
+  background-color: var(--deep);
+  background-image:
+    linear-gradient(rgba(56, 213, 231, 0.032) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(56, 213, 231, 0.032) 1px, transparent 1px);
+  background-size: 48px 48px;
   border-top: 1px solid var(--hairline);
   color: var(--muted);
   font-size: 14px;
+}
+footer.colophon::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent 0%, rgba(56, 213, 231, 0.2) 18%, rgba(52, 211, 153, 0.55) 50%, rgba(243, 190, 98, 0.22) 82%, transparent 100%);
 }
 .fcols { display: grid; grid-template-columns: 1.35fr repeat(3, 1fr); gap: 28px; }
 .fcols h4 { color: var(--text); font-size: 14px; margin: 0 0 12px; font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.06em; }
@@ -1865,6 +1956,7 @@ html.kz-motion .rv.in { opacity: 1; transform: none; transition: opacity 0.6s cu
 <main id="top">
   <!-- ==================== ACT 01: MONOLITH HERO & BAR-BY-BAR REPLAY ENGINE ==================== -->
   <section aria-labelledby="hero-title" class="hero-monolith">
+    <canvas aria-hidden="true" id="kzHeroChartBg"></canvas>
     <div aria-hidden="true" class="hero-watermark">QUANTITATIVE ARCHITECTURE</div>
     <div class="wrap">
       <div class="coord-bar">
@@ -4239,6 +4331,251 @@ function mockShot(device, sym, seed) {
     document.querySelectorAll('[role="tab"]').forEach(t => t.addEventListener('click', () => setTimeout(restart, 30)));
     build();
   });
+})();
+
+/* 10. Pipcy-Inspired Cinematic 3D Hero Chart Background + Cursor-Following Glow Orbs */
+(() => {
+  const prefersReduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* A. Hero 3D Perspective Trading Chart Canvas (#kzHeroChartBg) */
+  const canvas = document.getElementById('kzHeroChartBg');
+  if (canvas) {
+    const ctx = canvas.getContext('2d');
+    if (ctx) {
+      let visible = true;
+      let rafId = null;
+      let time = 0;
+
+      const candleCount = 48;
+      const candles = [];
+      let price = 0.28;
+      for (let i = 0; i < candleCount; i++) {
+        const wave = Math.sin(i * 0.42) * 0.055 + Math.cos(i * 0.19) * 0.035;
+        const delta = 0.011 + wave * 0.48 + (i % 5 === 0 ? -0.048 : 0.024);
+        const open = price;
+        const close = Math.min(0.86, Math.max(0.14, open + delta));
+        const high = Math.min(0.93, Math.max(open, close) + 0.025 + ((i * 7) % 5) * 0.011);
+        const low = Math.max(0.08, Math.min(open, close) - 0.022 - ((i * 3) % 4) * 0.01);
+        candles.push({ open, close, high, low, bull: close >= open });
+        price = close;
+        if (price > 0.78) price -= 0.24;
+      }
+
+      const trendPts = [
+        { x: 0.05, y: 0.80 },
+        { x: 0.20, y: 0.64 },
+        { x: 0.30, y: 0.70 },
+        { x: 0.47, y: 0.49 },
+        { x: 0.58, y: 0.56 },
+        { x: 0.76, y: 0.30 },
+        { x: 0.90, y: 0.19 }
+      ];
+
+      const resize = () => {
+        const dpr = Math.min(window.devicePixelRatio || 1, 1.75);
+        const w = canvas.clientWidth;
+        const h = canvas.clientHeight;
+        if (w <= 0 || h <= 0) return;
+        canvas.width = Math.round(w * dpr);
+        canvas.height = Math.round(h * dpr);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      };
+
+      const drawScene = () => {
+        const w = canvas.clientWidth;
+        const h = canvas.clientHeight;
+        if (w <= 0 || h <= 0) return;
+        const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+        ctx.clearRect(0, 0, w, h);
+
+        const camZoom = 1.02 + Math.sin(time * 0.22) * 0.018;
+        const camPanX = Math.sin(time * 0.18) * 18;
+        const camPanY = Math.cos(time * 0.14) * 8;
+
+        ctx.save();
+        ctx.translate(w * 0.5 + camPanX, h * 0.5 + camPanY);
+        ctx.scale(camZoom, camZoom);
+        ctx.rotate(-0.022);
+        ctx.translate(-w * 0.5, -h * 0.5);
+
+        // 1. Perspective coordinate chart grid (48px)
+        const gridStep = 48;
+        const scrollX = (time * 10) % gridStep;
+        ctx.strokeStyle = isLight ? 'rgba(8, 126, 150, 0.065)' : 'rgba(56, 213, 231, 0.055)';
+        ctx.lineWidth = 1;
+        for (let x = -gridStep; x < w + gridStep * 2; x += gridStep) {
+          ctx.beginPath();
+          ctx.moveTo(x - scrollX, -40);
+          ctx.lineTo(x - scrollX - 24, h + 40);
+          ctx.stroke();
+        }
+        for (let y = 0; y < h + gridStep; y += gridStep) {
+          ctx.beginPath();
+          ctx.moveTo(-40, y);
+          ctx.lineTo(w + 40, y);
+          ctx.stroke();
+        }
+
+        // 2. Soft atmospheric background watermark
+        ctx.save();
+        ctx.font = "800 " + Math.max(28, Math.min(58, Math.round(w * 0.042))) + "px 'JetBrains Mono', monospace";
+        ctx.fillStyle = isLight ? 'rgba(8, 126, 150, 0.045)' : 'rgba(52, 211, 153, 0.045)';
+        ctx.fillText('TRADING INTELLIGENCE', w * 0.44 - ((time * 4) % 90), h * 0.25);
+        ctx.fillStyle = isLight ? 'rgba(163, 99, 0, 0.04)' : 'rgba(56, 213, 231, 0.04)';
+        ctx.fillText('AURORA QUANT', w * 0.08 + ((time * 3) % 70), h * 0.88);
+        ctx.restore();
+
+        // 3. Looping translucent glowing candlestick bars
+        const spacing = Math.max(26, w / 28);
+        const totalLoopW = candleCount * spacing;
+        const candleShift = (time * 16) % totalLoopW;
+        const chartTop = h * 0.14;
+        const chartH = h * 0.74;
+
+        for (let pass = 0; pass < 2; pass++) {
+          for (let i = 0; i < candleCount; i++) {
+            const c = candles[i];
+            const x = i * spacing - candleShift + pass * totalLoopW;
+            if (x < -spacing || x > w + spacing) continue;
+
+            const yHigh = chartTop + (1 - c.high) * chartH;
+            const yLow = chartTop + (1 - c.low) * chartH;
+            const yOpen = chartTop + (1 - c.open) * chartH;
+            const yClose = chartTop + (1 - c.close) * chartH;
+            const bodyTop = Math.min(yOpen, yClose);
+            const bodyH = Math.max(5, Math.abs(yClose - yOpen));
+            const bodyW = Math.max(8, spacing * 0.44);
+
+            const isCyan = i % 3 === 0;
+            const bullColor = isLight
+              ? (isCyan ? 'rgba(8, 126, 150, 0.15)' : 'rgba(5, 150, 105, 0.14)')
+              : (isCyan ? 'rgba(56, 213, 231, 0.18)' : 'rgba(52, 211, 153, 0.22)');
+            const bearColor = isLight ? 'rgba(225, 29, 72, 0.08)' : 'rgba(244, 63, 94, 0.11)';
+            const wickColor = c.bull
+              ? (isLight ? 'rgba(5, 150, 105, 0.18)' : 'rgba(52, 211, 153, 0.30)')
+              : (isLight ? 'rgba(225, 29, 72, 0.10)' : 'rgba(244, 63, 94, 0.16)');
+
+            ctx.beginPath();
+            ctx.moveTo(x, yHigh);
+            ctx.lineTo(x, yLow);
+            ctx.strokeStyle = wickColor;
+            ctx.lineWidth = 1.4;
+            ctx.stroke();
+
+            ctx.fillStyle = c.bull ? bullColor : bearColor;
+            ctx.fillRect(x - bodyW / 2, bodyTop, bodyW, bodyH);
+            ctx.strokeStyle = wickColor;
+            ctx.lineWidth = 0.8;
+            ctx.strokeRect(x - bodyW / 2, bodyTop, bodyW, bodyH);
+          }
+        }
+
+        // 4. Luminous upward zig-zag growth trendline + arrowhead
+        const pulse = 0.72 + Math.sin(time * 1.4) * 0.28;
+        const pts = trendPts.map((p, idx) => ({
+          x: p.x * w,
+          y: p.y * h + Math.sin(time * 0.7 + idx * 0.8) * 5
+        }));
+
+        const areaGrad = ctx.createLinearGradient(0, h * 0.18, 0, h * 0.92);
+        if (isLight) {
+          areaGrad.addColorStop(0, 'rgba(8, 126, 150, 0.12)');
+          areaGrad.addColorStop(1, 'rgba(8, 126, 150, 0)');
+        } else {
+          areaGrad.addColorStop(0, 'rgba(52, 211, 153, 0.18)');
+          areaGrad.addColorStop(0.55, 'rgba(56, 213, 231, 0.06)');
+          areaGrad.addColorStop(1, 'rgba(56, 213, 231, 0)');
+        }
+        ctx.beginPath();
+        ctx.moveTo(pts[0].x, h);
+        pts.forEach(p => ctx.lineTo(p.x, p.y));
+        ctx.lineTo(pts[pts.length - 1].x, h);
+        ctx.closePath();
+        ctx.fillStyle = areaGrad;
+        ctx.fill();
+
+        const lineGrad = ctx.createLinearGradient(pts[0].x, pts[0].y, pts[pts.length - 1].x, pts[pts.length - 1].y);
+        lineGrad.addColorStop(0, isLight ? 'rgba(8, 126, 150, 0.25)' : 'rgba(56, 213, 231, 0.35)');
+        lineGrad.addColorStop(0.55, isLight ? 'rgba(5, 150, 105, 0.45)' : 'rgba(52, 211, 153, 0.68)');
+        lineGrad.addColorStop(1, isLight ? 'rgba(163, 99, 0, 0.50)' : 'rgba(243, 190, 98, 0.82)');
+
+        ctx.save();
+        ctx.shadowColor = isLight ? 'rgba(5, 150, 105, 0.25)' : 'rgba(52, 211, 153, 0.55)';
+        ctx.shadowBlur = isLight ? 8 : 16;
+        ctx.beginPath();
+        pts.forEach((p, idx) => (idx === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y)));
+        ctx.strokeStyle = lineGrad;
+        ctx.lineWidth = 2.4;
+        ctx.lineJoin = 'round';
+        ctx.lineCap = 'round';
+        ctx.stroke();
+
+        const tip = pts[pts.length - 1];
+        const prev = pts[pts.length - 2];
+        const ang = Math.atan2(tip.y - prev.y, tip.x - prev.x);
+        const headLen = 13;
+        ctx.beginPath();
+        ctx.moveTo(tip.x, tip.y);
+        ctx.lineTo(tip.x - headLen * Math.cos(ang - 0.45), tip.y - headLen * Math.sin(ang - 0.45));
+        ctx.moveTo(tip.x, tip.y);
+        ctx.lineTo(tip.x - headLen * Math.cos(ang + 0.45), tip.y - headLen * Math.sin(ang + 0.45));
+        ctx.strokeStyle = isLight ? 'rgba(163, 99, 0, 0.62)' : `rgba(243, 190, 98, ${(0.72 * pulse + 0.22).toFixed(2)})`;
+        ctx.lineWidth = 2.4;
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.arc(tip.x, tip.y, 6 + pulse * 5, 0, Math.PI * 2);
+        ctx.fillStyle = isLight ? 'rgba(163, 99, 0, 0.14)' : `rgba(243, 190, 98, ${(0.22 * pulse).toFixed(2)})`;
+        ctx.fill();
+        ctx.restore();
+        ctx.restore();
+      };
+
+      const tick = () => {
+        if (!visible) { rafId = null; return; }
+        if (!prefersReduced) time += 0.016;
+        drawScene();
+        if (!prefersReduced) rafId = requestAnimationFrame(tick);
+      };
+
+      resize();
+      window.addEventListener('resize', resize, { passive: true });
+      const themeBtn = document.getElementById('themeBtn');
+      if (themeBtn) themeBtn.addEventListener('click', () => requestAnimationFrame(drawScene));
+      if ('IntersectionObserver' in window) {
+        new IntersectionObserver(entries => {
+          visible = entries[0].isIntersecting;
+          if (visible && !rafId) tick();
+        }, { threshold: 0.02 }).observe(canvas);
+      }
+      tick();
+    }
+  }
+
+  /* B. Cursor-Following Ambient Glow Orb on Key Product & Intelligence Sections */
+  if (!prefersReduced && window.innerWidth >= 900) {
+    document.querySelectorAll('#thi-truong, #aurora, #ha-tang-dinh-luong, #intelligence, #bat-dau').forEach(sec => {
+      sec.classList.add('kz-orb-host');
+      const orb = document.createElement('div');
+      orb.className = 'kz-cursor-orb';
+      orb.setAttribute('aria-hidden', 'true');
+      sec.insertBefore(orb, sec.firstChild);
+      let raf = null, gx = 0, gy = 0;
+      sec.addEventListener('pointermove', e => {
+        const r = sec.getBoundingClientRect();
+        gx = e.clientX - r.left;
+        gy = e.clientY - r.top;
+        orb.classList.add('is-active');
+        if (!raf) {
+          raf = requestAnimationFrame(() => {
+            orb.style.transform = `translate3d(${(gx - 220).toFixed(1)}px, ${(gy - 220).toFixed(1)}px, 0)`;
+            raf = null;
+          });
+        }
+      }, { passive: true });
+      sec.addEventListener('pointerleave', () => orb.classList.remove('is-active'), { passive: true });
+    });
+  }
 })();
 </script>
 </body>
