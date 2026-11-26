@@ -575,13 +575,13 @@ html[data-theme="light"] .sec-head-plate {
   pointer-events: none;
   z-index: 1;
   background:
-    radial-gradient(ellipse 64% 72% at 34% 46%, rgba(4, 7, 15, 0.78) 0%, rgba(4, 7, 15, 0.42) 60%, rgba(4, 7, 15, 0.06) 100%),
-    linear-gradient(to bottom, rgba(4, 7, 15, 0.16) 0%, rgba(4, 7, 15, 0.1) 46%, var(--ink) 100%);
+    radial-gradient(ellipse 90% 42% at 50% 0%, rgba(52, 211, 153, 0.08) 0%, transparent 72%),
+    linear-gradient(to bottom, rgba(4, 7, 15, 0.08) 0%, rgba(4, 7, 15, 0.04) 22%, rgba(4, 7, 15, 0.24) 62%, var(--ink) 100%);
 }
 html[data-theme="light"] .hero-monolith::before {
   background:
-    radial-gradient(ellipse 64% 72% at 34% 46%, rgba(243, 246, 251, 0.84) 0%, rgba(243, 246, 251, 0.48) 62%, rgba(243, 246, 251, 0.08) 100%),
-    linear-gradient(to bottom, rgba(243, 246, 251, 0.12) 0%, rgba(243, 246, 251, 0.1) 48%, var(--ink) 100%);
+    radial-gradient(ellipse 90% 42% at 50% 0%, rgba(8, 126, 150, 0.08) 0%, transparent 72%),
+    linear-gradient(to bottom, rgba(243, 246, 251, 0.06) 0%, rgba(243, 246, 251, 0.04) 22%, rgba(243, 246, 251, 0.24) 62%, var(--ink) 100%);
 }
 .hero-monolith > .wrap {
   position: relative;
@@ -4416,21 +4416,66 @@ function mockShot(device, sym, seed) {
           ctx.stroke();
         }
 
-        // 2. Soft atmospheric background watermark
+        // 2. Soft atmospheric background watermark in top panoramic band
         ctx.save();
-        ctx.font = "800 " + Math.max(28, Math.min(58, Math.round(w * 0.042))) + "px 'JetBrains Mono', monospace";
-        ctx.fillStyle = isLight ? 'rgba(8, 126, 150, 0.045)' : 'rgba(52, 211, 153, 0.045)';
-        ctx.fillText('TRADING INTELLIGENCE', w * 0.44 - ((time * 4) % 90), h * 0.25);
-        ctx.fillStyle = isLight ? 'rgba(163, 99, 0, 0.04)' : 'rgba(56, 213, 231, 0.04)';
-        ctx.fillText('AURORA QUANT', w * 0.08 + ((time * 3) % 70), h * 0.88);
+        ctx.font = "800 " + Math.max(24, Math.min(46, Math.round(w * 0.032))) + "px 'JetBrains Mono', monospace";
+        ctx.fillStyle = isLight ? 'rgba(8, 126, 150, 0.055)' : 'rgba(52, 211, 153, 0.06)';
+        ctx.fillText('TRADING INTELLIGENCE', w * 0.46 - ((time * 5) % 90), 86);
+        ctx.fillStyle = isLight ? 'rgba(163, 99, 0, 0.045)' : 'rgba(56, 213, 231, 0.05)';
+        ctx.fillText('AURORA QUANT', w * 0.06 + ((time * 4) % 70), 118);
         ctx.restore();
 
-        // 3. Looping translucent glowing candlestick bars
-        const spacing = Math.max(26, w / 28);
+        // 3A. PRIMARY TOP-STAGE PANORAMIC CANDLESTICKS (clearly visible in top hero band y = 14..186px)
+        const topSpacing = Math.max(22, w / 44);
+        const topLoopW = candleCount * topSpacing;
+        const topShift = (time * 22) % topLoopW;
+        const topBandY = 16;
+        const topBandH = Math.min(168, h * 0.24);
+
+        for (let pass = 0; pass < 2; pass++) {
+          for (let i = 0; i < candleCount; i++) {
+            const c = candles[i];
+            const x = i * topSpacing - topShift + pass * topLoopW;
+            if (x < -topSpacing || x > w + topSpacing) continue;
+
+            const yHigh = topBandY + (1 - c.high) * topBandH;
+            const yLow = topBandY + (1 - c.low) * topBandH;
+            const yOpen = topBandY + (1 - c.open) * topBandH;
+            const yClose = topBandY + (1 - c.close) * topBandH;
+            const bodyTop = Math.min(yOpen, yClose);
+            const bodyH = Math.max(6, Math.abs(yClose - yOpen));
+            const bodyW = Math.max(7, topSpacing * 0.48);
+
+            const isCyan = i % 3 === 0;
+            const bullFill = isLight
+              ? (isCyan ? 'rgba(8, 126, 150, 0.26)' : 'rgba(5, 150, 105, 0.28)')
+              : (isCyan ? 'rgba(56, 213, 231, 0.34)' : 'rgba(52, 211, 153, 0.40)');
+            const bearFill = isLight ? 'rgba(225, 29, 72, 0.16)' : 'rgba(244, 63, 94, 0.24)';
+            const wickCol = c.bull
+              ? (isLight ? 'rgba(5, 150, 105, 0.36)' : 'rgba(52, 211, 153, 0.62)')
+              : (isLight ? 'rgba(225, 29, 72, 0.22)' : 'rgba(244, 63, 94, 0.38)');
+
+            ctx.beginPath();
+            ctx.moveTo(x, yHigh);
+            ctx.lineTo(x, yLow);
+            ctx.strokeStyle = wickCol;
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+
+            ctx.fillStyle = c.bull ? bullFill : bearFill;
+            ctx.fillRect(x - bodyW / 2, bodyTop, bodyW, bodyH);
+            ctx.strokeStyle = wickCol;
+            ctx.lineWidth = 0.9;
+            ctx.strokeRect(x - bodyW / 2, bodyTop, bodyW, bodyH);
+          }
+        }
+
+        // 3B. Secondary deeper background candlesticks along full hero margins
+        const spacing = Math.max(30, w / 26);
         const totalLoopW = candleCount * spacing;
-        const candleShift = (time * 16) % totalLoopW;
-        const chartTop = h * 0.14;
-        const chartH = h * 0.74;
+        const candleShift = (time * 13) % totalLoopW;
+        const chartTop = Math.min(200, h * 0.24);
+        const chartH = h * 0.66;
 
         for (let pass = 0; pass < 2; pass++) {
           for (let i = 0; i < candleCount; i++) {
@@ -4444,68 +4489,66 @@ function mockShot(device, sym, seed) {
             const yClose = chartTop + (1 - c.close) * chartH;
             const bodyTop = Math.min(yOpen, yClose);
             const bodyH = Math.max(5, Math.abs(yClose - yOpen));
-            const bodyW = Math.max(8, spacing * 0.44);
+            const bodyW = Math.max(8, spacing * 0.42);
 
             const isCyan = i % 3 === 0;
             const bullColor = isLight
-              ? (isCyan ? 'rgba(8, 126, 150, 0.15)' : 'rgba(5, 150, 105, 0.14)')
-              : (isCyan ? 'rgba(56, 213, 231, 0.18)' : 'rgba(52, 211, 153, 0.22)');
-            const bearColor = isLight ? 'rgba(225, 29, 72, 0.08)' : 'rgba(244, 63, 94, 0.11)';
+              ? (isCyan ? 'rgba(8, 126, 150, 0.11)' : 'rgba(5, 150, 105, 0.10)')
+              : (isCyan ? 'rgba(56, 213, 231, 0.13)' : 'rgba(52, 211, 153, 0.15)');
+            const bearColor = isLight ? 'rgba(225, 29, 72, 0.06)' : 'rgba(244, 63, 94, 0.08)';
             const wickColor = c.bull
-              ? (isLight ? 'rgba(5, 150, 105, 0.18)' : 'rgba(52, 211, 153, 0.30)')
-              : (isLight ? 'rgba(225, 29, 72, 0.10)' : 'rgba(244, 63, 94, 0.16)');
+              ? (isLight ? 'rgba(5, 150, 105, 0.14)' : 'rgba(52, 211, 153, 0.22)')
+              : (isLight ? 'rgba(225, 29, 72, 0.08)' : 'rgba(244, 63, 94, 0.12)');
 
             ctx.beginPath();
             ctx.moveTo(x, yHigh);
             ctx.lineTo(x, yLow);
             ctx.strokeStyle = wickColor;
-            ctx.lineWidth = 1.4;
+            ctx.lineWidth = 1.2;
             ctx.stroke();
 
             ctx.fillStyle = c.bull ? bullColor : bearColor;
             ctx.fillRect(x - bodyW / 2, bodyTop, bodyW, bodyH);
-            ctx.strokeStyle = wickColor;
-            ctx.lineWidth = 0.8;
-            ctx.strokeRect(x - bodyW / 2, bodyTop, bodyW, bodyH);
           }
         }
 
-        // 4. Luminous upward zig-zag growth trendline + arrowhead
+        // 4. Luminous upward zig-zag growth trendline + arrowhead across the TOP HERO BAND
         const pulse = 0.72 + Math.sin(time * 1.4) * 0.28;
+        const topTrendBase = topBandY + topBandH;
         const pts = trendPts.map((p, idx) => ({
           x: p.x * w,
-          y: p.y * h + Math.sin(time * 0.7 + idx * 0.8) * 5
+          y: topBandY + p.y * topBandH * 0.92 + Math.sin(time * 0.85 + idx * 0.8) * 3.5
         }));
 
-        const areaGrad = ctx.createLinearGradient(0, h * 0.18, 0, h * 0.92);
+        const areaGrad = ctx.createLinearGradient(0, topBandY, 0, topTrendBase + 24);
         if (isLight) {
-          areaGrad.addColorStop(0, 'rgba(8, 126, 150, 0.12)');
+          areaGrad.addColorStop(0, 'rgba(8, 126, 150, 0.16)');
           areaGrad.addColorStop(1, 'rgba(8, 126, 150, 0)');
         } else {
-          areaGrad.addColorStop(0, 'rgba(52, 211, 153, 0.18)');
-          areaGrad.addColorStop(0.55, 'rgba(56, 213, 231, 0.06)');
+          areaGrad.addColorStop(0, 'rgba(52, 211, 153, 0.22)');
+          areaGrad.addColorStop(0.65, 'rgba(56, 213, 231, 0.06)');
           areaGrad.addColorStop(1, 'rgba(56, 213, 231, 0)');
         }
         ctx.beginPath();
-        ctx.moveTo(pts[0].x, h);
+        ctx.moveTo(pts[0].x, topTrendBase + 20);
         pts.forEach(p => ctx.lineTo(p.x, p.y));
-        ctx.lineTo(pts[pts.length - 1].x, h);
+        ctx.lineTo(pts[pts.length - 1].x, topTrendBase + 20);
         ctx.closePath();
         ctx.fillStyle = areaGrad;
         ctx.fill();
 
         const lineGrad = ctx.createLinearGradient(pts[0].x, pts[0].y, pts[pts.length - 1].x, pts[pts.length - 1].y);
-        lineGrad.addColorStop(0, isLight ? 'rgba(8, 126, 150, 0.25)' : 'rgba(56, 213, 231, 0.35)');
-        lineGrad.addColorStop(0.55, isLight ? 'rgba(5, 150, 105, 0.45)' : 'rgba(52, 211, 153, 0.68)');
-        lineGrad.addColorStop(1, isLight ? 'rgba(163, 99, 0, 0.50)' : 'rgba(243, 190, 98, 0.82)');
+        lineGrad.addColorStop(0, isLight ? 'rgba(8, 126, 150, 0.35)' : 'rgba(56, 213, 231, 0.48)');
+        lineGrad.addColorStop(0.55, isLight ? 'rgba(5, 150, 105, 0.58)' : 'rgba(52, 211, 153, 0.85)');
+        lineGrad.addColorStop(1, isLight ? 'rgba(163, 99, 0, 0.65)' : 'rgba(243, 190, 98, 0.95)');
 
         ctx.save();
-        ctx.shadowColor = isLight ? 'rgba(5, 150, 105, 0.25)' : 'rgba(52, 211, 153, 0.55)';
-        ctx.shadowBlur = isLight ? 8 : 16;
+        ctx.shadowColor = isLight ? 'rgba(5, 150, 105, 0.28)' : 'rgba(52, 211, 153, 0.68)';
+        ctx.shadowBlur = isLight ? 8 : 18;
         ctx.beginPath();
         pts.forEach((p, idx) => (idx === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y)));
         ctx.strokeStyle = lineGrad;
-        ctx.lineWidth = 2.4;
+        ctx.lineWidth = 2.6;
         ctx.lineJoin = 'round';
         ctx.lineCap = 'round';
         ctx.stroke();
@@ -4519,13 +4562,13 @@ function mockShot(device, sym, seed) {
         ctx.lineTo(tip.x - headLen * Math.cos(ang - 0.45), tip.y - headLen * Math.sin(ang - 0.45));
         ctx.moveTo(tip.x, tip.y);
         ctx.lineTo(tip.x - headLen * Math.cos(ang + 0.45), tip.y - headLen * Math.sin(ang + 0.45));
-        ctx.strokeStyle = isLight ? 'rgba(163, 99, 0, 0.62)' : `rgba(243, 190, 98, ${(0.72 * pulse + 0.22).toFixed(2)})`;
-        ctx.lineWidth = 2.4;
+        ctx.strokeStyle = isLight ? 'rgba(163, 99, 0, 0.72)' : `rgba(243, 190, 98, ${(0.78 * pulse + 0.22).toFixed(2)})`;
+        ctx.lineWidth = 2.6;
         ctx.stroke();
 
         ctx.beginPath();
         ctx.arc(tip.x, tip.y, 6 + pulse * 5, 0, Math.PI * 2);
-        ctx.fillStyle = isLight ? 'rgba(163, 99, 0, 0.14)' : `rgba(243, 190, 98, ${(0.22 * pulse).toFixed(2)})`;
+        ctx.fillStyle = isLight ? 'rgba(163, 99, 0, 0.16)' : `rgba(243, 190, 98, ${(0.28 * pulse).toFixed(2)})`;
         ctx.fill();
         ctx.restore();
         ctx.restore();
